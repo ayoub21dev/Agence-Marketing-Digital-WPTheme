@@ -1,0 +1,6 @@
+- [x] Update functions.php seeding logic to include common hero, blog posts grid, and newsletter CTA sections for the Blog page
+- [x] Update template-parts/layouts/blog_posts_grid.php to retrieve page_layouts from static Blog page
+- [x] Replace archive-blog.php hardcoded rendering with dynamic ACF page_layouts rendering
+- [/] Trigger local seeding and verify layouts populate correctly
+- [ ] Verify that Blog, À propos, and other pages display correctly
+- [ ] Create walkthrough with verification results
