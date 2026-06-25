@@ -4,10 +4,16 @@
  */
 $form_title      = v5_get_field_default('form_title', 'Envoyer un Message');
 $form_desc       = v5_get_field_default('form_desc', 'Utilisez ce formulaire pour les demandes de référencement, les corrections, les questions des acheteurs ou les notes de partenariat.');
+$office_icon     = v5_get_field_default('office_icon', '');
 $office_title    = v5_get_field_default('office_title', 'Siège Social');
 $office_address  = v5_get_field_default('office_address', '8 rue de la Paix, 75002 Paris, France');
 $office_city     = v5_get_field_default('office_city', 'Casablanca, Maroc');
+$email_icon      = v5_get_field_default('email_icon', '');
 $email           = v5_get_field_default('email', v5_digital_get_dynamic_email());
+
+// Normalize icon fields (ACF image may return an array depending on config).
+if (is_array($office_icon)) { $office_icon = isset($office_icon['url']) ? $office_icon['url'] : ''; }
+if (is_array($email_icon))  { $email_icon  = isset($email_icon['url'])  ? $email_icon['url']  : ''; }
 $guarantee_title = v5_get_field_default('guarantee_title', 'Garantie d\'Indépendance');
 $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas de placements payants ni de classements sponsorisés. Les agences qui souhaitent être référencées passent par notre processus d\'évaluation standard et indépendant.');
 ?>
@@ -98,7 +104,11 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                     <div class="space-y-6 text-[13.5px] text-slate-500 leading-relaxed font-sans">
                         <?php if ($has_address) : ?>
                         <div class="flex items-start gap-3 <?php echo $has_email ? 'border-b border-slate-200/60 pb-5' : 'pb-2'; ?>">
-                            <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"></i>
+                            <?php if (!empty($office_icon)) : ?>
+                                <img src="<?php echo esc_url($office_icon); ?>" alt="" class="w-4 h-4 mt-0.5 flex-shrink-0 object-contain">
+                            <?php else : ?>
+                                <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"></i>
+                            <?php endif; ?>
                             <div>
                                 <?php if (!empty($office_title)) : ?>
                                     <h4 class="font-semibold text-slate-800 text-[13px] mb-0.5 font-display"><?php echo esc_html($office_title); ?></h4>
@@ -115,7 +125,11 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                         
                         <?php if ($has_email) : ?>
                         <div class="flex items-start gap-3 pb-2">
-                            <i data-lucide="mail" class="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"></i>
+                            <?php if (!empty($email_icon)) : ?>
+                                <img src="<?php echo esc_url($email_icon); ?>" alt="" class="w-4 h-4 mt-0.5 flex-shrink-0 object-contain">
+                            <?php else : ?>
+                                <i data-lucide="mail" class="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"></i>
+                            <?php endif; ?>
                             <div>
                                 <h4 class="font-semibold text-slate-800 text-[13px] mb-0.5 font-display">Email</h4>
                                 <a href="mailto:<?php echo esc_attr($email); ?>" class="text-brand-600 font-medium break-all hover:text-brand-700 transition-colors"><?php echo esc_html($email); ?></a>

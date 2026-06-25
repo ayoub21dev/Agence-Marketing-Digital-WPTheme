@@ -14,6 +14,39 @@ function v5_digital_get_dynamic_email() {
 }
 
 // ----------------------------------------------------
+// Allow SVG uploads (admins only) so editors can upload icon files.
+// Note: SVGs can carry scripts. For untrusted editors, install the
+// "Safe SVG" plugin to sanitize uploads.
+// ----------------------------------------------------
+function v5_digital_allow_svg_uploads($mimes) {
+    if (current_user_can('manage_options')) {
+        $mimes['svg']  = 'image/svg+xml';
+        $mimes['svgz'] = 'image/svg+xml';
+    }
+    return $mimes;
+}
+add_filter('upload_mimes', 'v5_digital_allow_svg_uploads');
+
+// Make WordPress accept the SVG file type/extension on upload.
+function v5_digital_fix_svg_mime($data, $file, $filename, $mimes, $real_mime = '') {
+    $ext = isset($data['ext']) ? $data['ext'] : '';
+    if ($ext === '' && preg_match('/\.svgz?$/i', $filename)) {
+        if (current_user_can('manage_options')) {
+            $data['ext']  = 'svg';
+            $data['type'] = 'image/svg+xml';
+        }
+    }
+    return $data;
+}
+add_filter('wp_check_filetype_and_ext', 'v5_digital_fix_svg_mime', 10, 5);
+
+// Render SVG thumbnails correctly in the media library / ACF preview.
+function v5_digital_svg_admin_thumb_css() {
+    echo '<style>img[src$=".svg"], .attachment img[src$=".svg"], .acf-image-uploader img[src$=".svg"]{width:100%;height:auto;min-height:48px;}</style>';
+}
+add_action('admin_head', 'v5_digital_svg_admin_thumb_css');
+
+// ----------------------------------------------------
 // 1. REGISTER CUSTOM POST TYPES (FR LABELS)
 // ----------------------------------------------------
 
@@ -1244,6 +1277,17 @@ if (function_exists('acf_add_local_field_group')) {
                                 'default_value' => 'Utilisez ce formulaire pour les demandes de référencement, les corrections, les questions des acheteurs ou les notes de partenariat.',
                             ),
                             array(
+                                'key' => 'field_cform_office_icon',
+                                'label' => 'Icône Adresse',
+                                'name' => 'office_icon',
+                                'type' => 'image',
+                                'instructions' => 'Téléversez une icône (SVG ou image) pour le bloc adresse. Laissez vide pour utiliser l\'icône par défaut. Supprimez l\'image pour masquer l\'icône.',
+                                'return_format' => 'url',
+                                'library' => 'all',
+                                'mime_types' => 'svg,png,jpg,jpeg,webp,gif',
+                                'preview_size' => 'thumbnail',
+                            ),
+                            array(
                                 'key' => 'field_cform_office_title',
                                 'label' => 'Titre Siège Social',
                                 'name' => 'office_title',
@@ -1263,6 +1307,17 @@ if (function_exists('acf_add_local_field_group')) {
                                 'name' => 'office_city',
                                 'type' => 'text',
                                 'default_value' => 'Casablanca, Maroc',
+                            ),
+                            array(
+                                'key' => 'field_cform_email_icon',
+                                'label' => 'Icône Email',
+                                'name' => 'email_icon',
+                                'type' => 'image',
+                                'instructions' => 'Téléversez une icône (SVG ou image) pour le bloc email. Laissez vide pour utiliser l\'icône par défaut. Supprimez l\'image pour masquer l\'icône.',
+                                'return_format' => 'url',
+                                'library' => 'all',
+                                'mime_types' => 'svg,png,jpg,jpeg,webp,gif',
+                                'preview_size' => 'thumbnail',
                             ),
                             array(
                                 'key' => 'field_cform_email',
