@@ -3280,3 +3280,77 @@ function v5_digital_backfill_homepage_hero_fields() {
 }
 add_action('admin_init', 'v5_digital_backfill_homepage_hero_fields');
 
+/**
+ * Ensure the outcomes section has editable testimonial posts available.
+ */
+function v5_digital_backfill_testimonials() {
+    if (!function_exists('update_field')) {
+        return;
+    }
+
+    $existing = get_posts(array(
+        'post_type'      => 'testimonial',
+        'post_status'    => 'publish',
+        'posts_per_page' => 1,
+        'fields'         => 'ids',
+    ));
+
+    if (!empty($existing)) {
+        return;
+    }
+
+    $testimonials = array(
+        array(
+            'author' => 'Meryem Alaoui',
+            'role' => 'Directrice Marketing - Dakhla Travel Co.',
+            'quote' => 'Le profil RMD sur le site nous a montré exactement ce dont nous avions besoin : preuves SEO, budget, et commentaires vérifiés.',
+            'rating' => 5,
+            'agency_name' => 'RMD',
+            'agency_slug' => 'rmd',
+            'project' => 'Audit SEO technique et pages locales',
+            'result' => 'Leads organiques +38% en 10 semaines',
+        ),
+        array(
+            'author' => 'Yassine El Fassi',
+            'role' => 'Co-fondateur - Casa Homeware',
+            'quote' => 'Le profil de Pixagram a rendu notre choix beaucoup moins risqué. Leurs projets correspondaient à notre secteur.',
+            'rating' => 5,
+            'agency_name' => 'Pixagram',
+            'agency_slug' => 'pixagram',
+            'project' => 'Rafraîchissement de marque et social commerce',
+            'result' => 'Ventes Instagram +44% après lancement',
+        ),
+        array(
+            'author' => 'Salma Bennani',
+            'role' => 'Growth Manager - Rabat Fintech Lab',
+            'quote' => 'Nous avons comparé trois agences de paid media et choisi MediaBoost car les preuves d’audit étaient claires.',
+            'rating' => 5,
+            'agency_name' => 'MediaBoost',
+            'agency_slug' => 'mediaboost',
+            'project' => 'Tracking d’acquisition et optimisation CRO',
+            'result' => 'Coût par lead qualifié en baisse de 31%',
+        ),
+    );
+
+    foreach ($testimonials as $testimonial) {
+        $post_id = wp_insert_post(array(
+            'post_title'   => $testimonial['author'],
+            'post_content' => $testimonial['quote'],
+            'post_status'  => 'publish',
+            'post_type'    => 'testimonial',
+        ));
+
+        if (!$post_id || is_wp_error($post_id)) {
+            continue;
+        }
+
+        update_field('field_testimonial_rating', $testimonial['rating'], $post_id);
+        update_field('field_testimonial_author_role', $testimonial['role'], $post_id);
+        update_field('field_testimonial_hired_agency_name', $testimonial['agency_name'], $post_id);
+        update_field('field_testimonial_hired_agency_slug', $testimonial['agency_slug'], $post_id);
+        update_field('field_testimonial_project', $testimonial['project'], $post_id);
+        update_field('field_testimonial_result', $testimonial['result'], $post_id);
+    }
+}
+add_action('admin_init', 'v5_digital_backfill_testimonials');
+

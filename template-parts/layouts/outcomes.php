@@ -12,7 +12,7 @@ $has_eyebrow = !empty($eyebrow);
 $has_title   = !empty($title);
 $has_desc    = !empty($description);
 $has_metrics = !empty($metrics) && is_array($metrics);
-$has_reviews = $reviews !== ""; // True if unset (null, falls back to query) or array of posts
+$has_reviews = true;
 
 if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics || $has_reviews) :
 ?>
