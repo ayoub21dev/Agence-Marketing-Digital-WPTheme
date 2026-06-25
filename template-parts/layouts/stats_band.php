@@ -1,7 +1,10 @@
 <?php
 /**
  * Stats Band Layout (agence-marketing-digital)
+ * Stats now render inside the hero, below the CTA.
  */
+return;
+
 $stats_query = new WP_Query(array(
     'post_type' => 'stat_metric',
     'posts_per_page' => -1,
