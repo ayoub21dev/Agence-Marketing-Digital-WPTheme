@@ -8,30 +8,6 @@ $title           = v5_get_field_default('title', 'Trouvez les <span class="hero-
 $description     = v5_get_field_default('description', 'Comparez les agences digitales marocaines grâce à des recherches éditoriales, des scores techniques de vitesse et des avis clients vérifiés.');
 $social_proof_1  = v5_get_field_default('social_proof_1', '150+ agences évaluées');
 $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% éditorial');
-$hero_stats = v5_get_field_default('hero_stats', array());
-
-if (!is_array($hero_stats)) {
-    $hero_stats = array();
-}
-
-if (empty($hero_stats)) {
-    $stats_query = new WP_Query(array(
-        'post_type'      => 'stat_metric',
-        'posts_per_page' => -1,
-        'post_status'    => 'publish',
-    ));
-
-    if ($stats_query->have_posts()) {
-        while ($stats_query->have_posts()) {
-            $stats_query->the_post();
-            $hero_stats[] = array(
-                'number' => get_field('stat_number'),
-                'label'  => get_field('stat_label'),
-            );
-        }
-        wp_reset_postdata();
-    }
-}
 ?>
 
 <section class="relative z-10 bg-white/80 border-b border-slate-200 backdrop-blur-sm">
@@ -129,20 +105,6 @@ if (empty($hero_stats)) {
                     <span><?php echo esc_html($social_proof_2); ?></span>
                 </span>
             </div>
-
-            <?php if (!empty($hero_stats)) : ?>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-3xl mx-auto pt-5 border-t border-slate-200/60 mt-5">
-                    <?php foreach ($hero_stats as $hero_stat) :
-                        $num = isset($hero_stat['number']) ? $hero_stat['number'] : '';
-                        $lbl = isset($hero_stat['label']) ? $hero_stat['label'] : '';
-                        ?>
-                        <div class="text-center">
-                            <div class="text-[1rem] md:text-[1.15rem] font-extrabold text-slate-900 tracking-tight font-display"><?php echo esc_html($num); ?></div>
-                            <div class="text-[8.5px] md:text-[9.5px] text-slate-500 font-semibold mt-1 uppercase tracking-wider font-mono leading-snug"><?php echo esc_html($lbl); ?></div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
 
         </div>
     </div>

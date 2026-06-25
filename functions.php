@@ -592,24 +592,33 @@ if (function_exists('acf_add_local_field_group')) {
                                 'type' => 'text',
                                 'default_value' => 'Référencement 100% éditorial',
                             ),
+                        ),
+                    ),
+                    // Layout 1.1: Stats Band
+                    'stats_band_section' => array(
+                        'key' => 'layout_stats_band_section',
+                        'name' => 'stats_band_section',
+                        'label' => '[Accueil] Statistiques',
+                        'display' => 'block',
+                        'sub_fields' => array(
                             array(
-                                'key' => 'field_hero_stats',
-                                'label' => 'Statistiques affichées sous la preuve sociale',
-                                'instructions' => 'Ces chiffres apparaissent dans la section Hero, directement sous "150+ agences évaluées · Référencement 100% éditorial".',
-                                'name' => 'hero_stats',
+                                'key' => 'field_stats_band_stats',
+                                'label' => 'Statistiques',
+                                'instructions' => 'Section indépendante et déplaçable. Placez-la juste après le Hero pour afficher les chiffres sous la preuve sociale.',
+                                'name' => 'stats',
                                 'type' => 'repeater',
                                 'layout' => 'table',
                                 'button_label' => 'Ajouter une statistique',
                                 'sub_fields' => array(
                                     array(
-                                        'key' => 'field_hero_stat_number',
+                                        'key' => 'field_stats_band_number',
                                         'label' => 'Nombre / Chiffre',
                                         'name' => 'number',
                                         'type' => 'text',
                                         'required' => 1,
                                     ),
                                     array(
-                                        'key' => 'field_hero_stat_label',
+                                        'key' => 'field_stats_band_label',
                                         'label' => 'Étiquette / Libellé',
                                         'name' => 'label',
                                         'type' => 'text',
@@ -2634,7 +2643,11 @@ function v5_digital_setup_theme_content() {
                         'icon' => 'home',
                     ),
                 ),
-                'hero_stats' => array(
+            ),
+            // Stats Band
+            array(
+                'acf_fc_layout' => 'stats_band_section',
+                'stats' => array(
                     array(
                         'number' => '0',
                         'label' => 'Placements payants ou rangs sponsorisés',
@@ -2766,20 +2779,6 @@ function v5_digital_setup_theme_content() {
         $existing_homepage_layouts = get_field('field_page_layouts', $homepage_id);
         if (empty($existing_homepage_layouts) || isset($_GET['force_seed'])) {
             update_field('field_page_layouts', $layouts, $homepage_id);
-        } elseif (is_array($existing_homepage_layouts)) {
-            $homepage_layouts_changed = false;
-            foreach ($existing_homepage_layouts as &$existing_layout) {
-                if (($existing_layout['acf_fc_layout'] ?? '') === 'hero_section' && empty($existing_layout['hero_stats'])) {
-                    $existing_layout['hero_stats'] = $layouts[0]['hero_stats'];
-                    $homepage_layouts_changed = true;
-                    break;
-                }
-            }
-            unset($existing_layout);
-
-            if ($homepage_layouts_changed) {
-                update_field('field_page_layouts', $existing_homepage_layouts, $homepage_id);
-            }
         }
 
         // 4.6 Seed Mockup Blog Articles
@@ -3161,7 +3160,8 @@ function v5_get_field_default($field_name, $default_value = '', $is_sub_field = 
 
 /**
  * Keep existing homepage flexible content editable after theme updates.
- * Fills missing hero repeater rows without overwriting user-entered values.
+ * Fills missing hero CTA rows and restores the movable stats section without
+ * overwriting user-entered values.
  */
 function v5_digital_backfill_homepage_hero_fields() {
     if (!function_exists('get_field') || !function_exists('update_field')) {
@@ -3206,7 +3206,7 @@ function v5_digital_backfill_homepage_hero_fields() {
         ),
     );
 
-    $default_hero_stats = array(
+    $default_stats = array(
         array(
             'number' => '0',
             'label' => 'Placements payants ou rangs sponsorisés',
@@ -3226,10 +3226,15 @@ function v5_digital_backfill_homepage_hero_fields() {
     );
 
     $changed = false;
+    $has_stats_band = false;
+    $stats_from_old_hero = array();
     foreach ($layouts as $index => &$layout) {
         if (($layout['acf_fc_layout'] ?? '') === 'stats_band_section') {
-            unset($layouts[$index]);
-            $changed = true;
+            $has_stats_band = true;
+            if (empty($layout['stats'])) {
+                $layout['stats'] = $default_stats;
+                $changed = true;
+            }
             continue;
         }
 
@@ -3237,17 +3242,37 @@ function v5_digital_backfill_homepage_hero_fields() {
             continue;
         }
 
+        if (!empty($layout['hero_stats']) && is_array($layout['hero_stats'])) {
+            $stats_from_old_hero = $layout['hero_stats'];
+        }
+
         if (empty($layout['hero_ctas'])) {
             $layout['hero_ctas'] = $default_hero_ctas;
             $changed = true;
         }
-
-        if (empty($layout['hero_stats'])) {
-            $layout['hero_stats'] = $default_hero_stats;
-            $changed = true;
-        }
     }
     unset($layout);
+
+    if (!$has_stats_band) {
+        $stats_section = array(
+            'acf_fc_layout' => 'stats_band_section',
+            'stats' => !empty($stats_from_old_hero) ? $stats_from_old_hero : $default_stats,
+        );
+
+        $inserted = false;
+        foreach ($layouts as $index => $layout) {
+            if (($layout['acf_fc_layout'] ?? '') === 'hero_section') {
+                array_splice($layouts, $index + 1, 0, array($stats_section));
+                $inserted = true;
+                break;
+            }
+        }
+
+        if (!$inserted) {
+            $layouts[] = $stats_section;
+        }
+        $changed = true;
+    }
 
     if ($changed) {
         update_field('field_page_layouts', array_values($layouts), $homepage_id);

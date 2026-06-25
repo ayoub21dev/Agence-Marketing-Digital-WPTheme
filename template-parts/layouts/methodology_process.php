@@ -29,15 +29,13 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
         background: #ffffff;
     }
     .method-wrap {
-        width: min(1180px, calc(100% - 40px));
+        width: min(1120px, calc(100% - 40px));
         margin: 0 auto;
     }
     .section-head {
-        display: grid;
-        grid-template-columns: minmax(0, 0.68fr) minmax(280px, 0.32fr);
-        align-items: end;
-        gap: 32px;
-        margin-bottom: 28px;
+        max-width: 760px;
+        margin: 0 auto 34px;
+        text-align: center;
     }
     .section-label {
         font-size: 11px;
@@ -57,20 +55,24 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
         color: var(--muted);
         font-size: 15px;
         line-height: 1.72;
+        max-width: 620px;
+        margin: 14px auto 0;
     }
     .process-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 1px;
         background: var(--line);
         overflow: hidden;
-        border-radius: 12px;
+        border-radius: 14px;
         box-shadow: 0 1px 3px rgba(16, 20, 24, 0.04), 0 0 0 1px rgba(16, 20, 24, 0.06);
+        max-width: 1120px;
+        margin: 0 auto;
     }
     .process-stage {
         background: white;
-        min-height: 340px;
-        padding: 24px;
+        min-height: 410px;
+        padding: clamp(26px, 2.4vw, 34px);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -81,23 +83,24 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
         color: #a4adba;
         font-size: 12px;
     }
-    .stage-icon { width: 100%; height: 100px; margin: 12px 0 18px; }
+    .stage-icon { width: 100%; height: 118px; margin: 18px 0 24px; }
     .process-stage h3 {
-        font-size: 18px;
+        font-size: 20px;
+        line-height: 1.35;
         font-weight: 800;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         color: var(--ink);
     }
     .process-stage p {
         color: var(--muted);
-        font-size: 13.5px;
-        line-height: 1.6;
+        font-size: 14.5px;
+        line-height: 1.65;
     }
     .stage-tags {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        margin-top: 16px;
+        margin-top: 22px;
     }
     .stage-tags span {
         background: #f1f4f8;
@@ -110,21 +113,19 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
     }
 
     @media (max-width: 980px) {
-        .section-head { grid-template-columns: 1fr; gap: 16px; }
         .process-grid { grid-template-columns: repeat(2, 1fr); }
+        .process-stage { min-height: 360px; }
     }
 
     @media (max-width: 640px) {
         .method-wrap { width: min(100% - 28px, 1180px); }
         .process-grid { grid-template-columns: 1fr; }
-        .process-stage { min-height: 280px; }
+        .process-stage { min-height: auto; }
     }
 </style>
 
 <section id="process" class="blg-methodology-section">
     <div class="method-wrap">
-        <div class="section-head">
-            <div>
         <?php if ($has_label || $has_title || $has_desc) : ?>
         <div class="section-head">
             <div>
