@@ -3040,6 +3040,15 @@ function v5_digital_setup_theme_content() {
                 update_field('field_blog_author_name', $art['author'], $post_id);
                 update_field('field_blog_cover_image_url', $art['image'], $post_id);
 
+                // Back the article with a real WordPress author profile.
+                $author_user_id = v5_digital_get_or_create_author($art['author']);
+                if ($author_user_id && (int) get_post_field('post_author', $post_id) !== $author_user_id) {
+                    wp_update_post(array(
+                        'ID'          => $post_id,
+                        'post_author' => $author_user_id,
+                    ));
+                }
+
                 // Build layout fields
                 $layout_data = array();
                 foreach ($art['content_layouts'] as $layout) {
@@ -3657,6 +3666,133 @@ function v5_digital_fix_corrupted_menu_names() {
 }
 
 /**
+ * Resolve the "author_name" of an article to a real WordPress author profile,
+ * creating the user once if it does not exist yet. Identifiers are derived
+ * deterministically (accent-free slug) so repeated runs reuse the same account
+ * instead of creating duplicates. Returns the user ID, or 0 on failure.
+ */
+function v5_digital_get_or_create_author($name) {
+    $name = trim(wp_strip_all_tags((string) $name));
+    if ($name === '') {
+        return 0;
+    }
+
+    // Deterministic, accent-free identifier (e.g. "Karim El Amrani" -> "karim-el-amrani").
+    $slug = sanitize_title(remove_accents($name));
+    if ($slug === '') {
+        return 0;
+    }
+
+    // Reuse an existing profile: match by author slug (user_nicename) then login.
+    $existing = get_user_by('slug', $slug);
+    if (!$existing) {
+        $existing = get_user_by('login', $slug);
+    }
+    if ($existing) {
+        return (int) $existing->ID;
+    }
+
+    // Build a unique, non-routable email on the site's own domain.
+    $host = wp_parse_url(home_url(), PHP_URL_HOST);
+    if (empty($host)) {
+        $host = 'example.com';
+    }
+    $email = $slug . '@' . $host;
+    if (email_exists($email)) {
+        $email = $slug . '-' . wp_generate_password(6, false, false) . '@' . $host;
+    }
+
+    // Split the display name into first / last for the profile.
+    $parts = preg_split('/\s+/', $name, 2);
+    $first = isset($parts[0]) ? $parts[0] : $name;
+    $last  = isset($parts[1]) ? $parts[1] : '';
+
+    $user_id = wp_insert_user(array(
+        'user_login'   => $slug,
+        'user_pass'    => wp_generate_password(20, true),
+        'user_email'   => $email,
+        'display_name' => $name,
+        'nickname'     => $name,
+        'first_name'   => $first,
+        'last_name'    => $last,
+        'role'         => 'author',
+    ));
+
+    return is_wp_error($user_id) ? 0 : (int) $user_id;
+}
+
+/**
+ * Synchronize every article's WordPress author (post_author) with the name in
+ * its ACF "author_name" field, so each article is backed by a real author
+ * profile. Idempotent: only writes when the assignment actually differs.
+ */
+function v5_digital_sync_post_authors() {
+    if (!function_exists('get_field')) {
+        return;
+    }
+
+    $posts = get_posts(array(
+        'post_type'      => 'post',
+        'post_status'    => array('publish', 'draft', 'pending', 'private', 'future'),
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+    ));
+
+    foreach ($posts as $post_id) {
+        $author_name = get_field('author_name', $post_id);
+        if (empty($author_name)) {
+            continue;
+        }
+
+        $user_id = v5_digital_get_or_create_author($author_name);
+        if (!$user_id) {
+            continue;
+        }
+
+        if ((int) get_post_field('post_author', $post_id) !== $user_id) {
+            wp_update_post(array(
+                'ID'          => $post_id,
+                'post_author' => $user_id,
+            ));
+        }
+    }
+}
+
+/**
+ * Keep a single article in sync whenever it is saved: if it carries an
+ * "author_name", point its WordPress author at the matching profile. Runs on
+ * acf/save_post (priority > 10) so the ACF field value is already persisted.
+ * The early "already matches" return makes the nested wp_update_post safe
+ * against recursion.
+ */
+function v5_digital_sync_post_author_on_save($post_id) {
+    if (!is_numeric($post_id)) {
+        return; // ACF options pages etc.
+    }
+    $post_id = (int) $post_id;
+
+    if (get_post_type($post_id) !== 'post') {
+        return;
+    }
+
+    $author_name = get_field('author_name', $post_id);
+    if (empty($author_name)) {
+        return;
+    }
+
+    $user_id = v5_digital_get_or_create_author($author_name);
+    if (!$user_id || (int) get_post_field('post_author', $post_id) === $user_id) {
+        return;
+    }
+
+    wp_update_post(array(
+        'ID'          => $post_id,
+        'post_author' => $user_id,
+    ));
+}
+add_action('acf/save_post', 'v5_digital_sync_post_author_on_save', 20);
+
+/**
  * One-time data migrations / self-heal routines.
  *
  * These were previously hooked individually to `admin_init`, which made each of
@@ -3666,7 +3802,7 @@ function v5_digital_fix_corrupted_menu_names() {
  * changing any of the routines or their seed data.
  */
 if (!defined('V5_DIGITAL_MIGRATION_VERSION')) {
-    define('V5_DIGITAL_MIGRATION_VERSION', '2026.06.25');
+    define('V5_DIGITAL_MIGRATION_VERSION', '2026.06.26-authors');
 }
 
 function v5_digital_run_data_migrations() {
@@ -3683,6 +3819,7 @@ function v5_digital_run_data_migrations() {
     v5_digital_migrate_blog_cpt_to_posts();
     v5_digital_backfill_post_categories();
     v5_digital_fix_corrupted_menu_names();
+    v5_digital_sync_post_authors();
 
     update_option('v5_digital_migration_version', V5_DIGITAL_MIGRATION_VERSION);
 }
