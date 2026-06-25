@@ -13,14 +13,19 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v4
 
-      - name: Deploy theme via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+      - name: Deploy theme via FTP (with retries)
+        uses: nick-fields/retry@v3
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          port: 21
-          timeout: 120000
-          local-dir: ./
-          server-dir: /public_html/wp-content/themes/agence-marketing-digital/
+          timeout_minutes: 12
+          max_attempts: 4
+          retry_wait_seconds: 30
+          command: |
+            npx --yes @samkirkland/ftp-deploy@4.3.5 \
+              --server "${{ secrets.FTP_SERVER }}" \
+              --username "${{ secrets.FTP_USERNAME }}" \
+              --password "${{ secrets.FTP_PASSWORD }}" \
+              --protocol ftps \
+              --port 21 \
+              --timeout 600000 \
+              --local-dir ./ \
+              --server-dir /public_html/wp-content/themes/agence-marketing-digital/
