@@ -25,14 +25,43 @@ $suggested = new WP_Query(array(
 ?>
 
 <style>
-    /* Oversized 404 glyph — sizing only. The entrance, the accent-word colour
-       pop and the amber underline draw are ALL handled by the theme's native
-       home-hero motion (animatePageEntrance / animateHeroTitle in
-       theme-scripts.js), via the .hero-title / .hero-focus-word /
-       .hero-location-word hooks below. FOUC is covered by header.php's
-       existing .hero-title opacity guard. */
+    /* ── 404 hero shell: fills the viewport so the page never feels empty ── */
+    .err-hero {
+        position: relative;
+        overflow: hidden;
+        min-height: calc(100vh - 56px); /* minus the sticky header */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+    }
+
+    /* Static dotted grid covering the WHOLE section — used as the no-JS /
+       reduced-motion fallback. When the canvas siphon runs, JS hides this. */
+    .err-bg {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(oklch(86% 0.006 250) 1.1px, transparent 1.1px);
+        background-size: 22px 22px;
+        pointer-events: none;
+    }
+
+    /* Animated particle vortex ("black hole" siphon) — sits behind the content. */
+    .err-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    /* Oversized 404 glyph — sizing only. The entrance + the accent "0" colour
+       pop are handled by the theme's native home-hero motion (animateHeroTitle
+       in theme-scripts.js) via .hero-title / .hero-focus-word. FOUC is covered
+       by header.php's existing .hero-title opacity guard. */
     .err-code {
-        font-size: clamp(96px, 18vw, 200px);
+        font-size: clamp(110px, 20vw, 240px);
         line-height: 0.9;
         font-weight: 800;
         letter-spacing: -0.04em;
@@ -42,9 +71,11 @@ $suggested = new WP_Query(array(
 
 <main class="flex-grow">
 
-    <!-- Hero: same backdrop treatment as the home hero (bg-white/80 + blur) -->
-    <section class="relative z-10 bg-white/80 backdrop-blur-sm">
-        <div class="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 pt-20 pb-16 md:pt-28 md:pb-20 text-center">
+    <!-- Hero: full-height shell with dotted-grid texture + ambient blue glow -->
+    <section class="err-hero relative z-10">
+        <div class="err-bg" aria-hidden="true"></div>
+
+        <div class="relative z-10 max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-20 md:py-24 text-center">
 
             <span class="section-label text-slate-400 mb-4 block">404 · Page introuvable</span>
 
@@ -150,6 +181,129 @@ $suggested = new WP_Query(array(
     </section>
     <?php endif; ?>
 </main>
+
+<script>
+/* ── 404 "black hole": a field of points spiralling into the number ──
+   Lightweight canvas vortex. Falls back to the static .err-bg dotted grid
+   when canvas is unavailable or the user prefers reduced motion. */
+(function () {
+    function initBlackHole() {
+        var section = document.querySelector('.err-hero');
+        if (!section) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        var code     = section.querySelector('.err-code');
+        var staticBg = section.querySelector('.err-bg');
+
+        var canvas = document.createElement('canvas');
+        canvas.className = 'err-canvas';
+        canvas.setAttribute('aria-hidden', 'true');
+        section.insertBefore(canvas, section.firstChild);
+
+        var ctx = canvas.getContext('2d');
+        if (!ctx) return;                       // keep the static grid fallback
+        if (staticBg) staticBg.style.display = 'none';
+
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        var W = 0, H = 0, cx = 0, cy = 0, maxR = 1, inner = 90;
+        var particles = [];
+
+        function computeGeometry() {
+            var sr = section.getBoundingClientRect();
+            W = sr.width; H = sr.height;
+            if (code) {
+                var cr = code.getBoundingClientRect();
+                cx = cr.left - sr.left + cr.width / 2;
+                cy = cr.top  - sr.top  + cr.height / 2;
+                inner = Math.max(70, cr.height * 0.46);
+            } else {
+                cx = W / 2; cy = H / 2; inner = 90;
+            }
+            var corners = [[0, 0], [W, 0], [0, H], [W, H]];
+            maxR = 1;
+            for (var i = 0; i < corners.length; i++) {
+                var d = Math.hypot(corners[i][0] - cx, corners[i][1] - cy);
+                if (d > maxR) maxR = d;
+            }
+        }
+
+        function spawn(p, atEdge) {
+            p.a    = Math.random() * Math.PI * 2;
+            p.r    = atEdge ? maxR * (0.9 + Math.random() * 0.18)
+                            : inner + Math.random() * (maxR - inner);
+            p.size = 0.8 + Math.random() * 1.5;
+            p.spin = 0.7 + Math.random() * 0.8;
+            p.fall = 0.5 + Math.random() * 0.85;
+            p.base = 0.22 + Math.random() * 0.42;
+        }
+
+        function build() {
+            var count = Math.max(140, Math.min(520, Math.floor((W * H) / 7800)));
+            particles = [];
+            for (var i = 0; i < count; i++) { var p = {}; spawn(p, false); particles.push(p); }
+        }
+
+        function resize() {
+            computeGeometry();
+            canvas.width  = Math.floor(W * dpr);
+            canvas.height = Math.floor(H * dpr);
+            canvas.style.width  = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            build();
+        }
+
+        function frame() {
+            ctx.clearRect(0, 0, W, H);
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                var rr = Math.max(p.r, 1);
+
+                // Gravity: accelerate inward + swirl faster as it nears the core.
+                p.r -= p.fall * (0.35 + (inner / rr) * 2.7);
+                p.a += (0.004 + (inner / rr) * 0.055) * p.spin;
+
+                if (p.r <= inner) { spawn(p, true); continue; }
+
+                // Fade in at the outer edge, wink out right at the event horizon.
+                var fadeIn  = Math.min(1, (maxR - p.r) / (maxR * 0.16));
+                var fadeOut = Math.min(1, (p.r - inner) / (inner * 0.35));
+                var alpha   = p.base * Math.min(fadeIn, fadeOut);
+                if (alpha <= 0.01) continue;
+
+                var x = cx + Math.cos(p.a) * p.r;
+                var y = cy + Math.sin(p.a) * p.r;
+
+                // Slightly darker (more visible) as points funnel toward the core.
+                var t = (p.r - inner) / (maxR - inner);   // 0 near core .. 1 far
+                var R = Math.round(148 + 55 * t);
+                var G = Math.round(163 + 50 * t);
+                var B = Math.round(184 + 41 * t);
+
+                ctx.beginPath();
+                ctx.fillStyle = 'rgba(' + R + ',' + G + ',' + B + ',' + alpha.toFixed(3) + ')';
+                ctx.arc(x, y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            raf = requestAnimationFrame(frame);
+        }
+
+        var raf = 0, rt;
+        resize();
+        frame();
+        window.addEventListener('resize', function () {
+            clearTimeout(rt);
+            rt = setTimeout(resize, 150);
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initBlackHole);
+    } else {
+        initBlackHole();
+    }
+}());
+</script>
 
 <?php
 get_footer();
