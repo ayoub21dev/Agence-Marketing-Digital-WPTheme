@@ -1,7 +1,7 @@
 <?php
 /**
  * Hero Section Layout (agence-marketing-digital)
- * Now supports dynamic CTAs (with styling and icons) and dynamic stats.
+ * Supports dynamic CTAs, styling, icons, and social proof.
  */
 $eyebrow         = v5_get_field_default('eyebrow', '01 · MATCH & DISCOVER');
 $title           = v5_get_field_default('title', 'Trouvez les <span class="hero-focus-word">meilleures</span> agences de marketing digital au <span class="hero-location-word">Maroc</span>');
@@ -10,7 +10,7 @@ $social_proof_1  = v5_get_field_default('social_proof_1', '150+ agences évalué
 $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% éditorial');
 ?>
 
-<section class="relative z-10 bg-white/80 border-b border-slate-200 backdrop-blur-sm">
+<section class="relative z-10 bg-white/80 backdrop-blur-sm">
     <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pt-8 pb-10 md:pt-12 md:pb-16">
         <div class="max-w-3xl mx-auto text-center mb-8">
             <?php if ($eyebrow) : ?>
@@ -94,7 +94,7 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
             </div>
 
             <!-- Social proof micro-line -->
-            <div class="flex items-center justify-center gap-2 text-[12px] text-slate-400 font-mono mb-8 -mt-4">
+            <div class="flex items-center justify-center gap-2 text-[12px] text-slate-400 font-mono mb-5 md:mb-6 -mt-4">
                 <span class="flex items-center gap-1">
                     <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i>
                     <span><?php echo esc_html($social_proof_1); ?></span>

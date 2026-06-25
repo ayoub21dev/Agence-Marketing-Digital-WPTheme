@@ -12,7 +12,7 @@ if (empty($stats)) {
     return;
 }
 ?>
-<section class="py-7 bg-white/60 border-b border-slate-200 backdrop-blur-sm">
+<section class="relative z-20 -mt-11 md:-mt-16 pb-9 md:pb-12 bg-transparent">
     <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-3xl mx-auto">
             <?php foreach ($stats as $stat) :
