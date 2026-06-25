@@ -1745,12 +1745,18 @@ if (function_exists('acf_add_local_field_group')) {
 // ----------------------------------------------------
 
 function v5_digital_enqueue_assets() {
+    // Version assets by file modification time so each deploy busts the cache.
+    $css_path = get_template_directory() . '/assets/css/theme-styles.css';
+    $js_path  = get_template_directory() . '/assets/js/theme-scripts.js';
+    $css_ver  = file_exists($css_path) ? filemtime($css_path) : '1.0.0';
+    $js_ver   = file_exists($js_path)  ? filemtime($js_path)  : '1.0.0';
+
     // Custom theme stylesheet
     wp_enqueue_style(
         'agence-marketing-digital-styles',
         get_template_directory_uri() . '/assets/css/theme-styles.css',
         array(),
-        '1.0.0'
+        $css_ver
     );
 
     // Custom theme javascript enqueued in footer
@@ -1758,7 +1764,7 @@ function v5_digital_enqueue_assets() {
         'agence-marketing-digital-scripts',
         get_template_directory_uri() . '/assets/js/theme-scripts.js',
         array(),
-        '1.0.0',
+        $js_ver,
         true
     );
 }
