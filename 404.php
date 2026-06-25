@@ -25,9 +25,12 @@ $suggested = new WP_Query(array(
 ?>
 
 <style>
-    /* Oversized glyph — sizing only. Colour + animation come from the shared
-       .hero-focus-word token and the theme's GSAP hero entrance, so the accent
-       behaves identically to the home page headline. */
+    /* Oversized 404 glyph — sizing only. The entrance, the accent-word colour
+       pop and the amber underline draw are ALL handled by the theme's native
+       home-hero motion (animatePageEntrance / animateHeroTitle in
+       theme-scripts.js), via the .hero-title / .hero-focus-word /
+       .hero-location-word hooks below. FOUC is covered by header.php's
+       existing .hero-title opacity guard. */
     .err-code {
         font-size: clamp(96px, 18vw, 200px);
         line-height: 0.9;
@@ -45,9 +48,11 @@ $suggested = new WP_Query(array(
 
             <span class="section-label text-slate-400 mb-4 block">404 · Page introuvable</span>
 
-            <!-- .hero-title + .hero-focus-word → animated by theme-scripts.js exactly like home -->
-            <h1 class="err-code hero-title font-display mb-2">
-                4<span class="hero-focus-word">0</span>4
+            <!-- Wired into the home hero's real animation hook:
+                 .hero-focus-word gives the 0 the same blue scale-in + colour
+                 pop as the home headline's "meilleures". -->
+            <h1 class="err-code hero-title font-display mb-2" aria-label="404">
+                <span aria-hidden="true">4</span><span class="hero-focus-word" aria-hidden="true">0</span><span aria-hidden="true">4</span>
             </h1>
 
             <h2 class="text-[1.5rem] md:text-[2rem] font-extrabold text-slate-900 tracking-tight leading-tight mb-4 font-display">
@@ -58,18 +63,13 @@ $suggested = new WP_Query(array(
                 Le lien est peut-être rompu ou la page a été déplacée. Pas d'inquiétude — voici quelques pistes pour retrouver votre chemin.
             </p>
 
-            <!-- Buttons: identical classes to hero.php primary/secondary CTAs -->
-            <div class="flex flex-col sm:flex-row gap-3 justify-center mb-10 hero-actions">
+            <!-- Primary CTA: identical classes to the hero.php primary button -->
+            <div class="flex justify-center mb-10 hero-actions">
                 <a href="<?php echo esc_url(home_url('/')); ?>"
                    class="w-full sm:w-auto px-7 py-3.5 rounded-xl text-[14px] transition-all flex items-center justify-center gap-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold shadow-lg shadow-brand-600/10">
                     <i data-lucide="home" class="w-4 h-4"></i>
                     <span>Retour à l'accueil</span>
                 </a>
-                <button onclick="openSearchPalette()" type="button"
-                   class="w-full sm:w-auto px-7 py-3.5 rounded-xl text-[14px] transition-all flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-slate-300 font-bold cursor-pointer">
-                    <i data-lucide="search" class="w-4 h-4 text-brand-600"></i>
-                    <span>Rechercher</span>
-                </button>
             </div>
 
             <!-- Mono quick-links, same hover language as home breadcrumbs/links -->
