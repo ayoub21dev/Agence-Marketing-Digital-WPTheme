@@ -18,13 +18,9 @@
     background: oklch(75% 0.01 250);
 }
 
-/* Radial dot background from Mockup */
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background-color: oklch(98.5% 0.004 250);
-    background-image: radial-gradient(oklch(88% 0.005 250) 1px, transparent 1px);
-    background-size: 24px 24px;
-    background-position: center top;
     -webkit-font-smoothing: antialiased;
 }
 
