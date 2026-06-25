@@ -3562,3 +3562,21 @@ function v5_digital_backfill_post_categories() {
 }
 add_action('admin_init', 'v5_digital_backfill_post_categories');
 
+/**
+ * Self-healing: repair menu names corrupted to "Gence ..." (a leftover
+ * "Agence ..." with the leading "A" lost). Renames them once; idempotent.
+ */
+function v5_digital_fix_corrupted_menu_names() {
+    $menus = wp_get_nav_menus();
+    if (empty($menus) || is_wp_error($menus)) {
+        return;
+    }
+    foreach ($menus as $m) {
+        $new_name = preg_replace('/\bGence\b/u', 'Agence', $m->name);
+        if ($new_name !== null && $new_name !== $m->name) {
+            wp_update_term($m->term_id, 'nav_menu', array('name' => $new_name));
+        }
+    }
+}
+add_action('admin_init', 'v5_digital_fix_corrupted_menu_names');
+
