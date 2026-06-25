@@ -3082,70 +3082,44 @@ function v5_digital_setup_theme_content() {
 }
 add_action('after_switch_theme', 'v5_digital_setup_theme_content');
 
-// 4.7. Unified force-seed URL trigger (runs on front-end/admin-end via ?force_seed=1 or ?force_seed=v5_digital_seed_2026)
-add_action('init', function() {
-    if (isset($_GET['force_seed'])) {
-        $is_admin = current_user_can('manage_options');
-        $is_secret = ($_GET['force_seed'] === 'v5_digital_seed_2026');
-        
-        if ($is_secret || ($is_admin && $_GET['force_seed'] === '1')) {
-            // Execute the theme setup content function
-            v5_digital_setup_theme_content();
-            
-            // If secret bypass token was used, print diagnostic JSON and exit
-            if ($is_secret) {
-                header('Content-Type: application/json');
-                
-                // Get pages
-                $pages = array('accueil', 'blog', 'annuaire', 'about', 'methodologie', 'contact');
-                $page_report = array();
-                foreach ($pages as $slug) {
-                    if ($slug === 'accueil') {
-                        $p_id = get_option('page_on_front');
-                        $title = 'Accueil';
-                    } else {
-                        $p_obj = get_page_by_path($slug);
-                        $p_id = $p_obj ? $p_obj->ID : 0;
-                        $title = $p_obj ? $p_obj->post_title : '';
-                    }
-                    $layouts = function_exists('get_field') ? get_field('page_layouts', $p_id) : array();
-                    $page_report[$slug] = array(
-                        'id' => $p_id,
-                        'title' => $title,
-                        'slug' => $p_id ? get_post_field('post_name', $p_id) : '',
-                        'layout_count' => is_array($layouts) ? count($layouts) : 0,
-                    );
-                }
-                
-                // Get menus
-                $menus = wp_get_nav_menus();
-                $menu_list = array();
-                foreach ($menus as $m) {
-                    $menu_list[] = array(
-                        'term_id' => $m->term_id,
-                        'name' => $m->name,
-                        'slug' => $m->slug,
-                        'count' => $m->count,
-                        'items' => array_map(function($i) { return array('title' => $i->title, 'url' => $i->url, 'object_id' => $i->object_id); }, wp_get_nav_menu_items($m->term_id))
-                    );
-                }
-                
-                echo json_encode(array(
-                    'status' => 'FORCE_SEED_SUCCESS',
-                    'theme_stylesheet' => get_stylesheet(),
-                    'nav_menu_locations' => get_theme_mod('nav_menu_locations'),
-                    'polylang' => get_option('polylang'),
-                    'pages' => $page_report,
-                    'menus' => $menu_list
-                ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                exit;
-            }
-            
-            // Otherwise redirect to dashboard with notice
-            wp_safe_redirect(admin_url('?seeding_completed=1'));
-            exit;
-        }
+// 4.7. Force-seed trigger — administrators only, CSRF-protected via ?force_seed=1 + nonce.
+add_action('admin_init', function() {
+    if (!isset($_GET['force_seed'])) {
+        return;
     }
+
+    // Destructive full reseed: deletes terms/menus and overwrites content.
+    // Restricted to administrators and protected against CSRF with a nonce.
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
+    if (!wp_verify_nonce($nonce, 'v5_digital_force_seed')) {
+        wp_die(esc_html__('Lien de réinitialisation invalide ou expiré. Veuillez relancer depuis le tableau de bord.', 'agence-marketing-digital'));
+    }
+
+    v5_digital_setup_theme_content();
+
+    wp_safe_redirect(admin_url('?seeding_completed=1'));
+    exit;
+});
+
+// Offer administrators a safe, nonce-protected link to trigger a full reseed.
+add_action('admin_notices', function() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+    if (!$screen || $screen->id !== 'dashboard') {
+        return;
+    }
+    $url = wp_nonce_url(admin_url('?force_seed=1'), 'v5_digital_force_seed');
+    echo '<div class="notice notice-info"><p>'
+        . esc_html__('Thème Agence Marketing Digital :', 'agence-marketing-digital') . ' '
+        . '<a href="' . esc_url($url) . '" onclick="return confirm(\'' . esc_js(__('Réinitialiser tout le contenu de démonstration ? Cette action écrase les pages, menus et taxonomies.', 'agence-marketing-digital')) . '\');">'
+        . esc_html__('Réinitialiser le contenu du thème', 'agence-marketing-digital')
+        . '</a></p></div>';
 });
 
 // Admin notice on successful seeding
@@ -3173,6 +3147,107 @@ function v5_digital_theme_setup() {
     add_theme_support('title-tag');
 }
 add_action('after_setup_theme', 'v5_digital_theme_setup');
+
+/**
+ * Resolve the primary navigation menu items (Polylang-aware), with the language
+ * switcher placeholder stripped out. Returns an array of nav menu item objects
+ * (empty array when no menu is assigned). Shared by the desktop and mobile navs
+ * so the resolution logic lives in one place.
+ */
+function v5_digital_get_primary_menu_items() {
+    $menu_id = 0;
+
+    if (function_exists('pll_get_nav_menu_theme_loc')) {
+        $menu_id = pll_get_nav_menu_theme_loc('primary');
+    }
+
+    if (!$menu_id) {
+        $locations = get_nav_menu_locations();
+        if (!empty($locations)) {
+            if (function_exists('pll_current_language')) {
+                $lang_loc = 'primary___' . pll_current_language();
+                if (isset($locations[$lang_loc]) && $locations[$lang_loc] > 0) {
+                    $menu_id = $locations[$lang_loc];
+                }
+            }
+            if (!$menu_id && isset($locations['primary']) && $locations['primary'] > 0) {
+                $menu_id = $locations['primary'];
+            }
+            if (!$menu_id) {
+                foreach ($locations as $loc => $id) {
+                    if (strpos($loc, 'primary') === 0 && $id > 0) {
+                        $menu_id = $id;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!$menu_id) {
+        $menus = wp_get_nav_menus();
+        if (!empty($menus)) {
+            foreach ($menus as $m) {
+                $items = wp_get_nav_menu_items($m->term_id);
+                if (!empty($items)) {
+                    $menu_id = $m->term_id;
+                    break;
+                }
+            }
+        }
+    }
+
+    $items = $menu_id ? wp_get_nav_menu_items($menu_id) : array();
+    if (!is_array($items)) {
+        return array();
+    }
+
+    // Drop the Polylang language switcher placeholder.
+    return array_values(array_filter($items, function ($item) {
+        return $item->url !== '#pll_switcher' && strpos($item->url, 'pll_switcher') === false;
+    }));
+}
+
+/**
+ * Static fallback navigation links, used only when no menu is assigned.
+ * Defined once and rendered by both the desktop and mobile navs.
+ */
+function v5_digital_nav_fallback_links() {
+    return array(
+        array('url' => home_url('/'),              'label' => 'accueil',      'check' => 'front'),
+        array('url' => home_url('/blog/'),         'label' => 'blog',         'check' => 'blog'),
+        array('url' => home_url('/about/'),        'label' => 'à propos',     'check' => 'about'),
+        array('url' => home_url('/methodologie/'), 'label' => 'méthodologie', 'check' => 'methodologie'),
+        array('url' => home_url('/contact/'),      'label' => 'contact',      'check' => 'contact'),
+    );
+}
+
+/** Active state for a real menu item, compared by URL against the current request. */
+function v5_digital_menu_item_is_active($item) {
+    global $wp;
+    $current_url = rtrim(home_url(add_query_arg(array(), $wp->request)), '/');
+    $item_url    = rtrim($item->url, '/');
+
+    if ($item_url === $current_url || ($item_url === rtrim(home_url(), '/') && is_front_page())) {
+        return true;
+    }
+    if (strpos($item_url, '/blog') !== false && (is_post_type_archive('blog') || is_singular('blog') || is_page('blog'))) {
+        return true;
+    }
+    return false;
+}
+
+/** Active state for a static fallback link, keyed by its 'check' token. */
+function v5_digital_nav_fallback_is_active($check) {
+    switch ($check) {
+        case 'front':
+            return is_front_page();
+        case 'blog':
+            return is_page('blog') || is_home() || is_singular('blog') || is_post_type_archive('blog') || is_singular('post');
+        default:
+            return is_page($check);
+    }
+}
 
 // ----------------------------------------------------
 // 6. DYNAMIC XML SITEMAP
@@ -3320,11 +3395,17 @@ function v5_digital_backfill_homepage_hero_fields() {
         return;
     }
 
+    // The hero CTA "page" field is an ACF page_link field: its stored value must
+    // be a post ID (ACF resolves it to a URL on read), matching what the seeder
+    // writes. Resolve the contact page so we never store a raw URL string here.
+    $contact_page = get_page_by_path('contact');
+    $contact_page_id = $contact_page ? (int) $contact_page->ID : '';
+
     $default_hero_ctas = array(
         array(
             'text' => 'Trouver mon agence',
             'link_type' => 'page',
-            'page' => home_url('/contact/'),
+            'page' => $contact_page_id,
             'url' => '',
             'style' => 'primary',
             'bg_color' => '',
@@ -3415,7 +3496,6 @@ function v5_digital_backfill_homepage_hero_fields() {
         update_field('field_page_layouts', array_values($layouts), $homepage_id);
     }
 }
-add_action('admin_init', 'v5_digital_backfill_homepage_hero_fields');
 
 /**
  * Ensure the outcomes section has editable testimonial posts available.
@@ -3489,7 +3569,6 @@ function v5_digital_backfill_testimonials() {
         update_field('field_testimonial_result', $testimonial['result'], $post_id);
     }
 }
-add_action('admin_init', 'v5_digital_backfill_testimonials');
 
 /**
  * Migrate legacy Blog CPT entries into native WordPress posts.
@@ -3513,7 +3592,6 @@ function v5_digital_migrate_blog_cpt_to_posts() {
         ));
     }
 }
-add_action('admin_init', 'v5_digital_migrate_blog_cpt_to_posts');
 
 /**
  * Self-healing: give every blog post a real category derived from its ACF
@@ -3560,7 +3638,6 @@ function v5_digital_backfill_post_categories() {
         }
     }
 }
-add_action('admin_init', 'v5_digital_backfill_post_categories');
 
 /**
  * Self-healing: repair menu names corrupted to "Gence ..." (a leftover
@@ -3578,7 +3655,38 @@ function v5_digital_fix_corrupted_menu_names() {
         }
     }
 }
-add_action('admin_init', 'v5_digital_fix_corrupted_menu_names');
+
+/**
+ * One-time data migrations / self-heal routines.
+ *
+ * These were previously hooked individually to `admin_init`, which made each of
+ * them re-run its (sometimes unbounded, posts_per_page => -1) query on EVERY
+ * admin page load. They are one-time fixes, so we now run them once per
+ * migration version: bump V5_DIGITAL_MIGRATION_VERSION to force a re-run after
+ * changing any of the routines or their seed data.
+ */
+if (!defined('V5_DIGITAL_MIGRATION_VERSION')) {
+    define('V5_DIGITAL_MIGRATION_VERSION', '2026.06.25');
+}
+
+function v5_digital_run_data_migrations() {
+    // Only an administrator hitting wp-admin should ever trigger these.
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+    if (get_option('v5_digital_migration_version') === V5_DIGITAL_MIGRATION_VERSION) {
+        return;
+    }
+
+    v5_digital_backfill_homepage_hero_fields();
+    v5_digital_backfill_testimonials();
+    v5_digital_migrate_blog_cpt_to_posts();
+    v5_digital_backfill_post_categories();
+    v5_digital_fix_corrupted_menu_names();
+
+    update_option('v5_digital_migration_version', V5_DIGITAL_MIGRATION_VERSION);
+}
+add_action('admin_init', 'v5_digital_run_data_migrations');
 
 /**
  * One-time setup: rebuild the footer menus cleanly and assign each to its

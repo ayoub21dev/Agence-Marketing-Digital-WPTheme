@@ -1,40 +1,6 @@
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
-    <script type="text/javascript">
-        window.onerror = function(message, source, lineno, colno, error) {
-            var errorDiv = document.createElement('div');
-            errorDiv.id = 'js-debug-error';
-            errorDiv.style.display = 'block';
-            errorDiv.style.color = 'red';
-            errorDiv.style.padding = '10px';
-            errorDiv.style.background = '#ffebeb';
-            errorDiv.style.border = '1px solid red';
-            errorDiv.style.margin = '10px';
-            errorDiv.innerText = 'JS Error: ' + message + ' at ' + source + ':' + lineno + ':' + colno;
-            document.addEventListener("DOMContentLoaded", function() {
-                document.body.insertBefore(errorDiv, document.body.firstChild);
-            });
-        };
-        window.addEventListener('unhandledrejection', function(event) {
-            var reason = event.reason ? event.reason.toString() : '';
-            if (reason.indexOf('AbortError') !== -1 || reason.indexOf('Transition was skipped') !== -1) {
-                return;
-            }
-            var errorDiv = document.createElement('div');
-            errorDiv.id = 'js-debug-rejection';
-            errorDiv.style.display = 'block';
-            errorDiv.style.color = 'red';
-            errorDiv.style.padding = '10px';
-            errorDiv.style.background = '#ffebeb';
-            errorDiv.style.border = '1px solid red';
-            errorDiv.style.margin = '10px';
-            errorDiv.innerText = 'JS Promise Rejection: ' + event.reason;
-            document.addEventListener("DOMContentLoaded", function() {
-                document.body.insertBefore(errorDiv, document.body.firstChild);
-            });
-        });
-    </script>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -118,76 +84,19 @@
                 <!-- Desktop Nav Links (Dynamic) -->
                 <nav class="hidden md:flex items-center gap-7">
                     <?php
-                    global $wp;
-                    $menu_id = 0;
-                    if (function_exists('pll_get_nav_menu_theme_loc')) {
-                        $menu_id = pll_get_nav_menu_theme_loc('primary');
-                    }
-                    if (!$menu_id) {
-                        $locations = get_nav_menu_locations();
-                        if (!empty($locations)) {
-                            if (function_exists('pll_current_language')) {
-                                $lang_loc = 'primary___' . pll_current_language();
-                                if (isset($locations[$lang_loc]) && $locations[$lang_loc] > 0) {
-                                    $menu_id = $locations[$lang_loc];
-                                }
-                            }
-                            if (!$menu_id && isset($locations['primary']) && $locations['primary'] > 0) {
-                                $menu_id = $locations['primary'];
-                            }
-                            if (!$menu_id) {
-                                foreach ($locations as $loc => $id) {
-                                    if (strpos($loc, 'primary') === 0 && $id > 0) {
-                                        $menu_id = $id;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (!$menu_id) {
-                        $menus = wp_get_nav_menus();
-                        if (!empty($menus)) {
-                            foreach ($menus as $m) {
-                                $items = wp_get_nav_menu_items($m->term_id);
-                                if (!empty($items)) {
-                                    $menu_id = $m->term_id;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    $menu_items = $menu_id ? wp_get_nav_menu_items($menu_id) : array();
-                    
+                    // Resolved once here and reused by the mobile menu below.
+                    $menu_items = v5_digital_get_primary_menu_items();
+
                     if (!empty($menu_items)) {
                         foreach ($menu_items as $item) {
-                            if ($item->url === '#pll_switcher' || strpos($item->url, 'pll_switcher') !== false) {
-                                continue;
-                            }
-                            $is_current = false;
-                            $current_url = home_url(add_query_arg(array(), $wp->request));
-                            $current_url = rtrim($current_url, '/');
-                            $item_url = rtrim($item->url, '/');
-                            
-                            if ($item_url == $current_url || ($item_url == home_url() && is_front_page())) {
-                                $is_current = true;
-                            } elseif (strpos($item_url, '/blog') !== false && (is_post_type_archive('blog') || is_singular('blog') || is_page('blog'))) {
-                                $is_current = true;
-                            }
-                            
-                            $active_class = $is_current ? 'active' : '';
+                            $active_class = v5_digital_menu_item_is_active($item) ? 'active' : '';
                             echo '<a href="' . esc_url($item->url) . '" class="nav-link ' . $active_class . ' text-[13px] font-medium transition-colors">' . esc_html($item->title) . '</a>';
                         }
                     } else {
-                        // Fallback static links in French
-                        $current_page_slug = basename(get_permalink());
-                        ?>
-                        <a href="<?php echo esc_url(home_url('/')); ?>" class="nav-link <?php echo is_front_page() ? 'active' : ''; ?> text-[13px] font-medium">accueil</a>
-                        <a href="<?php echo esc_url(home_url('/blog/')); ?>" class="nav-link <?php echo is_post_type_archive('blog') || is_singular('blog') || is_page('blog') || is_home() || is_singular('post') ? 'active' : ''; ?> text-[13px] font-medium">blog</a>
-                        <a href="<?php echo esc_url(home_url('/about/')); ?>" class="nav-link <?php echo is_page('about') ? 'active' : ''; ?> text-[13px] font-medium">à propos</a>
-                        <a href="<?php echo esc_url(home_url('/methodologie/')); ?>" class="nav-link <?php echo is_page('methodologie') ? 'active' : ''; ?> text-[13px] font-medium">méthodologie</a>
-                        <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="nav-link <?php echo is_page('contact') ? 'active' : ''; ?> text-[13px] font-medium">contact</a>
-                        <?php
+                        foreach (v5_digital_nav_fallback_links() as $link) {
+                            $active_class = v5_digital_nav_fallback_is_active($link['check']) ? 'active' : '';
+                            echo '<a href="' . esc_url($link['url']) . '" class="nav-link ' . $active_class . ' text-[13px] font-medium">' . esc_html($link['label']) . '</a>';
+                        }
                     }
                     ?>
                 </nav>
@@ -212,24 +121,17 @@
         <div id="mobileMenu" class="hidden md:hidden border-t border-slate-200 bg-white">
             <div class="px-5 py-2 space-y-0.5">
                 <?php
-                global $wp;
+                // Reuses $menu_items resolved by the desktop nav above.
                 if (!empty($menu_items)) {
                     foreach ($menu_items as $item) {
-                        if ($item->url === '#pll_switcher' || strpos($item->url, 'pll_switcher') !== false) {
-                            continue;
-                        }
-                        $is_current = (rtrim($item->url, '/') == rtrim(home_url(add_query_arg(array(), $wp->request)), '/')) || ($item->url == home_url() && is_front_page());
-                        $active_class = $is_current ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50';
+                        $active_class = v5_digital_menu_item_is_active($item) ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50';
                         echo '<a href="' . esc_url($item->url) . '" class="block px-3 py-2 text-[13px] font-medium rounded-md ' . $active_class . '">' . esc_html($item->title) . '</a>';
                     }
                 } else {
-                    ?>
-                    <a href="<?php echo esc_url(home_url('/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_front_page() ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">accueil</a>
-                    <a href="<?php echo esc_url(home_url('/blog/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_page('blog') || is_home() || is_singular('blog') || is_post_type_archive('blog') || is_singular('post') ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">blog</a>
-                    <a href="<?php echo esc_url(home_url('/about/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_page('about') ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">à propos</a>
-                    <a href="<?php echo esc_url(home_url('/methodologie/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_page('methodologie') ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">méthodologie</a>
-                    <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_page('contact') ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">contact</a>
-                    <?php
+                    foreach (v5_digital_nav_fallback_links() as $link) {
+                        $active_class = v5_digital_nav_fallback_is_active($link['check']) ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50';
+                        echo '<a href="' . esc_url($link['url']) . '" class="block px-3 py-2 text-[13px] font-medium rounded-md ' . $active_class . '">' . esc_html($link['label']) . '</a>';
+                    }
                 }
                 ?>
                 <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="w-full text-left block px-3 py-2 text-[13px] font-medium text-brand-600 hover:bg-slate-50 rounded-md flex items-center gap-1 font-semibold cursor-pointer">
