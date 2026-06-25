@@ -875,13 +875,6 @@ if (function_exists('acf_add_local_field_group')) {
                             ),
                         ),
                     ),
-                    // Layout 6: Stats Band (CPT Queries)
-                    'stats_band_section' => array(
-                        'key' => 'layout_stats_band_section',
-                        'name' => 'stats_band_section',
-                        'label' => '[Commun] Bandeau des Statistiques',
-                        'display' => 'block',
-                    ),
                     // Layout 7: Editor's Picks
                     'picks_section' => array(
                         'key' => 'layout_picks_section',
@@ -2643,20 +2636,20 @@ function v5_digital_setup_theme_content() {
                 ),
                 'hero_stats' => array(
                     array(
-                        'number' => '150+',
-                        'label' => 'Agences analysées et répertoriées',
-                    ),
-                    array(
-                        'number' => '2 400+',
-                        'label' => 'Avis clients vérifiés par notre équipe',
+                        'number' => '0',
+                        'label' => 'Placements payants ou rangs sponsorisés',
                     ),
                     array(
                         'number' => '6',
                         'label' => 'Villes marocaines couvertes',
                     ),
                     array(
-                        'number' => '0',
-                        'label' => 'Placements payants ou rangs sponsorisés',
+                        'number' => '2 400+',
+                        'label' => 'Avis clients vérifiés par notre équipe',
+                    ),
+                    array(
+                        'number' => '150+',
+                        'label' => 'Agences analysées et répertoriées',
                     ),
                 ),
             ),
@@ -2735,10 +2728,6 @@ function v5_digital_setup_theme_content() {
                     array('value' => '2 400+', 'label' => 'Avis clients vérifiés')
                 ),
                 'reviews' => $testimonial_ids
-            ),
-            // Stats Band
-            array(
-                'acf_fc_layout' => 'stats_band_section',
             ),
             // Picks
             array(
@@ -3169,4 +3158,100 @@ function v5_get_field_default($field_name, $default_value = '', $is_sub_field = 
     }
     return $value;
 }
+
+/**
+ * Keep existing homepage flexible content editable after theme updates.
+ * Fills missing hero repeater rows without overwriting user-entered values.
+ */
+function v5_digital_backfill_homepage_hero_fields() {
+    if (!function_exists('get_field') || !function_exists('update_field')) {
+        return;
+    }
+
+    $homepage_id = (int) get_option('page_on_front');
+    if (!$homepage_id) {
+        $homepage = get_page_by_path('accueil');
+        $homepage_id = $homepage ? (int) $homepage->ID : 0;
+    }
+
+    if (!$homepage_id) {
+        return;
+    }
+
+    $layouts = get_field('page_layouts', $homepage_id);
+    if (empty($layouts) || !is_array($layouts)) {
+        return;
+    }
+
+    $default_hero_ctas = array(
+        array(
+            'text' => 'Trouver mon agence',
+            'link_type' => 'page',
+            'page' => home_url('/contact/'),
+            'url' => '',
+            'style' => 'primary',
+            'bg_color' => '',
+            'text_color' => '',
+            'icon' => 'sparkles',
+        ),
+        array(
+            'text' => 'Faire référencer mon agence',
+            'link_type' => 'url',
+            'page' => '',
+            'url' => '/contact/?subject=listing',
+            'style' => 'secondary',
+            'bg_color' => '',
+            'text_color' => '',
+            'icon' => 'home',
+        ),
+    );
+
+    $default_hero_stats = array(
+        array(
+            'number' => '0',
+            'label' => 'Placements payants ou rangs sponsorisés',
+        ),
+        array(
+            'number' => '6',
+            'label' => 'Villes marocaines couvertes',
+        ),
+        array(
+            'number' => '2 400+',
+            'label' => 'Avis clients vérifiés par notre équipe',
+        ),
+        array(
+            'number' => '150+',
+            'label' => 'Agences analysées et répertoriées',
+        ),
+    );
+
+    $changed = false;
+    foreach ($layouts as $index => &$layout) {
+        if (($layout['acf_fc_layout'] ?? '') === 'stats_band_section') {
+            unset($layouts[$index]);
+            $changed = true;
+            continue;
+        }
+
+        if (($layout['acf_fc_layout'] ?? '') !== 'hero_section') {
+            continue;
+        }
+
+        if (empty($layout['hero_ctas'])) {
+            $layout['hero_ctas'] = $default_hero_ctas;
+            $changed = true;
+        }
+
+        if (empty($layout['hero_stats'])) {
+            $layout['hero_stats'] = $default_hero_stats;
+            $changed = true;
+        }
+    }
+    unset($layout);
+
+    if ($changed) {
+        update_field('field_page_layouts', array_values($layouts), $homepage_id);
+    }
+}
+add_action('admin_init', 'v5_digital_backfill_homepage_hero_fields');
 
