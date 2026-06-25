@@ -24,7 +24,7 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
             <?php endif; ?>
             
             <?php if ($description) : ?>
-                <p class="text-[16px] md:text-[18px] text-slate-500 mb-8 leading-relaxed max-w-xl mx-auto">
+                <p class="text-[16px] md:text-[18px] text-black mb-8 leading-relaxed max-w-xl mx-auto">
                     <?php echo esc_html($description); ?>
                 </p>
             <?php endif; ?>
