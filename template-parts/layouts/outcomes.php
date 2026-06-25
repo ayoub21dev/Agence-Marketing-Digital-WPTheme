@@ -7,6 +7,8 @@ $title       = v5_get_field_default('title', 'Ce que disent les équipes après 
 $description = v5_get_field_default('description', 'Histoires réelles de sélection par des équipes marocaines ayant analysé les profils, les audits techniques et les avis vérifiés avant de contacter une agence.');
 $metrics     = v5_get_field_default('metrics', null);
 $reviews     = v5_get_field_default('reviews', null);
+$reviews_cards = v5_get_field_default('reviews_cards', null);
+$has_cards   = !empty($reviews_cards) && is_array($reviews_cards);
 
 $has_eyebrow = !empty($eyebrow);
 $has_title   = !empty($title);
@@ -68,6 +70,64 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
 
         <?php if ($has_reviews) : ?>
             <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
+                <?php if ($has_cards) : ?>
+                    <?php foreach ($reviews_cards as $card) :
+                        $c_quote   = isset($card['quote']) ? $card['quote'] : '';
+                        $c_rating  = !empty($card['rating']) ? intval($card['rating']) : 5;
+                        $c_author  = isset($card['author']) ? $card['author'] : '';
+                        $c_role    = isset($card['role']) ? $card['role'] : '';
+                        $c_image   = isset($card['image']) ? $card['image'] : '';
+                        if (is_array($c_image)) { $c_image = isset($c_image['url']) ? $c_image['url'] : ''; }
+                        $c_agency  = isset($card['agency_name']) ? $card['agency_name'] : '';
+                        $c_url     = isset($card['agency_url']) ? $card['agency_url'] : '';
+                        $c_project = isset($card['project']) ? $card['project'] : '';
+                        $c_result  = isset($card['result']) ? $card['result'] : '';
+                        ?>
+                        <article class="flex min-h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
+                            <div class="flex-1 p-6">
+                                <div class="mb-4 flex gap-0.5 text-amber-500" aria-label="<?php echo esc_attr($c_rating); ?> stars">
+                                    <?php for ($i = 0; $i < 5; $i++) {
+                                        echo $i < $c_rating
+                                            ? '<i data-lucide="star" class="h-4 w-4 fill-amber-500"></i>'
+                                            : '<i data-lucide="star" class="h-4 w-4 text-slate-200"></i>';
+                                    } ?>
+                                </div>
+                                <p class="text-[15px] leading-relaxed text-slate-700">"<?php echo esc_html($c_quote); ?>"</p>
+                                <div class="mt-7 flex items-center gap-3">
+                                    <?php if (!empty($c_image)) : ?>
+                                        <img src="<?php echo esc_url($c_image); ?>" alt="<?php echo esc_attr($c_author); ?>" class="h-11 w-11 rounded-full object-cover">
+                                    <?php else : ?>
+                                        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-[12px] font-bold text-slate-500"><?php echo esc_html(substr($c_author, 0, 1)); ?></div>
+                                    <?php endif; ?>
+                                    <div>
+                                        <div class="text-[14px] font-bold text-slate-950"><?php echo esc_html($c_author); ?></div>
+                                        <div class="text-[12px] text-slate-500"><?php echo esc_html($c_role); ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php if (!empty($c_agency) || !empty($c_project) || !empty($c_result)) : ?>
+                            <div class="border-t border-slate-100 bg-slate-50 p-6 text-[13px]">
+                                <div class="grid grid-cols-[74px_1fr] gap-y-3">
+                                    <?php if (!empty($c_agency)) : ?>
+                                        <span class="text-slate-500">Recrutée</span>
+                                        <?php if (!empty($c_url)) : ?>
+                                            <a href="<?php echo esc_url($c_url); ?>" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-600 hover:text-brand-700"><?php echo esc_html($c_agency); ?></a>
+                                        <?php else : ?>
+                                            <span class="font-semibold text-slate-800"><?php echo esc_html($c_agency); ?></span>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                    <?php if (!empty($c_project)) : ?>
+                                        <span class="text-slate-500">Projet</span><span><?php echo esc_html($c_project); ?></span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($c_result)) : ?>
+                                        <span class="text-slate-500">Résultat</span><span class="text-emerald-700"><?php echo esc_html($c_result); ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        </article>
+                    <?php endforeach; ?>
+                <?php else : ?>
                 <?php
                 $query_args = array(
                     'post_type'      => 'testimonial',
@@ -238,6 +298,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                     endforeach;
                 endif;
                 ?>
+                <?php endif; // end $has_cards ?>
             </div>
         <?php endif; ?>
     </div>
