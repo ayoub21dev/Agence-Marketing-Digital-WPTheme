@@ -13,19 +13,62 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v4
 
-      - name: Deploy theme via FTP (with retries)
-        uses: nick-fields/retry@v3
+      # Self-heal: Hostinger sometimes refuses a GitHub runner IP, so we retry
+      # the proven action up to 3 times, each attempt landing on a fresh IP.
+      - name: Deploy theme via FTP (attempt 1)
+        id: deploy1
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-          timeout_minutes: 12
-          max_attempts: 4
-          retry_wait_seconds: 30
-          command: |
-            npx --yes @samkirkland/ftp-deploy@1.2.5 \
-              --server "${{ secrets.FTP_SERVER }}" \
-              --username "${{ secrets.FTP_USERNAME }}" \
-              --password "${{ secrets.FTP_PASSWORD }}" \
-              --protocol ftps \
-              --port 21 \
-              --timeout 600000 \
-              --local-dir ./ \
-              --server-dir /public_html/wp-content/themes/agence-marketing-digital/
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          timeout: 600000
+          local-dir: ./
+          server-dir: /public_html/wp-content/themes/agence-marketing-digital/
+
+      - name: Wait before retry 2
+        if: steps.deploy1.outcome == 'failure'
+        run: sleep 30
+
+      - name: Deploy theme via FTP (attempt 2)
+        id: deploy2
+        if: steps.deploy1.outcome == 'failure'
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          timeout: 600000
+          local-dir: ./
+          server-dir: /public_html/wp-content/themes/agence-marketing-digital/
+
+      - name: Wait before retry 3
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        run: sleep 45
+
+      - name: Deploy theme via FTP (attempt 3)
+        id: deploy3
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          timeout: 600000
+          local-dir: ./
+          server-dir: /public_html/wp-content/themes/agence-marketing-digital/
+
+      - name: Fail job if all attempts failed
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure' && steps.deploy3.outcome == 'failure'
+        run: |
+          echo "::error::All 3 FTP deploy attempts failed."
+          exit 1
