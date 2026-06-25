@@ -1,18 +1,56 @@
 <?php
 if (!function_exists('v5_digital_render_footer_column')) {
     function v5_digital_render_footer_column($theme_location, $fallback_slug, $default_title, $default_links) {
-        // Static footer links — intentionally fixed, not pulled from WP nav menus.
+        // The column TITLE is always the clean fixed French label.
+        // The LINKS come dynamically from the menu assigned to $theme_location
+        // (WordPress > Menus > Manage Locations). If no menu is assigned, we
+        // fall back to the default links so the footer is never empty.
+        $menu_id = 0;
+
+        // Polylang-aware resolution of the assigned menu for this location.
+        if (function_exists('pll_get_nav_menu_theme_loc')) {
+            $menu_id = (int) pll_get_nav_menu_theme_loc($theme_location);
+        }
+        if (!$menu_id) {
+            $locations = get_nav_menu_locations();
+            if (!empty($locations)) {
+                if (function_exists('pll_current_language')) {
+                    $lang_loc = $theme_location . '___' . pll_current_language();
+                    if (!empty($locations[$lang_loc])) {
+                        $menu_id = (int) $locations[$lang_loc];
+                    }
+                }
+                if (!$menu_id && !empty($locations[$theme_location])) {
+                    $menu_id = (int) $locations[$theme_location];
+                }
+            }
+        }
+
+        $menu_items = $menu_id ? wp_get_nav_menu_items($menu_id) : array();
+        if (!is_array($menu_items)) {
+            $menu_items = array();
+        }
         ?>
         <div>
             <h4 class="font-semibold text-slate-900 text-[13px] mb-3 font-display"><?php echo esc_html($default_title); ?></h4>
             <ul class="space-y-2 text-[13px]">
-                <?php foreach ($default_links as $label => $url) : ?>
-                    <li>
-                        <a href="<?php echo esc_url($url); ?>" class="text-slate-500 hover:text-slate-900 transition-colors">
-                            <?php echo esc_html($label); ?>
-                        </a>
-                    </li>
-                <?php endforeach; ?>
+                <?php if (!empty($menu_items)) : ?>
+                    <?php foreach ($menu_items as $item) : ?>
+                        <li>
+                            <a href="<?php echo esc_url($item->url); ?>" class="text-slate-500 hover:text-slate-900 transition-colors">
+                                <?php echo esc_html($item->title); ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <?php foreach ($default_links as $label => $url) : ?>
+                        <li>
+                            <a href="<?php echo esc_url($url); ?>" class="text-slate-500 hover:text-slate-900 transition-colors">
+                                <?php echo esc_html($label); ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </ul>
         </div>
         <?php

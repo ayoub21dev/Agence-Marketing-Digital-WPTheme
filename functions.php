@@ -71,7 +71,7 @@ function v5_digital_register_cpts() {
         ),
         'public' => true,
         'has_archive' => false,
-        'supports' => array('title'),
+        'supports' => array('title', 'page-attributes'),
         'menu_icon' => 'dashicons-chart-bar',
     ));
 
@@ -622,29 +622,13 @@ if (function_exists('acf_add_local_field_group')) {
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
-                                'key' => 'field_stats_band_stats',
+                                'key' => 'field_stats_band_info',
                                 'label' => 'Statistiques',
-                                'instructions' => 'Section indépendante et déplaçable. Placez-la juste après le Hero pour afficher les chiffres sous la preuve sociale.',
-                                'name' => 'stats',
-                                'type' => 'repeater',
-                                'layout' => 'table',
-                                'button_label' => 'Ajouter une statistique',
-                                'sub_fields' => array(
-                                    array(
-                                        'key' => 'field_stats_band_number',
-                                        'label' => 'Nombre / Chiffre',
-                                        'name' => 'number',
-                                        'type' => 'text',
-                                        'required' => 1,
-                                    ),
-                                    array(
-                                        'key' => 'field_stats_band_label',
-                                        'label' => 'Étiquette / Libellé',
-                                        'name' => 'label',
-                                        'type' => 'text',
-                                        'required' => 1,
-                                    ),
-                                ),
+                                'name' => 'stats_band_info',
+                                'type' => 'message',
+                                'message' => "Les chiffres affichés ici sont gérés dans le menu « Statistiques » (à gauche). Modifiez-y la valeur, le libellé et l'ordre.\n\nCette section reste déplaçable : placez-la où vous voulez sur la page (ou ajoutez-la à une autre page) pour positionner le bloc de statistiques.",
+                                'esc_html' => 0,
+                                'new_lines' => 'wpautop',
                             ),
                         ),
                     ),
