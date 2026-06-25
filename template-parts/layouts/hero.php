@@ -29,8 +29,7 @@ $stats_query = new WP_Query(array(
             <?php endif; ?>
             
             <?php if ($description) : ?>
-               <p class="text-[16px] md:text-[18px] mb-8 leading-relaxed max-w-xl mx-auto"
-   style="color: black !important;">
+                <p class="text-[16px] md:text-[18px] text-slate-500 mb-8 leading-relaxed max-w-xl mx-auto">
                     <?php echo esc_html($description); ?>
                 </p>
             <?php endif; ?>

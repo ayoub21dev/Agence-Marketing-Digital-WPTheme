@@ -10,9 +10,36 @@ $stats_query = new WP_Query(array(
     'posts_per_page' => -1,
     'post_status' => 'publish'
 ));
+
+$social_proof_1 = '150+ agences évaluées';
+$social_proof_2 = 'Référencement 100% éditorial';
+$page_layouts = function_exists('get_field') ? get_field('page_layouts') : array();
+
+if (!empty($page_layouts) && is_array($page_layouts)) {
+    foreach ($page_layouts as $layout_row) {
+        if (($layout_row['acf_fc_layout'] ?? '') !== 'hero_section') {
+            continue;
+        }
+
+        $social_proof_1 = !empty($layout_row['social_proof_1']) ? $layout_row['social_proof_1'] : $social_proof_1;
+        $social_proof_2 = !empty($layout_row['social_proof_2']) ? $layout_row['social_proof_2'] : $social_proof_2;
+        break;
+    }
+}
 ?>
 <section class="py-12 bg-white/60 border-b border-slate-200 backdrop-blur-sm">
     <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+        <div class="mb-8 flex flex-wrap items-center justify-center gap-2 text-[12px] text-slate-400 font-mono">
+            <span class="inline-flex items-center gap-1">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i>
+                <span><?php echo esc_html($social_proof_1); ?></span>
+            </span>
+            <span class="text-slate-200">·</span>
+            <span class="inline-flex items-center gap-1">
+                <i data-lucide="award" class="w-3.5 h-3.5 text-brand-400"></i>
+                <span><?php echo esc_html($social_proof_2); ?></span>
+            </span>
+        </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             <?php 
             if ($stats_query->have_posts()) : 
