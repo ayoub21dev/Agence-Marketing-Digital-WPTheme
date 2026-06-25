@@ -250,7 +250,7 @@ $post_count = $blog_query->found_posts;
                 if ($blog_query->have_posts()) :
                     while ($blog_query->have_posts()) : $blog_query->the_post();
 
-                        $badge      = get_field('badge')     ?: 'Guide';
+                        $badge      = v5_digital_get_post_badge(get_the_ID(), 'Guide');
                         $read_time  = get_field('read_time') ?: '5 min de lecture';
                         $author     = get_field('author_name') ?: get_the_author();
 

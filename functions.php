@@ -3274,6 +3274,35 @@ add_action('template_redirect', function() {
  * ONLY when the field is unset or newly created (i.e. returns null or false).
  * If the user explicitly cleared the field (returns empty string ""), we return "" to keep it empty/hidden.
  */
+/**
+ * Resolve a blog post's display category/badge dynamically.
+ * Priority: the ACF "badge" field → first real assigned category →
+ * the provided default. The WordPress default "Uncategorized" term is
+ * skipped so it never shows on the front-end.
+ */
+function v5_digital_get_post_badge($post_id = null, $default = 'Guide') {
+    if (!$post_id) {
+        $post_id = get_the_ID();
+    }
+
+    $badge = function_exists('get_field') ? get_field('badge', $post_id) : '';
+    if (!empty($badge)) {
+        return $badge;
+    }
+
+    $categories = get_the_category($post_id);
+    if (!empty($categories)) {
+        foreach ($categories as $cat) {
+            if ((int) $cat->term_id === 1 || $cat->slug === 'uncategorized' || strtolower($cat->name) === 'uncategorized' || strtolower($cat->name) === 'non classé') {
+                continue;
+            }
+            return $cat->name;
+        }
+    }
+
+    return $default;
+}
+
 function v5_get_field_default($field_name, $default_value = '', $is_sub_field = true) {
     $value = $is_sub_field ? get_sub_field($field_name) : get_field($field_name);
     if ($value === null || $value === false) {

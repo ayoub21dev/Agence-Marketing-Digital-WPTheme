@@ -67,12 +67,8 @@ $guides_query = new WP_Query($query_args);
                         $thumbnail_url = !empty($seeded_image) ? $seeded_image : 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
                     }
                     
-                    // Retrieve category/tag name or fallback
-                    $badge = get_field('badge', $post_id);
-                    if (empty($badge)) {
-                        $categories = get_the_category($post_id);
-                        $badge = !empty($categories) ? $categories[0]->name : 'Analyse';
-                    }
+                    // Retrieve category/tag name or fallback (skips "Uncategorized")
+                    $badge = v5_digital_get_post_badge($post_id, 'Analyse');
                     ?>
                     <div onclick="window.location.href='<?php the_permalink(); ?>'" class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
                         <div class="h-48 overflow-hidden bg-slate-100 flex-shrink-0">

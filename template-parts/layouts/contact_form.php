@@ -106,8 +106,6 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                         <div class="flex items-start gap-3 <?php echo $has_email ? 'border-b border-slate-200/60 pb-5' : 'pb-2'; ?>">
                             <?php if (!empty($office_icon)) : ?>
                                 <img src="<?php echo esc_url($office_icon); ?>" alt="" class="w-4 h-4 mt-0.5 flex-shrink-0 object-contain">
-                            <?php else : ?>
-                                <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"></i>
                             <?php endif; ?>
                             <div>
                                 <?php if (!empty($office_title)) : ?>
@@ -127,8 +125,6 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                         <div class="flex items-start gap-3 pb-2">
                             <?php if (!empty($email_icon)) : ?>
                                 <img src="<?php echo esc_url($email_icon); ?>" alt="" class="w-4 h-4 mt-0.5 flex-shrink-0 object-contain">
-                            <?php else : ?>
-                                <i data-lucide="mail" class="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"></i>
                             <?php endif; ?>
                             <div>
                                 <h4 class="font-semibold text-slate-800 text-[13px] mb-0.5 font-display">Email</h4>

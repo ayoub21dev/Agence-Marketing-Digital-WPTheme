@@ -49,8 +49,7 @@ get_header();
     if (have_posts()) :
         while (have_posts()) : the_post();
             // Fetch fields
-            $badge = get_field('badge');
-            if (!$badge) $badge = 'Guide';
+            $badge = v5_digital_get_post_badge(get_the_ID(), 'Guide');
             
             $read_time = get_field('read_time');
             if (!$read_time) $read_time = '5 min de lecture';
