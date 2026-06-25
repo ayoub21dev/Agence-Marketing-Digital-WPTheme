@@ -6,8 +6,6 @@
 $eyebrow         = v5_get_field_default('eyebrow', '01 · MATCH & DISCOVER');
 $title           = v5_get_field_default('title', 'Trouvez les <span class="hero-focus-word">meilleures</span> agences de marketing digital au <span class="hero-location-word">Maroc</span>');
 $description     = v5_get_field_default('description', 'Comparez les agences digitales marocaines grâce à des recherches éditoriales, des scores techniques de vitesse et des avis clients vérifiés.');
-$social_proof_1  = v5_get_field_default('social_proof_1', '150+ agences évaluées');
-$social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% éditorial');
 ?>
 
 <section class="relative z-10 bg-white/80 border-b border-slate-200 backdrop-blur-sm">
@@ -24,7 +22,7 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
             <?php endif; ?>
             
             <?php if ($description) : ?>
-               <<p class="text-[16px] md:text-[18px] text-slate-500 mb-8 leading-relaxed max-w-xl mx-auto">
+                <p class="text-[16px] md:text-[18px] text-slate-500 mb-8 leading-relaxed max-w-xl mx-auto">
                     <?php echo esc_html($description); ?>
                 </p>
             <?php endif; ?>
@@ -91,19 +89,6 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
                     <?php
                 endif;
                 ?>
-            </div>
-
-            <!-- Social proof micro-line -->
-            <div class="flex items-center justify-center gap-2 text-[12px] text-slate-400 font-mono mb-8 -mt-4">
-                <span class="flex items-center gap-1">
-                    <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i>
-                    <span><?php echo esc_html($social_proof_1); ?></span>
-                </span>
-                <span class="text-slate-200">·</span>
-                <span class="flex items-center gap-1">
-                    <i data-lucide="award" class="w-3.5 h-3.5 text-brand-400"></i>
-                    <span><?php echo esc_html($social_proof_2); ?></span>
-                </span>
             </div>
 
             <!-- Dynamic stats inside hero (aligned with site's visual identity) -->
