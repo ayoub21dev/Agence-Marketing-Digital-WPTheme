@@ -252,7 +252,7 @@ $post_count = $blog_query->found_posts;
 
                         $badge      = v5_digital_get_post_badge(get_the_ID(), 'Guide');
                         $read_time  = get_field('read_time') ?: '5 min de lecture';
-                        $author     = get_field('author_name') ?: get_the_author();
+                        $author     = get_the_author() ?: get_field('author_name');
 
                         // Cover image priority: media field → URL field → post thumbnail → placeholder
                         $cover_image = get_field('cover_image_media');

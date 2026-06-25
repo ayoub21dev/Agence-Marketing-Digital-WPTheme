@@ -3759,38 +3759,43 @@ function v5_digital_sync_post_authors() {
 }
 
 /**
- * Keep a single article in sync whenever it is saved: if it carries an
- * "author_name", point its WordPress author at the matching profile. Runs on
- * acf/save_post (priority > 10) so the ACF field value is already persisted.
- * The early "already matches" return makes the nested wp_update_post safe
- * against recursion.
+ * The WordPress author (post_author) is the single source of truth for the
+ * byline. On every save — including Quick Edit — mirror the ACF "author_name"
+ * field FROM the post's WordPress author, so the field stays accurate and can
+ * never revert an author change made via the Author dropdown / Quick Edit.
+ *
+ * Hooked on save_post at priority 20 (after ACF has persisted its own fields at
+ * priority 10) so this mirror always wins. update_field() does not trigger
+ * save_post, so there is no recursion.
  */
-function v5_digital_sync_post_author_on_save($post_id) {
+function v5_digital_mirror_author_name_on_save($post_id) {
     if (!is_numeric($post_id)) {
         return; // ACF options pages etc.
     }
     $post_id = (int) $post_id;
 
-    if (get_post_type($post_id) !== 'post') {
+    if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) {
+        return;
+    }
+    if (get_post_type($post_id) !== 'post' || !function_exists('update_field')) {
         return;
     }
 
-    $author_name = get_field('author_name', $post_id);
-    if (empty($author_name)) {
+    $author_id = (int) get_post_field('post_author', $post_id);
+    if (!$author_id) {
         return;
     }
 
-    $user_id = v5_digital_get_or_create_author($author_name);
-    if (!$user_id || (int) get_post_field('post_author', $post_id) === $user_id) {
+    $display = get_the_author_meta('display_name', $author_id);
+    if ($display === '') {
         return;
     }
 
-    wp_update_post(array(
-        'ID'          => $post_id,
-        'post_author' => $user_id,
-    ));
+    if ((string) get_field('author_name', $post_id) !== $display) {
+        update_field('field_blog_author_name', $display, $post_id);
+    }
 }
-add_action('acf/save_post', 'v5_digital_sync_post_author_on_save', 20);
+add_action('save_post', 'v5_digital_mirror_author_name_on_save', 20);
 
 /**
  * One-time data migrations / self-heal routines.
