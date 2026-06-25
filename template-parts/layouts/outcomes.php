@@ -113,7 +113,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                                         <?php if (!empty($c_url)) : ?>
                                             <a href="<?php echo esc_url($c_url); ?>" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-600 hover:text-brand-700"><?php echo esc_html($c_agency); ?></a>
                                         <?php else : ?>
-                                            <span class="font-semibold text-slate-800"><?php echo esc_html($c_agency); ?></span>
+                                            <span class="font-semibold text-brand-600"><?php echo esc_html($c_agency); ?></span>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                     <?php if (!empty($c_project)) : ?>
@@ -219,7 +219,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                                         <?php if (!empty($agency_url)) : ?>
                                             <a href="<?php echo esc_url($agency_url); ?>" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-600 hover:text-brand-700"><?php echo esc_html($agency_name); ?></a>
                                         <?php else : ?>
-                                            <span class="font-semibold text-slate-800"><?php echo esc_html($agency_name); ?></span>
+                                            <span class="font-semibold text-brand-600"><?php echo esc_html($agency_name); ?></span>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                     <?php if (!empty($project)) : ?>
@@ -286,7 +286,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                             <div class="border-t border-slate-100 bg-slate-50 p-6 text-[13px]">
                                 <div class="grid grid-cols-[74px_1fr] gap-y-3">
                                     <span class="text-slate-500">Recrutée</span>
-                                    <span class="font-semibold text-slate-800"><?php echo esc_html($fallback_review['agency']); ?></span>
+                                    <span class="font-semibold text-brand-600"><?php echo esc_html($fallback_review['agency']); ?></span>
                                     <span class="text-slate-500">Projet</span>
                                     <span><?php echo esc_html($fallback_review['project']); ?></span>
                                     <span class="text-slate-500">Résultat</span>
