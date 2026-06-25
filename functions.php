@@ -342,6 +342,14 @@ if (function_exists('acf_add_local_field_group')) {
                 'instructions' => 'e.g. "rmd", "pixagram", "mediaboost". Laissez vide si non applicable.',
             ),
             array(
+                'key' => 'field_testimonial_hired_agency_url',
+                'label' => 'Site web de l\'agence recrutée',
+                'name' => 'hired_agency_url',
+                'type' => 'url',
+                'required' => 0,
+                'instructions' => 'URL complète du site de l\'agence, e.g. "https://exemple.com". Le nom devient un lien vers ce site.',
+            ),
+            array(
                 'key' => 'field_testimonial_project',
                 'label' => 'Projet réalisé',
                 'name' => 'project',

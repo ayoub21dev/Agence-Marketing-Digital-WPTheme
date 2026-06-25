@@ -1,74 +1,18 @@
 <?php
 if (!function_exists('v5_digital_render_footer_column')) {
     function v5_digital_render_footer_column($theme_location, $fallback_slug, $default_title, $default_links) {
-        global $wp;
-        $menu_id = 0;
-        if (function_exists('pll_get_nav_menu_theme_loc')) {
-            $menu_id = pll_get_nav_menu_theme_loc($theme_location);
-        }
-        if (!$menu_id) {
-            $locations = get_nav_menu_locations();
-            if (!empty($locations)) {
-                if (function_exists('pll_current_language')) {
-                    $lang_loc = $theme_location . '___' . pll_current_language();
-                    if (isset($locations[$lang_loc]) && $locations[$lang_loc] > 0) {
-                        $menu_id = $locations[$lang_loc];
-                    }
-                }
-                if (!$menu_id && isset($locations[$theme_location]) && $locations[$theme_location] > 0) {
-                    $menu_id = $locations[$theme_location];
-                }
-            }
-        }
-        
-        // Fallback to slug lookup
-        if (!$menu_id) {
-            $menu_obj = get_term_by('slug', $fallback_slug, 'nav_menu');
-            if ($menu_obj) {
-                $menu_id = $menu_obj->term_id;
-            }
-        }
-        
-        // Determine title
-        $title = $default_title;
-        if ($menu_id) {
-            $menu_obj = wp_get_nav_menu_object($menu_id);
-            if ($menu_obj) {
-                $cleaned_name = str_replace(array('Agence Footer ', 'Agence ', 'Gence Footer ', 'Gence ', 'Footer '), '', $menu_obj->name);
-                // Translate common names to French
-                $translations = array(
-                    'Explore' => 'Découvrir',
-                    'Resources' => 'Ressources',
-                    'Company' => 'Société',
-                    'Legal' => 'Légal'
-                );
-                $title = isset($translations[$cleaned_name]) ? $translations[$cleaned_name] : $cleaned_name;
-            }
-        }
-        
-        $menu_items = $menu_id ? wp_get_nav_menu_items($menu_id) : array();
-        
+        // Static footer links — intentionally fixed, not pulled from WP nav menus.
         ?>
         <div>
-            <h4 class="font-semibold text-slate-900 text-[13px] mb-3 font-display"><?php echo esc_html($title); ?></h4>
+            <h4 class="font-semibold text-slate-900 text-[13px] mb-3 font-display"><?php echo esc_html($default_title); ?></h4>
             <ul class="space-y-2 text-[13px]">
-                <?php if (!empty($menu_items)) : ?>
-                    <?php foreach ($menu_items as $item) : ?>
-                        <li>
-                            <a href="<?php echo esc_url($item->url); ?>" class="text-slate-500 hover:text-slate-900 transition-colors">
-                                <?php echo esc_html($item->title); ?>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                <?php else : ?>
-                    <?php foreach ($default_links as $label => $url) : ?>
-                        <li>
-                            <a href="<?php echo esc_url($url); ?>" class="text-slate-500 hover:text-slate-900 transition-colors">
-                                <?php echo esc_html($label); ?>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                <?php foreach ($default_links as $label => $url) : ?>
+                    <li>
+                        <a href="<?php echo esc_url($url); ?>" class="text-slate-500 hover:text-slate-900 transition-colors">
+                            <?php echo esc_html($label); ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
             </ul>
         </div>
         <?php

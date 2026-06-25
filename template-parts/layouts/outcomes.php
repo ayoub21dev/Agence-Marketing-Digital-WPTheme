@@ -120,6 +120,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                         $image = !empty($image_media) ? (is_array($image_media) ? $image_media['url'] : $image_media) : $image_url;
                         $agency_name = get_field('hired_agency_name', $t_id);
                         $agency_slug = get_field('hired_agency_slug', $t_id);
+                        $agency_url  = get_field('hired_agency_url', $t_id);
                         $project = get_field('project', $t_id);
                         $result  = get_field('result', $t_id);
 
@@ -155,8 +156,8 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                                 <div class="grid grid-cols-[74px_1fr] gap-y-3">
                                     <?php if (!empty($agency_name)) : ?>
                                         <span class="text-slate-500">Recrutée</span>
-                                        <?php if (!empty($agency_slug)) : ?>
-                                            <a href="<?php echo esc_url(home_url('/annuaire/?id=' . $agency_slug)); ?>" class="font-semibold text-brand-600 hover:text-brand-700"><?php echo esc_html($agency_name); ?></a>
+                                        <?php if (!empty($agency_url)) : ?>
+                                            <a href="<?php echo esc_url($agency_url); ?>" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-600 hover:text-brand-700"><?php echo esc_html($agency_name); ?></a>
                                         <?php else : ?>
                                             <span class="font-semibold text-slate-800"><?php echo esc_html($agency_name); ?></span>
                                         <?php endif; ?>

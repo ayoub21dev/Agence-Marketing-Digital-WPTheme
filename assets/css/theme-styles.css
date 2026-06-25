@@ -20,7 +20,7 @@
 
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: oklch(98.5% 0.004 250);
+    background-color: #ffffff;
     -webkit-font-smoothing: antialiased;
 }
 

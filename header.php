@@ -183,7 +183,6 @@
                         $current_page_slug = basename(get_permalink());
                         ?>
                         <a href="<?php echo esc_url(home_url('/')); ?>" class="nav-link <?php echo is_front_page() ? 'active' : ''; ?> text-[13px] font-medium">accueil</a>
-                        <a href="<?php echo esc_url(home_url('/annuaire/')); ?>" class="nav-link <?php echo is_page('annuaire') ? 'active' : ''; ?> text-[13px] font-medium">annuaire</a>
                         <a href="<?php echo esc_url(home_url('/blog/')); ?>" class="nav-link <?php echo is_post_type_archive('blog') || is_singular('blog') || is_page('blog') || is_home() || is_singular('post') ? 'active' : ''; ?> text-[13px] font-medium">blog</a>
                         <a href="<?php echo esc_url(home_url('/about/')); ?>" class="nav-link <?php echo is_page('about') ? 'active' : ''; ?> text-[13px] font-medium">à propos</a>
                         <a href="<?php echo esc_url(home_url('/methodologie/')); ?>" class="nav-link <?php echo is_page('methodologie') ? 'active' : ''; ?> text-[13px] font-medium">méthodologie</a>
@@ -226,7 +225,6 @@
                 } else {
                     ?>
                     <a href="<?php echo esc_url(home_url('/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_front_page() ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">accueil</a>
-                    <a href="<?php echo esc_url(home_url('/annuaire/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_page('annuaire') ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">annuaire</a>
                     <a href="<?php echo esc_url(home_url('/blog/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_page('blog') || is_home() || is_singular('blog') || is_post_type_archive('blog') || is_singular('post') ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">blog</a>
                     <a href="<?php echo esc_url(home_url('/about/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_page('about') ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">à propos</a>
                     <a href="<?php echo esc_url(home_url('/methodologie/')); ?>" class="block px-3 py-2 text-[13px] font-medium <?php echo is_page('methodologie') ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'; ?> rounded-md">méthodologie</a>
