@@ -594,7 +594,8 @@ if (function_exists('acf_add_local_field_group')) {
                             ),
                             array(
                                 'key' => 'field_hero_stats',
-                                'label' => 'Statistiques du Hero',
+                                'label' => 'Statistiques affichées sous la preuve sociale',
+                                'instructions' => 'Ces chiffres apparaissent dans la section Hero, directement sous "150+ agences évaluées · Référencement 100% éditorial".',
                                 'name' => 'hero_stats',
                                 'type' => 'repeater',
                                 'layout' => 'table',
@@ -2643,19 +2644,19 @@ function v5_digital_setup_theme_content() {
                 'hero_stats' => array(
                     array(
                         'number' => '150+',
-                        'label' => 'Agences analysées',
+                        'label' => 'Agences analysées et répertoriées',
                     ),
                     array(
                         'number' => '2 400+',
-                        'label' => 'Avis vérifiés',
+                        'label' => 'Avis clients vérifiés par notre équipe',
                     ),
                     array(
                         'number' => '6',
-                        'label' => 'Villes couvertes',
+                        'label' => 'Villes marocaines couvertes',
                     ),
                     array(
                         'number' => '0',
-                        'label' => 'Placements payants',
+                        'label' => 'Placements payants ou rangs sponsorisés',
                     ),
                 ),
             ),
@@ -2776,6 +2777,20 @@ function v5_digital_setup_theme_content() {
         $existing_homepage_layouts = get_field('field_page_layouts', $homepage_id);
         if (empty($existing_homepage_layouts) || isset($_GET['force_seed'])) {
             update_field('field_page_layouts', $layouts, $homepage_id);
+        } elseif (is_array($existing_homepage_layouts)) {
+            $homepage_layouts_changed = false;
+            foreach ($existing_homepage_layouts as &$existing_layout) {
+                if (($existing_layout['acf_fc_layout'] ?? '') === 'hero_section' && empty($existing_layout['hero_stats'])) {
+                    $existing_layout['hero_stats'] = $layouts[0]['hero_stats'];
+                    $homepage_layouts_changed = true;
+                    break;
+                }
+            }
+            unset($existing_layout);
+
+            if ($homepage_layouts_changed) {
+                update_field('field_page_layouts', $existing_homepage_layouts, $homepage_id);
+            }
         }
 
         // 4.6 Seed Mockup Blog Articles
