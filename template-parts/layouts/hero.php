@@ -8,11 +8,6 @@ $title           = v5_get_field_default('title', 'Trouvez les <span class="hero-
 $description     = v5_get_field_default('description', 'Comparez les agences digitales marocaines grâce à des recherches éditoriales, des scores techniques de vitesse et des avis clients vérifiés.');
 $social_proof_1  = v5_get_field_default('social_proof_1', '150+ agences évaluées');
 $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% éditorial');
-$stats_query = new WP_Query(array(
-    'post_type' => 'stat_metric',
-    'posts_per_page' => -1,
-    'post_status' => 'publish'
-));
 ?>
 
 <section class="relative z-10 bg-white/80 border-b border-slate-200 backdrop-blur-sm">
@@ -111,42 +106,6 @@ $stats_query = new WP_Query(array(
                 </span>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-7 max-w-4xl mx-auto pt-7 border-t border-slate-200/60 mt-7">
-                <?php
-                if ($stats_query->have_posts()) :
-                    while ($stats_query->have_posts()) : $stats_query->the_post();
-                        $num = get_field('stat_number');
-                        $lbl = get_field('stat_label');
-                        ?>
-                        <div class="text-center">
-                            <div class="text-[1.35rem] md:text-[1.65rem] font-extrabold text-slate-900 tracking-tight font-display"><?php echo esc_html($num); ?></div>
-                            <div class="text-[10px] md:text-[11px] text-slate-500 font-semibold mt-1 uppercase tracking-wider font-mono"><?php echo esc_html($lbl); ?></div>
-                        </div>
-                        <?php
-                    endwhile;
-                    wp_reset_postdata();
-                else :
-                    ?>
-                    <div class="text-center">
-                        <div class="text-[1.35rem] md:text-[1.65rem] font-extrabold text-slate-900 tracking-tight font-display">0</div>
-                        <div class="text-[10px] md:text-[11px] text-slate-500 font-semibold mt-1 uppercase tracking-wider font-mono">Placements payants ou rangs sponsorisés</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-[1.35rem] md:text-[1.65rem] font-extrabold text-slate-900 tracking-tight font-display">6</div>
-                        <div class="text-[10px] md:text-[11px] text-slate-500 font-semibold mt-1 uppercase tracking-wider font-mono">Villes marocaines couvertes</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-[1.35rem] md:text-[1.65rem] font-extrabold text-slate-900 tracking-tight font-display">2 400+</div>
-                        <div class="text-[10px] md:text-[11px] text-slate-500 font-semibold mt-1 uppercase tracking-wider font-mono">Avis clients vérifiés par notre équipe</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-[1.35rem] md:text-[1.65rem] font-extrabold text-slate-900 tracking-tight font-display">150+</div>
-                        <div class="text-[10px] md:text-[11px] text-slate-500 font-semibold mt-1 uppercase tracking-wider font-mono">Agences analysées et répertoriées</div>
-                    </div>
-                    <?php
-                endif;
-                ?>
-            </div>
         </div>
     </div>
 </section>
