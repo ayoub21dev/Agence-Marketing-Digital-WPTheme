@@ -3580,3 +3580,121 @@ function v5_digital_fix_corrupted_menu_names() {
 }
 add_action('admin_init', 'v5_digital_fix_corrupted_menu_names');
 
+/**
+ * One-time setup: rebuild the footer menus cleanly and assign each to its
+ * location. Removes the tangled/duplicate footer menus, creates 4 properly
+ * organized menus, and wires them to their locations (Polylang-aware).
+ *
+ * Runs ONCE (guarded by an option) so that afterwards the footer is fully
+ * managed from WordPress — your manual edits/assignments are never overwritten.
+ */
+function v5_digital_setup_footer_menus_once() {
+    if (get_option('v5_footer_menus_setup_v1_done')) {
+        return;
+    }
+
+    if (!function_exists('wp_create_nav_menu') || !function_exists('wp_update_nav_menu_item')) {
+        return;
+    }
+
+    // 1. Remove the existing (tangled) footer menus so we start clean.
+    $all = wp_get_nav_menus();
+    if (!empty($all) && !is_wp_error($all)) {
+        foreach ($all as $m) {
+            if (stripos($m->name, 'footer') !== false) {
+                wp_delete_nav_menu($m->term_id);
+            }
+        }
+    }
+
+    // 2. Define the 4 clean footer menus, keyed by their theme location.
+    $footer_menus = array(
+        'footer_explore' => array(
+            'name'  => 'Footer Découvrir',
+            'items' => array(
+                array('title' => 'Accueil',  'url' => home_url('/')),
+                array('title' => 'Annuaire', 'url' => home_url('/annuaire/')),
+                array('title' => 'Blog',     'url' => home_url('/blog/')),
+            ),
+        ),
+        'footer_resources' => array(
+            'name'  => 'Footer Ressources',
+            'items' => array(
+                array('title' => 'Méthodologie', 'url' => home_url('/methodologie/')),
+                array('title' => 'Contact',      'url' => home_url('/contact/')),
+            ),
+        ),
+        'footer_villes' => array(
+            'name'  => 'Footer Villes',
+            'items' => array(
+                array('title' => 'Casablanca', 'url' => home_url('/annuaire/?city=Casablanca')),
+                array('title' => 'Rabat',      'url' => home_url('/annuaire/?city=Rabat')),
+                array('title' => 'Tanger',     'url' => home_url('/annuaire/?city=Tangier')),
+                array('title' => 'Marrakech',  'url' => home_url('/annuaire/?city=Marrakech')),
+            ),
+        ),
+        'footer_legal' => array(
+            'name'  => 'Footer Légal',
+            'items' => array(
+                array('title' => 'Politique de Confidentialité', 'url' => '#'),
+                array('title' => "Conditions d'Utilisation",     'url' => '#'),
+            ),
+        ),
+    );
+
+    $locations = get_nav_menu_locations();
+    if (!is_array($locations)) {
+        $locations = array();
+    }
+
+    foreach ($footer_menus as $location => $cfg) {
+        $menu_id = wp_create_nav_menu($cfg['name']);
+        if (is_wp_error($menu_id)) {
+            continue;
+        }
+
+        if (function_exists('pll_set_term_language')) {
+            pll_set_term_language($menu_id, 'fr');
+        }
+
+        foreach ($cfg['items'] as $item) {
+            wp_update_nav_menu_item($menu_id, 0, array(
+                'menu-item-title'  => $item['title'],
+                'menu-item-url'    => $item['url'],
+                'menu-item-status' => 'publish',
+                'menu-item-type'   => 'custom',
+            ));
+        }
+
+        // Assign to the location (base + Polylang FR suffix).
+        $locations[$location] = (int) $menu_id;
+        $locations[$location . '___fr'] = (int) $menu_id;
+    }
+
+    set_theme_mod('nav_menu_locations', $locations);
+    update_option('nav_menu_locations', $locations);
+
+    // Mirror assignments into Polylang's own mapping if present.
+    if (function_exists('pll_languages_list')) {
+        $polylang_options = get_option('polylang');
+        if (is_array($polylang_options)) {
+            $theme_slug = get_stylesheet();
+            if (!isset($polylang_options['nav_menus'])) {
+                $polylang_options['nav_menus'] = array();
+            }
+            if (!isset($polylang_options['nav_menus'][$theme_slug])) {
+                $polylang_options['nav_menus'][$theme_slug] = array();
+            }
+            foreach ($footer_menus as $location => $cfg) {
+                if (!empty($locations[$location])) {
+                    $polylang_options['nav_menus'][$theme_slug][$location]['fr'] = (int) $locations[$location];
+                }
+            }
+            update_option('polylang', $polylang_options);
+        }
+    }
+
+    update_option('v5_footer_menus_setup_v1_done', 1);
+}
+add_action('admin_init', 'v5_digital_setup_footer_menus_once');
+
