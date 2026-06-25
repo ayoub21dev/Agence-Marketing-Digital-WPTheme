@@ -131,14 +131,14 @@ if (empty($hero_stats)) {
             </div>
 
             <?php if (!empty($hero_stats)) : ?>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-7 max-w-4xl mx-auto pt-7 border-t border-slate-200/60 mt-7">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-3xl mx-auto pt-5 border-t border-slate-200/60 mt-5">
                     <?php foreach ($hero_stats as $hero_stat) :
                         $num = isset($hero_stat['number']) ? $hero_stat['number'] : '';
                         $lbl = isset($hero_stat['label']) ? $hero_stat['label'] : '';
                         ?>
                         <div class="text-center">
-                            <div class="text-[1.35rem] md:text-[1.65rem] font-extrabold text-slate-900 tracking-tight font-display"><?php echo esc_html($num); ?></div>
-                            <div class="text-[10px] md:text-[11px] text-slate-500 font-semibold mt-1 uppercase tracking-wider font-mono"><?php echo esc_html($lbl); ?></div>
+                            <div class="text-[1rem] md:text-[1.15rem] font-extrabold text-slate-900 tracking-tight font-display"><?php echo esc_html($num); ?></div>
+                            <div class="text-[8.5px] md:text-[9.5px] text-slate-500 font-semibold mt-1 uppercase tracking-wider font-mono leading-snug"><?php echo esc_html($lbl); ?></div>
                         </div>
                     <?php endforeach; ?>
                 </div>
