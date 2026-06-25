@@ -20,7 +20,7 @@ jobs:
           max_attempts: 4
           retry_wait_seconds: 30
           command: |
-            npx --yes @samkirkland/ftp-deploy@4.3.5 \
+            npx --yes @samkirkland/ftp-deploy@1.2.5 \
               --server "${{ secrets.FTP_SERVER }}" \
               --username "${{ secrets.FTP_USERNAME }}" \
               --password "${{ secrets.FTP_PASSWORD }}" \
