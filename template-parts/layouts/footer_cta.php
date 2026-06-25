@@ -15,7 +15,7 @@ if (is_front_page() || $secondary_btn === 'none' || $secondary_btn === '') {
 
 <section class="py-16 md:py-20 bg-slate-50/50 border-b border-slate-200">
     <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-        <div class="max-w-3xl">
+        <div class="max-w-3xl mx-auto text-center">
             <?php if ($eyebrow) : ?>
                 <span class="section-label text-slate-800 mb-2 block"><?php echo esc_html($eyebrow); ?></span>
             <?php endif; ?>
@@ -32,7 +32,7 @@ if (is_front_page() || $secondary_btn === 'none' || $secondary_btn === '') {
                 </p>
             <?php endif; ?>
             
-            <div class="flex flex-col sm:flex-row gap-3">
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
                 <a href="<?php echo esc_url(home_url('/contact/')); ?>"
                     class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold px-7 py-3 rounded-lg text-[14px] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-brand-600/10">
                     <span><?php echo esc_html($primary_btn); ?></span>

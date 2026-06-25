@@ -37,7 +37,7 @@ if (is_array($layouts)) {
 
 // ── Query blog posts ──────────────────────────────────────────────────────────
 $blog_query = new WP_Query(array(
-    'post_type'      => 'blog',
+    'post_type'      => 'post',
     'posts_per_page' => (int) $posts_per_page,
     'post_status'    => 'publish',
     'orderby'        => 'date',

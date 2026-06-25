@@ -1,6 +1,6 @@
 <?php
 /**
- * The template for displaying a single CPT blog article.
+ * Shared article template used by native WordPress posts.
  */
 
 get_header();

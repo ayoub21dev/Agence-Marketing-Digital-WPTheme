@@ -16,7 +16,7 @@ $has_posts   = $selected_post_ids !== ""; // If cleared, it returns "". If unset
 if ($has_eyebrow || $has_title || $has_link || $has_posts) :
 
 $query_args = array(
-    'post_type'      => 'blog',
+    'post_type'      => 'post',
     'post_status'    => 'publish'
 );
 
@@ -100,7 +100,7 @@ $guides_query = new WP_Query($query_args);
                     'social-media-compared' => home_url('/blog/')
                 );
                 foreach ($fallback_links as $slug => $default) {
-                    $p = get_page_by_path($slug, OBJECT, 'blog');
+                    $p = get_page_by_path($slug, OBJECT, 'post');
                     if ($p) {
                         $fallback_links[$slug] = get_permalink($p->ID);
                     }

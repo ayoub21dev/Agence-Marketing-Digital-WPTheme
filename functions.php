@@ -129,27 +129,6 @@ function v5_digital_register_cpts() {
         'menu_icon' => 'dashicons-testimonial',
     ));
 
-    // Blog CPT
-    register_post_type('blog', array(
-        'labels' => array(
-            'name' => __('Articles (Blog)', 'agence-marketing-digital'),
-            'singular_name' => __('Article', 'agence-marketing-digital'),
-            'all_items' => __('Tous les Articles', 'agence-marketing-digital'),
-            'add_new' => __('Ajouter', 'agence-marketing-digital'),
-            'add_new_item' => __('Ajouter un Nouvel Article', 'agence-marketing-digital'),
-            'edit_item' => __('Modifier l\'Article', 'agence-marketing-digital'),
-            'new_item' => __('Nouvel Article', 'agence-marketing-digital'),
-            'view_item' => __('Voir l\'Article', 'agence-marketing-digital'),
-            'search_items' => __('Rechercher des Articles', 'agence-marketing-digital'),
-            'not_found' => __('Aucun article trouvé', 'agence-marketing-digital'),
-        ),
-        'public' => true,
-        'has_archive' => false,
-        'supports' => array('title', 'editor', 'excerpt', 'thumbnail', 'author'),
-        'menu_icon' => 'dashicons-admin-post',
-        'rewrite' => array('slug' => 'blog', 'with_front' => false),
-        'show_in_rest' => true,
-    ));
 }
 add_action('init', 'v5_digital_register_cpts');
 
@@ -1007,7 +986,7 @@ if (function_exists('acf_add_local_field_group')) {
                                 'label' => 'Sélectionner des articles à afficher',
                                 'name' => 'posts',
                                 'type' => 'post_object',
-                                'post_type' => array('blog'),
+                                'post_type' => array('post'),
                                 'allow_null' => 1,
                                 'multiple' => 1,
                                 'return_format' => 'id',
@@ -1565,7 +1544,7 @@ if (function_exists('acf_add_local_field_group')) {
         ),
     ));
 
-    // 2.6 CPT Fields: Blog Metadata
+    // 2.6 Native Post Fields: Blog Metadata
     acf_add_local_field_group(array(
         'key' => 'group_blog_meta',
         'title' => 'Métadonnées de l\'Article',
@@ -1621,13 +1600,13 @@ if (function_exists('acf_add_local_field_group')) {
                 array(
                     'param' => 'post_type',
                     'operator' => '==',
-                    'value' => 'blog',
+                    'value' => 'post',
                 ),
             ),
         ),
     ));
 
-    // 2.7 CPT Fields: Blog Content (Flexible Content)
+    // 2.7 Native Post Fields: Blog Content (Flexible Content)
     acf_add_local_field_group(array(
         'key' => 'group_blog_content',
         'title' => 'Contenu Flexible de l\'Article',
@@ -1754,7 +1733,7 @@ if (function_exists('acf_add_local_field_group')) {
                 array(
                     'param' => 'post_type',
                     'operator' => '==',
-                    'value' => 'blog',
+                    'value' => 'post',
                 ),
             ),
         ),
@@ -1786,7 +1765,7 @@ function v5_digital_enqueue_assets() {
 add_action('wp_enqueue_scripts', 'v5_digital_enqueue_assets');
 
 // ----------------------------------------------------
-// 4. THEME SWITCH AUTOMATION (INITIALIZE PAGES & CPT DATA)
+// 4. THEME SWITCH AUTOMATION (INITIALIZE PAGES & SITE DATA)
 // ----------------------------------------------------
 
 function v5_digital_setup_theme_content() {
@@ -1814,7 +1793,7 @@ function v5_digital_setup_theme_content() {
     }
 
     // 4.1.2 PURGE EXISTING SEEDED CONTENT TO AVOID CONFLICTS
-    // Note: 'blog' CPT posts are intentionally excluded — they are user-managed
+    // Native WordPress posts are intentionally excluded — they are user-managed.
     $posts_to_purge = get_posts(array(
         'post_type' => array('partner_logo', 'stat_metric', 'specialty_hub', 'agency', 'testimonial'),
         'numberposts' => -1,
@@ -2908,14 +2887,14 @@ function v5_digital_setup_theme_content() {
         }
 
         foreach ($articles as $art) {
-            $art_post = get_page_by_path($art['slug'], OBJECT, 'blog');
+            $art_post = get_page_by_path($art['slug'], OBJECT, 'post');
             if (!$art_post) {
                 $post_id = wp_insert_post(array(
                     'post_title'   => $art['title'],
                     'post_name'    => $art['slug'],
                     'post_excerpt' => $art['excerpt'],
                     'post_status'  => 'publish',
-                    'post_type'    => 'blog',
+                    'post_type'    => 'post',
                 ));
             } else {
                 $post_id = $art_post->ID;
@@ -3109,9 +3088,9 @@ add_action('template_redirect', function() {
             echo '  </url>' . "\n";
         }
 
-        // 2. Query dynamic CPT posts
+        // 2. Query dynamic posts and CPT content
         $posts_query = new WP_Query(array(
-            'post_type'      => array('blog', 'agency', 'specialty_hub'),
+            'post_type'      => array('post', 'agency', 'specialty_hub'),
             'posts_per_page' => -1,
             'post_status'    => 'publish',
         ));
@@ -3353,4 +3332,28 @@ function v5_digital_backfill_testimonials() {
     }
 }
 add_action('admin_init', 'v5_digital_backfill_testimonials');
+
+/**
+ * Migrate legacy Blog CPT entries into native WordPress posts.
+ */
+function v5_digital_migrate_blog_cpt_to_posts() {
+    $legacy_posts = get_posts(array(
+        'post_type'      => 'blog',
+        'post_status'    => 'any',
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+    ));
+
+    if (empty($legacy_posts)) {
+        return;
+    }
+
+    foreach ($legacy_posts as $legacy_id) {
+        wp_update_post(array(
+            'ID'        => (int) $legacy_id,
+            'post_type' => 'post',
+        ));
+    }
+}
+add_action('admin_init', 'v5_digital_migrate_blog_cpt_to_posts');
 
