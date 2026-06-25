@@ -1,6 +1,6 @@
 <?php
 /**
- * Editor's Picks Layout (v5-digital)
+ * Editor's Picks Layout (agence-marketing-digital)
  */
 $eyebrow   = v5_get_field_default('eyebrow', "Choix de l'Éditeur");
 $title     = v5_get_field_default('title', "Les agences les plus performantes ce mois-ci.");

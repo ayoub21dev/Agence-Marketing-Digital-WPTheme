@@ -1,6 +1,6 @@
 <?php
 /**
- * Footer CTA Section Layout (v5-digital)
+ * Footer CTA Section Layout (agence-marketing-digital)
  */
 $eyebrow       = v5_get_field_default('eyebrow', 'Matchmaker');
 $title         = v5_get_field_default('title', 'Prêt à trouver la bonne agence digitale ?');

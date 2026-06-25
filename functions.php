@@ -1,6 +1,6 @@
 <?php
 /**
- * v5-digital Theme Functions and Definitions
+ * agence-marketing-digital Theme Functions and Definitions
  */
 
 // Helper to get dynamic domain-based contact email
@@ -21,8 +21,8 @@ function v5_digital_register_cpts() {
     // Partner Logos
     register_post_type('partner_logo', array(
         'labels' => array(
-            'name' => __('Logos Partenaires', 'v5-digital'),
-            'singular_name' => __('Logo Partenaire', 'v5-digital'),
+            'name' => __('Logos Partenaires', 'agence-marketing-digital'),
+            'singular_name' => __('Logo Partenaire', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => false,
@@ -33,8 +33,8 @@ function v5_digital_register_cpts() {
     // Stat Metrics
     register_post_type('stat_metric', array(
         'labels' => array(
-            'name' => __('Statistiques', 'v5-digital'),
-            'singular_name' => __('Statistique', 'v5-digital'),
+            'name' => __('Statistiques', 'agence-marketing-digital'),
+            'singular_name' => __('Statistique', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => false,
@@ -45,8 +45,8 @@ function v5_digital_register_cpts() {
     // Specialty Hubs
     register_post_type('specialty_hub', array(
         'labels' => array(
-            'name' => __('Spécialités', 'v5-digital'),
-            'singular_name' => __('Spécialité', 'v5-digital'),
+            'name' => __('Spécialités', 'agence-marketing-digital'),
+            'singular_name' => __('Spécialité', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => false,
@@ -57,16 +57,16 @@ function v5_digital_register_cpts() {
     // Agencies
     register_post_type('agency', array(
         'labels' => array(
-            'name' => __('Agences', 'v5-digital'),
-            'singular_name' => __('Agence', 'v5-digital'),
-            'all_items' => __('Toutes les Agences', 'v5-digital'),
-            'add_new' => __('Ajouter', 'v5-digital'),
-            'add_new_item' => __('Ajouter une Nouvelle Agence', 'v5-digital'),
-            'edit_item' => __('Modifier l\'Agence', 'v5-digital'),
-            'new_item' => __('Nouvelle Agence', 'v5-digital'),
-            'view_item' => __('Voir l\'Agence', 'v5-digital'),
-            'search_items' => __('Rechercher des Agences', 'v5-digital'),
-            'not_found' => __('Aucune agence trouvée', 'v5-digital'),
+            'name' => __('Agences', 'agence-marketing-digital'),
+            'singular_name' => __('Agence', 'agence-marketing-digital'),
+            'all_items' => __('Toutes les Agences', 'agence-marketing-digital'),
+            'add_new' => __('Ajouter', 'agence-marketing-digital'),
+            'add_new_item' => __('Ajouter une Nouvelle Agence', 'agence-marketing-digital'),
+            'edit_item' => __('Modifier l\'Agence', 'agence-marketing-digital'),
+            'new_item' => __('Nouvelle Agence', 'agence-marketing-digital'),
+            'view_item' => __('Voir l\'Agence', 'agence-marketing-digital'),
+            'search_items' => __('Rechercher des Agences', 'agence-marketing-digital'),
+            'not_found' => __('Aucune agence trouvée', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => true,
@@ -78,15 +78,15 @@ function v5_digital_register_cpts() {
     // Register Services Taxonomy
     register_taxonomy('agency_service', 'agency', array(
         'labels' => array(
-            'name' => __('Services', 'v5-digital'),
-            'singular_name' => __('Service', 'v5-digital'),
-            'all_items' => __('Tous les Services', 'v5-digital'),
-            'edit_item' => __('Modifier le Service', 'v5-digital'),
-            'view_item' => __('Voir le Service', 'v5-digital'),
-            'update_item' => __('Mettre à jour le Service', 'v5-digital'),
-            'add_new_item' => __('Ajouter un Nouveau Service', 'v5-digital'),
-            'new_item_name' => __('Nom du Nouveau Service', 'v5-digital'),
-            'search_items' => __('Rechercher des Services', 'v5-digital'),
+            'name' => __('Services', 'agence-marketing-digital'),
+            'singular_name' => __('Service', 'agence-marketing-digital'),
+            'all_items' => __('Tous les Services', 'agence-marketing-digital'),
+            'edit_item' => __('Modifier le Service', 'agence-marketing-digital'),
+            'view_item' => __('Voir le Service', 'agence-marketing-digital'),
+            'update_item' => __('Mettre à jour le Service', 'agence-marketing-digital'),
+            'add_new_item' => __('Ajouter un Nouveau Service', 'agence-marketing-digital'),
+            'new_item_name' => __('Nom du Nouveau Service', 'agence-marketing-digital'),
+            'search_items' => __('Rechercher des Services', 'agence-marketing-digital'),
         ),
         'public' => true,
         'hierarchical' => true,
@@ -99,15 +99,15 @@ function v5_digital_register_cpts() {
     // Register Cities Taxonomy
     register_taxonomy('agency_city', 'agency', array(
         'labels' => array(
-            'name' => __('Villes', 'v5-digital'),
-            'singular_name' => __('Ville', 'v5-digital'),
-            'all_items' => __('Toutes les Villes', 'v5-digital'),
-            'edit_item' => __('Modifier la Ville', 'v5-digital'),
-            'view_item' => __('Voir la Ville', 'v5-digital'),
-            'update_item' => __('Mettre à jour la Ville', 'v5-digital'),
-            'add_new_item' => __('Ajouter une Nouvelle Ville', 'v5-digital'),
-            'new_item_name' => __('Nom de la Nouvelle Ville', 'v5-digital'),
-            'search_items' => __('Rechercher des Villes', 'v5-digital'),
+            'name' => __('Villes', 'agence-marketing-digital'),
+            'singular_name' => __('Ville', 'agence-marketing-digital'),
+            'all_items' => __('Toutes les Villes', 'agence-marketing-digital'),
+            'edit_item' => __('Modifier la Ville', 'agence-marketing-digital'),
+            'view_item' => __('Voir la Ville', 'agence-marketing-digital'),
+            'update_item' => __('Mettre à jour la Ville', 'agence-marketing-digital'),
+            'add_new_item' => __('Ajouter une Nouvelle Ville', 'agence-marketing-digital'),
+            'new_item_name' => __('Nom de la Nouvelle Ville', 'agence-marketing-digital'),
+            'search_items' => __('Rechercher des Villes', 'agence-marketing-digital'),
         ),
         'public' => true,
         'hierarchical' => true,
@@ -120,8 +120,8 @@ function v5_digital_register_cpts() {
     // Testimonials CPT
     register_post_type('testimonial', array(
         'labels' => array(
-            'name' => __('Témoignages', 'v5-digital'),
-            'singular_name' => __('Témoignage', 'v5-digital'),
+            'name' => __('Témoignages', 'agence-marketing-digital'),
+            'singular_name' => __('Témoignage', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => false,
@@ -132,16 +132,16 @@ function v5_digital_register_cpts() {
     // Blog CPT
     register_post_type('blog', array(
         'labels' => array(
-            'name' => __('Articles (Blog)', 'v5-digital'),
-            'singular_name' => __('Article', 'v5-digital'),
-            'all_items' => __('Tous les Articles', 'v5-digital'),
-            'add_new' => __('Ajouter', 'v5-digital'),
-            'add_new_item' => __('Ajouter un Nouvel Article', 'v5-digital'),
-            'edit_item' => __('Modifier l\'Article', 'v5-digital'),
-            'new_item' => __('Nouvel Article', 'v5-digital'),
-            'view_item' => __('Voir l\'Article', 'v5-digital'),
-            'search_items' => __('Rechercher des Articles', 'v5-digital'),
-            'not_found' => __('Aucun article trouvé', 'v5-digital'),
+            'name' => __('Articles (Blog)', 'agence-marketing-digital'),
+            'singular_name' => __('Article', 'agence-marketing-digital'),
+            'all_items' => __('Tous les Articles', 'agence-marketing-digital'),
+            'add_new' => __('Ajouter', 'agence-marketing-digital'),
+            'add_new_item' => __('Ajouter un Nouvel Article', 'agence-marketing-digital'),
+            'edit_item' => __('Modifier l\'Article', 'agence-marketing-digital'),
+            'new_item' => __('Nouvel Article', 'agence-marketing-digital'),
+            'view_item' => __('Voir l\'Article', 'agence-marketing-digital'),
+            'search_items' => __('Rechercher des Articles', 'agence-marketing-digital'),
+            'not_found' => __('Aucun article trouvé', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => false,
@@ -1765,7 +1765,7 @@ if (function_exists('acf_add_local_field_group')) {
 function v5_digital_enqueue_assets() {
     // Custom theme stylesheet
     wp_enqueue_style(
-        'v5-digital-styles',
+        'agence-marketing-digital-styles',
         get_template_directory_uri() . '/assets/css/theme-styles.css',
         array(),
         '1.0.0'
@@ -1773,7 +1773,7 @@ function v5_digital_enqueue_assets() {
 
     // Custom theme javascript enqueued in footer
     wp_enqueue_script(
-        'v5-digital-scripts',
+        'agence-marketing-digital-scripts',
         get_template_directory_uri() . '/assets/js/theme-scripts.js',
         array(),
         '1.0.0',
@@ -2152,12 +2152,12 @@ function v5_digital_setup_theme_content() {
         }
         
         $menu_structure = array(
-            array('title' => __('accueil', 'v5-digital'), 'slug' => 'accueil'),
-            array('title' => __('annuaire', 'v5-digital'), 'slug' => 'annuaire'),
-            array('title' => __('blog', 'v5-digital'), 'slug' => 'blog'),
-            array('title' => __('à propos', 'v5-digital'), 'slug' => 'about'),
-            array('title' => __('méthodologie', 'v5-digital'), 'slug' => 'methodologie'),
-            array('title' => __('contact', 'v5-digital'), 'slug' => 'contact'),
+            array('title' => __('accueil', 'agence-marketing-digital'), 'slug' => 'accueil'),
+            array('title' => __('annuaire', 'agence-marketing-digital'), 'slug' => 'annuaire'),
+            array('title' => __('blog', 'agence-marketing-digital'), 'slug' => 'blog'),
+            array('title' => __('à propos', 'agence-marketing-digital'), 'slug' => 'about'),
+            array('title' => __('méthodologie', 'agence-marketing-digital'), 'slug' => 'methodologie'),
+            array('title' => __('contact', 'agence-marketing-digital'), 'slug' => 'contact'),
         );
         
         $position = 1;
@@ -3040,7 +3040,7 @@ add_action('init', function() {
 // Admin notice on successful seeding
 add_action('admin_notices', function() {
     if (isset($_GET['seeding_completed']) && $_GET['seeding_completed'] === '1') {
-        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Le contenu initial de la base de données a été ré-initialisé et configuré avec succès !', 'v5-digital') . '</p></div>';
+        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Le contenu initial de la base de données a été ré-initialisé et configuré avec succès !', 'agence-marketing-digital') . '</p></div>';
     }
 });
 
@@ -3051,11 +3051,11 @@ add_action('admin_notices', function() {
 function v5_digital_theme_setup() {
     // Navigation registration
     register_nav_menus(array(
-        'primary' => __('Primary Menu', 'v5-digital'),
-        'footer_explore' => __('Footer Explore (Découvrir)', 'v5-digital'),
-        'footer_resources' => __('Footer Resources (Ressources)', 'v5-digital'),
-        'footer_villes' => __('Footer Cities (Villes)', 'v5-digital'),
-        'footer_legal' => __('Footer Legal (Légal)', 'v5-digital'),
+        'primary' => __('Primary Menu', 'agence-marketing-digital'),
+        'footer_explore' => __('Footer Explore (Découvrir)', 'agence-marketing-digital'),
+        'footer_resources' => __('Footer Resources (Ressources)', 'agence-marketing-digital'),
+        'footer_villes' => __('Footer Cities (Villes)', 'agence-marketing-digital'),
+        'footer_legal' => __('Footer Legal (Légal)', 'agence-marketing-digital'),
     ));
 
     // Support standard dynamic title tag

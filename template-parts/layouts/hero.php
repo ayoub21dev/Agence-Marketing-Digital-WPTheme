@@ -1,6 +1,6 @@
 <?php
 /**
- * Hero Section Layout (v5-digital)
+ * Hero Section Layout (agence-marketing-digital)
  * Now supports dynamic CTAs (with styling and icons) and dynamic stats.
  */
 $eyebrow         = v5_get_field_default('eyebrow', '01 · MATCH & DISCOVER');

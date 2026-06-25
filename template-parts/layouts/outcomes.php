@@ -1,6 +1,6 @@
 <?php
 /**
- * Outcomes Section Layout (v5-digital)
+ * Outcomes Section Layout (agence-marketing-digital)
  */
 $eyebrow     = v5_get_field_default('eyebrow', 'Résultats clients vérifiés');
 $title       = v5_get_field_default('title', 'Ce que disent les équipes après avoir choisi via Agence Marketing Digital');
