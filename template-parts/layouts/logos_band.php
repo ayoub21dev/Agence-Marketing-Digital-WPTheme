@@ -1,6 +1,6 @@
 <?php
 /**
- * Logos Band Layout (v5-digital)
+ * Logos Band Layout (agence-marketing-digital)
  */
 $title = v5_get_field_default('section_title', 'ILS NOUS FONT CONFIANCE');
 $logo_query = new WP_Query(array(

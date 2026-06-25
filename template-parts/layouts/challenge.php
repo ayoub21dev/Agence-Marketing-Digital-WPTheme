@@ -1,6 +1,6 @@
 <?php
 /**
- * Challenge Section Layout (v5-digital)
+ * Challenge Section Layout (agence-marketing-digital)
  */
 $eyebrow         = v5_get_field_default('eyebrow', 'Le Défi');
 $title           = v5_get_field_default('title', 'La plupart des entreprises choisissent la <span class="challenge-focus-word">mauvaise agence</span> en <span class="challenge-time-word">48 heures</span>.');

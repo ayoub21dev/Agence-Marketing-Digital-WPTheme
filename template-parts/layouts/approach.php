@@ -1,6 +1,6 @@
 <?php
 /**
- * Approach Section Layout (v5-digital)
+ * Approach Section Layout (agence-marketing-digital)
  */
 $eyebrow     = v5_get_field_default('eyebrow', 'Notre Approche');
 $title       = v5_get_field_default('title', 'Une <span class="approach-focus-word">meilleure façon</span> de <span class="approach-action-word">choisir</span> une agence.');

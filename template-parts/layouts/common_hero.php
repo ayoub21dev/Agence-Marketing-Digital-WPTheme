@@ -50,7 +50,7 @@ if ($has_home || $has_current || $has_title || $has_desc || $has_cta) :
     }
 </style>
 
-<!-- Hero Header Section (v5_1 style: Centered with animation) -->
+<!-- Hero Header Section (centered with animation) -->
 <section class="relative z-10 bg-white/80 border-b border-slate-200 backdrop-blur-sm">
     <div class="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 pt-16 pb-12 md:pt-20 md:pb-16 text-center">
         <!-- Breadcrumbs & Back -->

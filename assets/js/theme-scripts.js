@@ -1,5 +1,5 @@
 /* ----------------------------------------------------
- * Custom Theme Scripts and GSAP Animations for v5-digital
+ * Custom Theme Scripts and GSAP Animations for agence-marketing-digital
  * ---------------------------------------------------- */
 
 document.addEventListener("DOMContentLoaded", () => {

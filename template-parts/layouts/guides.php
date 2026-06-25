@@ -1,6 +1,6 @@
 <?php
 /**
- * Guides Section Layout (v5-digital)
+ * Guides Section Layout (agence-marketing-digital)
  */
 $eyebrow   = v5_get_field_default('eyebrow', 'Éditorial');
 $title     = v5_get_field_default('title', 'Derniers guides & analyses.');

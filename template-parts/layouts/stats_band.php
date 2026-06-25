@@ -1,6 +1,6 @@
 <?php
 /**
- * Stats Band Layout (v5-digital)
+ * Stats Band Layout (agence-marketing-digital)
  */
 $stats_query = new WP_Query(array(
     'post_type' => 'stat_metric',
