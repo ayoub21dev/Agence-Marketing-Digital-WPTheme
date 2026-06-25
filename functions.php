@@ -3531,3 +3531,50 @@ function v5_digital_migrate_blog_cpt_to_posts() {
 }
 add_action('admin_init', 'v5_digital_migrate_blog_cpt_to_posts');
 
+/**
+ * Self-healing: give every blog post a real category derived from its ACF
+ * "badge" so it no longer shows as "Uncategorized" in the admin/front-end.
+ * Only touches posts still in the default category, so it's cheap and also
+ * fixes any new post left uncategorized.
+ */
+function v5_digital_backfill_post_categories() {
+    if (!function_exists('get_field')) {
+        return;
+    }
+
+    $default_cat = (int) get_option('default_category');
+    if (!$default_cat) {
+        return;
+    }
+
+    $posts = get_posts(array(
+        'post_type'      => 'post',
+        'post_status'    => array('publish', 'draft', 'pending', 'private', 'future'),
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+        'category__in'   => array($default_cat),
+    ));
+
+    foreach ($posts as $post_id) {
+        $badge = get_field('badge', $post_id);
+        if (empty($badge)) {
+            continue;
+        }
+
+        // Resolve or create the matching category.
+        $existing = term_exists($badge, 'category');
+        if ($existing && !is_wp_error($existing)) {
+            $term_id = (int) (is_array($existing) ? $existing['term_id'] : $existing);
+        } else {
+            $created = wp_insert_term($badge, 'category');
+            $term_id = (!is_wp_error($created) && !empty($created['term_id'])) ? (int) $created['term_id'] : 0;
+        }
+
+        if ($term_id) {
+            // Replace (not append) so the default "Uncategorized" is removed.
+            wp_set_post_categories($post_id, array($term_id), false);
+        }
+    }
+}
+add_action('admin_init', 'v5_digital_backfill_post_categories');
+
