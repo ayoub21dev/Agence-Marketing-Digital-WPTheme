@@ -106,6 +106,20 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
                 </span>
             </div>
 
+            <?php if (have_rows('hero_stats')) : ?>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-7 max-w-4xl mx-auto pt-7 border-t border-slate-200/60 mt-7">
+                    <?php while (have_rows('hero_stats')) : the_row();
+                        $num = get_sub_field('number');
+                        $lbl = get_sub_field('label');
+                        ?>
+                        <div class="text-center">
+                            <div class="text-[1.35rem] md:text-[1.65rem] font-extrabold text-slate-900 tracking-tight font-display"><?php echo esc_html($num); ?></div>
+                            <div class="text-[10px] md:text-[11px] text-slate-500 font-semibold mt-1 uppercase tracking-wider font-mono"><?php echo esc_html($lbl); ?></div>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+            <?php endif; ?>
+
         </div>
     </div>
 </section>
