@@ -80,6 +80,14 @@ if (empty($items)) {
     width: auto;
     max-width: 130px;
     object-fit: contain;
+    filter: grayscale(1) saturate(0);
+    opacity: 0.62;
+    transition: filter 180ms ease, opacity 180ms ease, transform 180ms ease;
+  }
+  .v5-logos-item:hover img {
+    filter: grayscale(0) saturate(1);
+    opacity: 1;
+    transform: translateY(-1px);
   }
   @media (min-width: 768px) {
     .v5-logos-item img {
