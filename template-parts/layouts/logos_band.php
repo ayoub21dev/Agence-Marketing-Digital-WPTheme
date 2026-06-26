@@ -1,69 +1,111 @@
 <?php
 /**
  * Logos Band Layout (agence-marketing-digital)
+ * Infinite horizontal marquee: the logo row scrolls continuously and loops
+ * seamlessly. The row is rendered twice and the track is animated -50% so the
+ * second copy takes over exactly where the first ends.
  */
 $title = v5_get_field_default('section_title', 'ILS NOUS FONT CONFIANCE');
-$logo_query = new WP_Query(array(
-  'post_type' => 'partner_logo',
-  'posts_per_page' => -1,
-  'post_status' => 'publish'
-));
-?>
-<section class="py-12 bg-slate-50 border-t border-b border-slate-200">
-  <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-    <?php if ($title): ?>
-      <span
-        class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-5"><?php echo esc_html($title); ?></span>
-    <?php endif; ?>
 
-    <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-8 md:gap-x-16">
-      <?php
-      if ($logo_query->have_posts()):
-        while ($logo_query->have_posts()):
-          $logo_query->the_post();
-          $logo_id = get_the_ID();
-          $logo_media = get_field('logo_image_media', $logo_id);
-          $logo_url = get_field('logo_image_url', $logo_id);
-          $logo_src = !empty($logo_media) ? $logo_media : $logo_url;
-          ?>
-          <div class="flex items-center justify-center h-10 min-w-[100px] max-w-[150px]">
-            <?php if (!empty($logo_src)): ?>
-              <img src="<?php echo esc_url($logo_src); ?>" alt="<?php the_title_attribute(); ?>" class="max-h-8 md:max-h-10 w-auto object-contain transition-all duration-300 hover:-translate-y-0.5">
-            <?php else: ?>
-              <div class="text-[15px] font-bold text-slate-500 hover:text-slate-900 transition-all duration-200 hover:-translate-y-0.5 uppercase font-display select-none cursor-default">
-                <?php the_title(); ?>
-              </div>
-            <?php endif; ?>
-          </div>
-        <?php
-        endwhile;
-        wp_reset_postdata();
-      else:
-        // Fallback static items
-        $fallbacks = array(
-          array('name' => 'Nestle', 'slug' => 'nestle'),
-          array('name' => 'Google', 'slug' => 'google'),
-          array('name' => 'Hyundai', 'slug' => 'hyundai'),
-          array('name' => 'L\'Oreal', 'slug' => 'loreal'),
-          array('name' => 'Volvo', 'slug' => 'volvo'),
-          array('name' => 'Samsung', 'slug' => 'samsung')
-        );
-        foreach ($fallbacks as $fallback):
-          $has_simple_icon = in_array($fallback['slug'], array('google', 'hyundai', 'volvo', 'samsung'));
-          ?>
-          <div class="flex items-center justify-center h-10 min-w-[100px] max-w-[150px]">
-            <?php if ($has_simple_icon): ?>
-              <img src="https://cdn.simpleicons.org/<?php echo $fallback['slug']; ?>/66717f" alt="<?php echo esc_attr($fallback['name']); ?>" class="max-h-8 md:max-h-10 w-auto object-contain transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-0.5">
-            <?php else: ?>
-              <div class="text-[15px] font-bold text-slate-500 hover:text-slate-900 transition-all duration-200 hover:-translate-y-0.5 uppercase font-display select-none cursor-default">
-                <?php echo esc_html($fallback['name']); ?>
-              </div>
-            <?php endif; ?>
-          </div>
-          <?php
-        endforeach;
-      endif;
-      ?>
+// Collect logos into a normalized list so we can render the row twice (loop).
+$items = array();
+
+$logo_query = new WP_Query(array(
+  'post_type'      => 'partner_logo',
+  'posts_per_page' => -1,
+  'post_status'    => 'publish',
+));
+
+if ($logo_query->have_posts()) :
+  while ($logo_query->have_posts()) :
+    $logo_query->the_post();
+    $logo_id    = get_the_ID();
+    $logo_media = get_field('logo_image_media', $logo_id);
+    $logo_url   = get_field('logo_image_url', $logo_id);
+    $items[] = array(
+      'src'  => !empty($logo_media) ? $logo_media : $logo_url,
+      'name' => get_the_title(),
+    );
+  endwhile;
+  wp_reset_postdata();
+else :
+  // Fallback demo brands (only when no "Logos Partenaires" exist yet).
+  $fallbacks = array(
+    array('name' => 'Nestle',  'slug' => 'nestle'),
+    array('name' => 'Google',  'slug' => 'google'),
+    array('name' => 'Hyundai', 'slug' => 'hyundai'),
+    array('name' => "L'Oreal", 'slug' => 'loreal'),
+    array('name' => 'Volvo',   'slug' => 'volvo'),
+    array('name' => 'Samsung', 'slug' => 'samsung'),
+  );
+  foreach ($fallbacks as $fb) {
+    $has_icon = in_array($fb['slug'], array('google', 'hyundai', 'volvo', 'samsung', 'spotify'), true);
+    $items[] = array(
+      'src'  => $has_icon ? 'https://cdn.simpleicons.org/' . $fb['slug'] . '/66717f' : '',
+      'name' => $fb['name'],
+    );
+  }
+endif;
+?>
+
+<style>
+  .v5-logos-marquee {
+    width: 100%;
+    overflow: hidden;
+    /* Soft fade on both edges so logos appear/disappear smoothly. */
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+            mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .v5-logos-track {
+    display: flex;
+    width: max-content;
+    align-items: center;
+    animation: v5-logos-scroll 35s linear infinite;
+  }
+  /* Pause when the visitor hovers the band. */
+  .v5-logos-marquee:hover .v5-logos-track {
+    animation-play-state: paused;
+  }
+  .v5-logos-item {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Space between logos. */
+    padding: 0 2.75rem;
+    height: 2.5rem;
+  }
+  @keyframes v5-logos-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .v5-logos-track { animation: none; }
+  }
+</style>
+
+<section class="py-12 bg-slate-50 border-t border-b border-slate-200 overflow-hidden">
+  <?php if ($title) : ?>
+    <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
+      <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-6"><?php echo esc_html($title); ?></span>
     </div>
-  </div>
+  <?php endif; ?>
+
+  <?php if (!empty($items)) : ?>
+    <div class="v5-logos-marquee">
+      <div class="v5-logos-track">
+        <?php for ($copy = 0; $copy < 2; $copy++) : ?>
+          <?php foreach ($items as $item) : ?>
+            <div class="v5-logos-item"<?php echo $copy === 1 ? ' aria-hidden="true"' : ''; ?>>
+              <?php if (!empty($item['src'])) : ?>
+                <img src="<?php echo esc_url($item['src']); ?>" alt="<?php echo esc_attr($item['name']); ?>" class="max-h-8 md:max-h-10 w-auto object-contain">
+              <?php else : ?>
+                <span class="text-[15px] font-bold text-slate-500 uppercase font-display select-none whitespace-nowrap"><?php echo esc_html($item['name']); ?></span>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        <?php endfor; ?>
+      </div>
+    </div>
+  <?php endif; ?>
 </section>
