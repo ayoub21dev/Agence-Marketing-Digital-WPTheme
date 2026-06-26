@@ -2783,7 +2783,7 @@ function v5_digital_setup_theme_content() {
                         'text' => 'Trouver mon agence',
                         'link_type' => 'page',
                         'page' => isset($seeded_page_ids['contact']) ? $seeded_page_ids['contact'] : '',
-                        'style' => 'primary',
+                        'style' => 'secondary',
                         'icon' => 'sparkles',
                     ),
                     array(
@@ -3582,7 +3582,7 @@ function v5_digital_backfill_homepage_hero_fields() {
             'link_type' => 'page',
             'page' => $contact_page_id,
             'url' => '',
-            'style' => 'primary',
+            'style' => 'secondary',
             'bg_color' => '',
             'text_color' => '',
             'icon' => 'sparkles',

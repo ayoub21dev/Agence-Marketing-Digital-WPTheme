@@ -48,16 +48,23 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
                         if (empty($link)) $link = '#';
 
                         // Resolve styles & classes
+                        $primary_classes = 'bg-brand-600 hover:bg-brand-700 text-white font-bold shadow-lg shadow-brand-600/10';
+                        $secondary_classes = 'bg-white hover:bg-slate-50 text-slate-800 font-bold border border-slate-200 hover:border-slate-300';
                         $classes = '';
                         $styles = '';
                         if ($style === 'primary') {
-                            $classes = 'bg-brand-600 hover:bg-brand-700 text-white font-bold shadow-lg shadow-brand-600/10';
+                            $classes = $primary_classes;
                         } elseif ($style === 'secondary') {
-                            $classes = 'bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-slate-300';
+                            $classes = $secondary_classes;
                         } elseif ($style === 'custom') {
                             $classes = 'font-bold transition-all';
                             if (!empty($bg_color)) $styles .= 'background-color:' . esc_attr($bg_color) . ';';
                             if (!empty($text_color)) $styles .= 'color:' . esc_attr($text_color) . ';';
+                        }
+
+                        if (trim(wp_strip_all_tags((string) $text)) === 'Trouver mon agence') {
+                            $classes = $secondary_classes;
+                            $styles = '';
                         }
 
                         // Determine if it is external
@@ -80,7 +87,7 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
                 else :
                     // Fallback to static CTAs if not populated
                     ?>
-                    <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-7 py-3.5 rounded-xl text-[14px] transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-brand-600/10">
+                    <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="bg-white hover:bg-slate-50 text-slate-800 font-bold px-7 py-3.5 rounded-xl text-[14px] border border-slate-200 hover:border-slate-300 transition-all flex items-center justify-center gap-2.5">
                         <i data-lucide="sparkles" class="w-4 h-4"></i>
                         <span>Trouver mon agence</span>
                     </a>
