@@ -28,13 +28,16 @@ function v5_digital_allow_svg_uploads($mimes) {
 add_filter('upload_mimes', 'v5_digital_allow_svg_uploads');
 
 // Make WordPress accept the SVG file type/extension on upload.
+// We force the SVG type for any .svg/.svgz filename (admins only) so the
+// server's finfo "real MIME" check — which often reports SVG as text/plain or
+// text/html — can no longer reject the upload.
 function v5_digital_fix_svg_mime($data, $file, $filename, $mimes, $real_mime = '') {
-    $ext = isset($data['ext']) ? $data['ext'] : '';
-    if ($ext === '' && preg_match('/\.svgz?$/i', $filename)) {
-        if (current_user_can('manage_options')) {
-            $data['ext']  = 'svg';
-            $data['type'] = 'image/svg+xml';
-        }
+    if (!current_user_can('manage_options')) {
+        return $data;
+    }
+    if (preg_match('/\.svgz?$/i', $filename)) {
+        $data['ext']  = 'svg';
+        $data['type'] = 'image/svg+xml';
     }
     return $data;
 }
