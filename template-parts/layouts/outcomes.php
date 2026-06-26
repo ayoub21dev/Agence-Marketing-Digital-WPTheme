@@ -85,7 +85,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                         ?>
                         <article class="flex min-h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
                             <div class="flex-1 p-6">
-                                <div class="mb-4 flex gap-0.5 text-amber-500" aria-label="<?php echo esc_attr($c_rating); ?> stars">
+                                <div role="img" class="mb-4 flex gap-0.5 text-amber-500" aria-label="<?php echo esc_attr($c_rating); ?> stars">
                                     <?php for ($i = 0; $i < 5; $i++) {
                                         echo $i < $c_rating
                                             ? '<i data-lucide="star" class="h-4 w-4 fill-amber-500"></i>'
@@ -189,7 +189,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                         ?>
                         <article class="flex min-h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
                             <div class="flex-1 p-6">
-                                <div class="mb-4 flex gap-0.5 text-amber-500" aria-label="<?php echo esc_attr($rating); ?> stars">
+                                <div role="img" class="mb-4 flex gap-0.5 text-amber-500" aria-label="<?php echo esc_attr($rating); ?> stars">
                                     <?php 
                                     for ($i = 0; $i < 5; $i++) {
                                         if ($i < $rating) {
@@ -267,7 +267,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                         ?>
                         <article class="flex min-h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
                             <div class="flex-1 p-6">
-                                <div class="mb-4 flex gap-0.5 text-amber-500" aria-label="5 stars">
+                                <div role="img" class="mb-4 flex gap-0.5 text-amber-500" aria-label="5 stars">
                                     <?php for ($i = 0; $i < 5; $i++) : ?>
                                         <i data-lucide="star" class="h-4 w-4 fill-amber-500"></i>
                                     <?php endfor; ?>
