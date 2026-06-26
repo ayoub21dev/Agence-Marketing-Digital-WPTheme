@@ -3083,6 +3083,41 @@ function v5_digital_setup_theme_content() {
 }
 add_action('after_switch_theme', 'v5_digital_setup_theme_content');
 
+// Read-only footer diagnostic (admins only): visit any wp-admin URL with
+// ?v5_footer_debug=1 to dump exactly what is holding the footer menu locations.
+// Helps diagnose the "Villes column keeps coming back" issue. Remove later.
+add_action('admin_init', function() {
+    if (!isset($_GET['v5_footer_debug']) || !current_user_can('manage_options')) {
+        return;
+    }
+
+    $theme_slug = get_stylesheet();
+    $polylang   = get_option('polylang');
+    $footer_loc = array('footer_explore', 'footer_resources', 'footer_villes', 'footer_legal');
+
+    $menus = array();
+    foreach (wp_get_nav_menus() as $m) {
+        $items = wp_get_nav_menu_items($m->term_id);
+        $menus[] = array(
+            'term_id'    => $m->term_id,
+            'name'       => $m->name,
+            'item_count' => is_array($items) ? count($items) : 0,
+        );
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode(array(
+        'polylang_active'             => (defined('POLYLANG_VERSION') ? POLYLANG_VERSION : (function_exists('pll_current_language') ? 'yes' : 'no')),
+        'nav_menu_locations_raw'      => get_option('theme_mods_' . $theme_slug)['nav_menu_locations'] ?? null,
+        'nav_menu_locations_filtered' => get_nav_menu_locations(),
+        'polylang_nav_menus'          => is_array($polylang) && isset($polylang['nav_menus']) ? $polylang['nav_menus'] : null,
+        'footer_setup_guard'          => get_option('v5_footer_menus_setup_v1_done'),
+        'migration_version'           => get_option('v5_digital_migration_version'),
+        'all_menus'                   => $menus,
+    ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    exit;
+});
+
 // 4.7. Force-seed trigger — administrators only, CSRF-protected via ?force_seed=1 + nonce.
 add_action('admin_init', function() {
     if (!isset($_GET['force_seed'])) {
