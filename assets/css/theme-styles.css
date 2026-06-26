@@ -29,6 +29,19 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.02em;
 }
 
+/* When logged in, the WordPress admin bar is fixed at the top (32px, or 46px
+   on small screens). Offset the sticky header so it pins BELOW the admin bar
+   instead of being clipped behind it. Visitors never see the admin bar, so
+   this only applies via the body.admin-bar class WordPress adds. */
+.admin-bar header.sticky {
+    top: 32px;
+}
+@media screen and (max-width: 782px) {
+    .admin-bar header.sticky {
+        top: 46px;
+    }
+}
+
 .page {
     animation: fadeIn 0.2s ease-out;
 }
