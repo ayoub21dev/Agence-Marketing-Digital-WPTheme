@@ -5,38 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Load Google Fonts without blocking render: fetch as a "print" sheet,
+         then promote it to "all" once it has loaded. <noscript> keeps it working
+         when JS is disabled. -->
+    <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
+    </noscript>
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace']
-                    },
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind utilities are now compiled to /assets/css/tailwind.css and
+         enqueued by the theme (no more render-blocking CDN runtime). -->
+
+    <!-- Lucide Icons (deferred: icons are drawn on DOMContentLoaded) -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+
     <script type="text/javascript">
         window.wpThemeSettings = {
             homeUrl: "<?php echo esc_url(home_url('/')); ?>"

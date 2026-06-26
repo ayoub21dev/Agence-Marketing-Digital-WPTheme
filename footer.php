@@ -231,9 +231,9 @@ if (!function_exists('v5_digital_render_footer_column')) {
         }
     </style>
 
-    <!-- GSAP Libraries CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <!-- GSAP Libraries CDN (deferred: animations init on DOMContentLoaded) -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
 
     <?php wp_footer(); ?>
 </body>

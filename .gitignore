@@ -1,0 +1,5 @@
+# Node / build tooling — never commit or deploy these
+node_modules/
+
+# The compiled CSS (assets/css/tailwind.css) IS committed so production has it
+# without needing a build step on the server.
