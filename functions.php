@@ -3159,8 +3159,102 @@ function v5_digital_theme_setup() {
 
     // Support standard dynamic title tag
     add_theme_support('title-tag');
+
+    // Load translations for the theme's own __() strings.
+    load_theme_textdomain('agence-marketing-digital', get_template_directory() . '/languages');
 }
 add_action('after_setup_theme', 'v5_digital_theme_setup');
+
+// ----------------------------------------------------
+// 5b. MULTILINGUAL — POLYLANG STRING INTEGRATION
+// ----------------------------------------------------
+//
+// Every hardcoded UI string the visitor can see is listed here once. Each is
+// registered with Polylang so it appears under "Langues > Traductions des
+// chaînes" in wp-admin, where the team translates it per language — no code and
+// no .po files needed. Templates output them via v5_t().
+
+/**
+ * The full list of translatable theme UI strings (French = the source text).
+ * Keep this in sync: any string passed to v5_t() should appear here so it shows
+ * up in Polylang's string-translation screen.
+ */
+function v5_digital_ui_strings() {
+    return array(
+        // Header / navigation
+        'Trouver une agence',
+        'Ouvrir le menu',
+        'Langue',
+        // Navigation fallback labels (shown only when no menu is assigned)
+        'accueil',
+        'blog',
+        'à propos',
+        'méthodologie',
+        'contact',
+        // Footer
+        'Recherche indépendante',
+        'Analyses indépendantes des agences de marketing digital au Maroc. Évaluations objectives, guides de sélection pratiques et absence d\'influence publicitaire.',
+        'Rechercher des agences, des pages, des villes...',
+        'Fermer la recherche',
+        // Blog / article meta
+        'Par',
+    );
+}
+
+/**
+ * Register the UI strings with Polylang (only when the plugin is active).
+ */
+add_action('init', function () {
+    if (!function_exists('pll_register_string')) {
+        return;
+    }
+    foreach (v5_digital_ui_strings() as $string) {
+        pll_register_string($string, $string, 'Agence Marketing Digital');
+    }
+});
+
+/**
+ * Translate a theme UI string. Returns the Polylang translation for the current
+ * language when Polylang is active, otherwise the original French text — so the
+ * theme works identically with or without the plugin.
+ */
+function v5_t($string) {
+    return function_exists('pll__') ? pll__($string) : $string;
+}
+
+/**
+ * Render a compact language switcher (e.g. FR / EN). Outputs nothing unless
+ * Polylang is active with at least two languages, so it stays invisible on a
+ * single-language site.
+ */
+function v5_digital_language_switcher() {
+    if (!function_exists('pll_the_languages')) {
+        return;
+    }
+
+    $langs = pll_the_languages(array(
+        'raw'           => 1,
+        'hide_if_empty' => 1,
+        'hide_current'  => 0,
+    ));
+
+    if (empty($langs) || !is_array($langs) || count($langs) < 2) {
+        return;
+    }
+
+    $items = array();
+    foreach ($langs as $lang) {
+        $code = strtoupper(esc_html($lang['slug']));
+        $cls  = !empty($lang['current_lang'])
+            ? 'text-slate-900 font-semibold'
+            : 'text-slate-500 hover:text-slate-900';
+        $items[] = '<a href="' . esc_url($lang['url']) . '" class="' . $cls . ' transition-colors uppercase" hreflang="' . esc_attr($lang['slug']) . '" lang="' . esc_attr($lang['slug']) . '">' . $code . '</a>';
+    }
+
+    echo '<div class="flex items-center gap-1.5 text-[12px] font-medium tracking-wide" role="navigation" aria-label="' . esc_attr(v5_t('Langue')) . '">';
+    echo implode('<span class="text-slate-300" aria-hidden="true">/</span>', $items);
+    echo '</div>';
+}
 
 /**
  * Resolve the primary navigation menu items (Polylang-aware), with the language

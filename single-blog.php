@@ -94,7 +94,7 @@ get_header();
                         <h1 class="text-[1.75rem] md:text-[2.25rem] font-extrabold text-slate-900 tracking-tight leading-tight mb-4 font-display"><?php the_title(); ?></h1>
                         
                         <div class="flex flex-wrap items-center gap-3 text-[12px] text-slate-500 font-mono">
-                            <span class="flex items-center gap-1"><i data-lucide="user" class="w-3.5 h-3.5"></i> <span>Par <?php echo esc_html($author); ?></span></span>
+                            <span class="flex items-center gap-1"><i data-lucide="user" class="w-3.5 h-3.5"></i> <span><?php echo esc_html(v5_t('Par')); ?> <?php echo esc_html($author); ?></span></span>
                             <span>&middot;</span>
                             <span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span><?php echo get_the_date('d M Y'); ?></span></span>
                             <span>&middot;</span>

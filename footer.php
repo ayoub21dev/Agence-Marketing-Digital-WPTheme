@@ -63,9 +63,9 @@ if (!function_exists('v5_digital_render_footer_column')) {
                         </div>
                     </div>
                     <p class="text-[13px] text-slate-500 leading-relaxed max-w-sm">
-                        <?php 
+                        <?php
                         $tagline = get_bloginfo('description');
-                        echo !empty($tagline) ? esc_html($tagline) : 'Analyses indépendantes des agences de marketing digital au Maroc. Évaluations objectives, guides de sélection pratiques et absence d\'influence publicitaire.'; 
+                        echo !empty($tagline) ? esc_html($tagline) : esc_html(v5_t('Analyses indépendantes des agences de marketing digital au Maroc. Évaluations objectives, guides de sélection pratiques et absence d\'influence publicitaire.'));
                         ?>
                     </p>
                 </div>
@@ -115,7 +115,7 @@ if (!function_exists('v5_digital_render_footer_column')) {
                 ?>
             </div>
             <div class="border-t border-slate-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p class="text-[12px] text-slate-500 font-mono">&copy; <?php echo date('Y'); ?> Agence Marketing Digital. Recherche indépendante.</p>
+                <p class="text-[12px] text-slate-500 font-mono">&copy; <?php echo esc_html(date('Y')); ?> Agence Marketing Digital. <?php echo esc_html(v5_t('Recherche indépendante')); ?>.</p>
                 <div class="flex items-center gap-4 text-slate-500">
                     <a href="#" aria-label="Twitter" class="hover:text-slate-700 transition-colors"><i data-lucide="twitter" class="w-4 h-4" aria-hidden="true"></i></a>
                     <a href="#" aria-label="LinkedIn" class="hover:text-slate-700 transition-colors"><i data-lucide="linkedin" class="w-4 h-4" aria-hidden="true"></i></a>
@@ -130,8 +130,8 @@ if (!function_exists('v5_digital_render_footer_column')) {
     <dialog id="search-modal" class="backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm rounded-xl border border-slate-200 shadow-xl max-w-xl w-full p-0 bg-white overflow-hidden outline-none">
         <div class="p-4 border-b border-slate-150 flex items-center gap-3">
             <i data-lucide="search" class="w-5 h-5 text-slate-500 flex-shrink-0"></i>
-            <input type="text" id="search-input" placeholder="Rechercher des agences, des pages, des villes..." class="w-full text-[15px] outline-none text-slate-700 bg-transparent font-sans">
-            <button onclick="closeSearchPalette()" aria-label="Fermer la recherche" class="text-slate-500 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i></button>
+            <input type="text" id="search-input" placeholder="<?php echo esc_attr(v5_t('Rechercher des agences, des pages, des villes...')); ?>" class="w-full text-[15px] outline-none text-slate-700 bg-transparent font-sans">
+            <button onclick="closeSearchPalette()" aria-label="<?php echo esc_attr(v5_t('Fermer la recherche')); ?>" class="text-slate-500 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i></button>
         </div>
         <ul id="search-results" class="max-h-80 overflow-y-auto p-2 space-y-0.5 font-sans">
             <!-- Search results populated dynamically -->

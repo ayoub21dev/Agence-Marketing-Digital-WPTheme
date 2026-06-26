@@ -77,7 +77,7 @@
                     } else {
                         foreach (v5_digital_nav_fallback_links() as $link) {
                             $active_class = v5_digital_nav_fallback_is_active($link['check']) ? 'active' : '';
-                            echo '<a href="' . esc_url($link['url']) . '" class="nav-link ' . $active_class . ' text-[13px] font-medium">' . esc_html($link['label']) . '</a>';
+                            echo '<a href="' . esc_url($link['url']) . '" class="nav-link ' . $active_class . ' text-[13px] font-medium">' . esc_html(v5_t($link['label'])) . '</a>';
                         }
                     }
                     ?>
@@ -87,12 +87,12 @@
                 <div class="flex items-center gap-3">
                     <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="hidden sm:flex bg-brand-600 hover:bg-brand-700 text-white font-semibold px-3.5 py-1.5 rounded-lg text-[12px] transition-all items-center gap-1 cursor-pointer">
                         <i data-lucide="sparkles" class="w-3.5 h-3.5 fill-white/20"></i>
-                        <span>Trouver une agence</span>
+                        <span><?php echo esc_html(v5_t('Trouver une agence')); ?></span>
                     </a>
-                    
 
- 
-                    <button onclick="toggleMobileMenu()" aria-label="Ouvrir le menu" aria-expanded="false" class="md:hidden p-1.5 text-slate-600 hover:text-brand-600 cursor-pointer">
+                    <?php v5_digital_language_switcher(); ?>
+
+                    <button onclick="toggleMobileMenu()" aria-label="<?php echo esc_attr(v5_t('Ouvrir le menu')); ?>" aria-expanded="false" class="md:hidden p-1.5 text-slate-600 hover:text-brand-600 cursor-pointer">
                         <i data-lucide="menu" class="w-5 h-5" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -112,13 +112,13 @@
                 } else {
                     foreach (v5_digital_nav_fallback_links() as $link) {
                         $active_class = v5_digital_nav_fallback_is_active($link['check']) ? 'bg-slate-50 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-50';
-                        echo '<a href="' . esc_url($link['url']) . '" class="block px-3 py-2 text-[13px] font-medium rounded-md ' . $active_class . '">' . esc_html($link['label']) . '</a>';
+                        echo '<a href="' . esc_url($link['url']) . '" class="block px-3 py-2 text-[13px] font-medium rounded-md ' . $active_class . '">' . esc_html(v5_t($link['label'])) . '</a>';
                     }
                 }
                 ?>
                 <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="w-full text-left block px-3 py-2 text-[13px] font-medium text-brand-600 hover:bg-slate-50 rounded-md flex items-center gap-1 font-semibold cursor-pointer">
                     <i data-lucide="sparkles" class="w-3.5 h-3.5 fill-brand-100"></i>
-                    <span>Trouver une agence</span>
+                    <span><?php echo esc_html(v5_t('Trouver une agence')); ?></span>
                 </a>
             </div>
         </div>
