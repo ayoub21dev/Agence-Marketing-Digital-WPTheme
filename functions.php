@@ -59,11 +59,21 @@ function v5_digital_register_cpts() {
         'labels' => array(
             'name' => __('Logos Partenaires', 'agence-marketing-digital'),
             'singular_name' => __('Logo Partenaire', 'agence-marketing-digital'),
+            'all_items' => __('Tous les Logos Partenaires', 'agence-marketing-digital'),
+            'add_new' => __('Ajouter', 'agence-marketing-digital'),
+            'add_new_item' => __('Ajouter un Logo Partenaire', 'agence-marketing-digital'),
+            'edit_item' => __('Modifier le Logo Partenaire', 'agence-marketing-digital'),
+            'new_item' => __('Nouveau Logo Partenaire', 'agence-marketing-digital'),
+            'view_item' => __('Voir le Logo Partenaire', 'agence-marketing-digital'),
+            'search_items' => __('Rechercher des Logos Partenaires', 'agence-marketing-digital'),
+            'not_found' => __('Aucun logo partenaire trouvé', 'agence-marketing-digital'),
+            'not_found_in_trash' => __('Aucun logo partenaire trouvé dans la corbeille', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => false,
         'supports' => array('title'),
         'menu_icon' => 'dashicons-format-image',
+        'show_in_rest' => true,
     ));
 
     // Stat Metrics
@@ -71,11 +81,21 @@ function v5_digital_register_cpts() {
         'labels' => array(
             'name' => __('Statistiques', 'agence-marketing-digital'),
             'singular_name' => __('Statistique', 'agence-marketing-digital'),
+            'all_items' => __('Toutes les Statistiques', 'agence-marketing-digital'),
+            'add_new' => __('Ajouter', 'agence-marketing-digital'),
+            'add_new_item' => __('Ajouter une Statistique', 'agence-marketing-digital'),
+            'edit_item' => __('Modifier la Statistique', 'agence-marketing-digital'),
+            'new_item' => __('Nouvelle Statistique', 'agence-marketing-digital'),
+            'view_item' => __('Voir la Statistique', 'agence-marketing-digital'),
+            'search_items' => __('Rechercher des Statistiques', 'agence-marketing-digital'),
+            'not_found' => __('Aucune statistique trouvée', 'agence-marketing-digital'),
+            'not_found_in_trash' => __('Aucune statistique trouvée dans la corbeille', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => false,
         'supports' => array('title', 'page-attributes'),
         'menu_icon' => 'dashicons-chart-bar',
+        'show_in_rest' => true,
     ));
 
     // Specialty Hubs
@@ -83,11 +103,21 @@ function v5_digital_register_cpts() {
         'labels' => array(
             'name' => __('Spécialités', 'agence-marketing-digital'),
             'singular_name' => __('Spécialité', 'agence-marketing-digital'),
+            'all_items' => __('Toutes les Spécialités', 'agence-marketing-digital'),
+            'add_new' => __('Ajouter', 'agence-marketing-digital'),
+            'add_new_item' => __('Ajouter une Spécialité', 'agence-marketing-digital'),
+            'edit_item' => __('Modifier la Spécialité', 'agence-marketing-digital'),
+            'new_item' => __('Nouvelle Spécialité', 'agence-marketing-digital'),
+            'view_item' => __('Voir la Spécialité', 'agence-marketing-digital'),
+            'search_items' => __('Rechercher des Spécialités', 'agence-marketing-digital'),
+            'not_found' => __('Aucune spécialité trouvée', 'agence-marketing-digital'),
+            'not_found_in_trash' => __('Aucune spécialité trouvée dans la corbeille', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => false,
         'supports' => array('title'),
         'menu_icon' => 'dashicons-category',
+        'show_in_rest' => true,
     ));
 
     // Agencies
@@ -158,11 +188,21 @@ function v5_digital_register_cpts() {
         'labels' => array(
             'name' => __('Témoignages', 'agence-marketing-digital'),
             'singular_name' => __('Témoignage', 'agence-marketing-digital'),
+            'all_items' => __('Tous les Témoignages', 'agence-marketing-digital'),
+            'add_new' => __('Ajouter', 'agence-marketing-digital'),
+            'add_new_item' => __('Ajouter un Témoignage', 'agence-marketing-digital'),
+            'edit_item' => __('Modifier le Témoignage', 'agence-marketing-digital'),
+            'new_item' => __('Nouveau Témoignage', 'agence-marketing-digital'),
+            'view_item' => __('Voir le Témoignage', 'agence-marketing-digital'),
+            'search_items' => __('Rechercher des Témoignages', 'agence-marketing-digital'),
+            'not_found' => __('Aucun témoignage trouvé', 'agence-marketing-digital'),
+            'not_found_in_trash' => __('Aucun témoignage trouvé dans la corbeille', 'agence-marketing-digital'),
         ),
         'public' => true,
         'has_archive' => false,
         'supports' => array('title', 'editor'),
         'menu_icon' => 'dashicons-testimonial',
+        'show_in_rest' => true,
     ));
 
 }
@@ -886,7 +926,6 @@ if (function_exists('acf_add_local_field_group')) {
                                 'instructions' => 'Ajoutez et modifiez chaque carte d\'avis directement ici. Si vide, les avis sont tirés des publications « Témoignage ».',
                                 'layout' => 'block',
                                 'button_label' => 'Ajouter une carte d\'avis',
-                                'max' => 6,
                                 'sub_fields' => array(
                                     array(
                                         'key' => 'field_out_card_quote',
@@ -962,7 +1001,6 @@ if (function_exists('acf_add_local_field_group')) {
                                 'post_type' => array('testimonial'),
                                 'filters' => array('search'),
                                 'elements' => array('title'),
-                                'max' => 6,
                                 'return_format' => 'id',
                             ),
                         ),

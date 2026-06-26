@@ -3,6 +3,42 @@
  * Layout: Search Filter Section
  * Standalone flexible content layout for the search filter block.
  */
+$service_terms = get_terms(array(
+    'taxonomy'   => 'agency_service',
+    'hide_empty' => false,
+    'orderby'    => 'name',
+    'order'      => 'ASC',
+));
+if (is_wp_error($service_terms)) {
+    $service_terms = array();
+}
+
+$city_terms = get_terms(array(
+    'taxonomy'   => 'agency_city',
+    'hide_empty' => false,
+    'orderby'    => 'name',
+    'order'      => 'ASC',
+));
+if (is_wp_error($city_terms)) {
+    $city_terms = array();
+}
+
+$fallback_services = array(
+    array('value' => 'SEO', 'label' => 'SEO (Référencement)'),
+    array('value' => 'Paid Ads', 'label' => 'Publicité Payante'),
+    array('value' => 'Social Media', 'label' => 'Réseaux Sociaux'),
+    array('value' => 'Web Design', 'label' => 'Design Web'),
+    array('value' => 'Branding', 'label' => 'Image de Marque'),
+    array('value' => 'Content Marketing', 'label' => 'Marketing de Contenu'),
+);
+
+$fallback_cities = array(
+    array('value' => 'Casablanca', 'label' => 'Casablanca'),
+    array('value' => 'Rabat', 'label' => 'Rabat'),
+    array('value' => 'Tangier', 'label' => 'Tanger'),
+    array('value' => 'Marrakech', 'label' => 'Marrakech'),
+    array('value' => 'Agadir', 'label' => 'Agadir'),
+);
 ?>
 <section class="relative z-10 py-6 bg-white/80 backdrop-blur-sm search-filter-section">
     <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -14,12 +50,15 @@
                     <div class="relative">
                         <select id="home-filter-service" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-[13px] text-slate-700 search-focus appearance-none cursor-pointer">
                             <option value="all">Tous les services</option>
-                            <option value="SEO">SEO (Référencement)</option>
-                            <option value="Paid Ads">Publicité Payante</option>
-                            <option value="Social Media">Réseaux Sociaux</option>
-                            <option value="Web Design">Design Web</option>
-                            <option value="Branding">Image de Marque</option>
-                            <option value="Content Marketing">Marketing de Contenu</option>
+                            <?php if (!empty($service_terms)) : ?>
+                                <?php foreach ($service_terms as $term) : ?>
+                                    <option value="<?php echo esc_attr($term->name); ?>"><?php echo esc_html($term->name); ?></option>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <?php foreach ($fallback_services as $service) : ?>
+                                    <option value="<?php echo esc_attr($service['value']); ?>"><?php echo esc_html($service['label']); ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
                 </div>
@@ -28,11 +67,15 @@
                     <div class="relative">
                         <select id="home-filter-city" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-[13px] text-slate-700 search-focus appearance-none cursor-pointer">
                             <option value="all">Toutes les villes</option>
-                            <option value="Casablanca">Casablanca</option>
-                            <option value="Rabat">Rabat</option>
-                            <option value="Tangier">Tanger</option>
-                            <option value="Marrakech">Marrakech</option>
-                            <option value="Agadir">Agadir</option>
+                            <?php if (!empty($city_terms)) : ?>
+                                <?php foreach ($city_terms as $term) : ?>
+                                    <option value="<?php echo esc_attr($term->name); ?>"><?php echo esc_html($term->name); ?></option>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <?php foreach ($fallback_cities as $city) : ?>
+                                    <option value="<?php echo esc_attr($city['value']); ?>"><?php echo esc_html($city['label']); ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
                 </div>

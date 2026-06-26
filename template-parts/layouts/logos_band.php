@@ -28,24 +28,11 @@ if ($logo_query->have_posts()) :
     );
   endwhile;
   wp_reset_postdata();
-else :
-  // Fallback demo brands (only when no "Logos Partenaires" exist yet).
-  $fallbacks = array(
-    array('name' => 'Nestle',  'slug' => 'nestle'),
-    array('name' => 'Google',  'slug' => 'google'),
-    array('name' => 'Hyundai', 'slug' => 'hyundai'),
-    array('name' => "L'Oreal", 'slug' => 'loreal'),
-    array('name' => 'Volvo',   'slug' => 'volvo'),
-    array('name' => 'Samsung', 'slug' => 'samsung'),
-  );
-  foreach ($fallbacks as $fb) {
-    $has_icon = in_array($fb['slug'], array('google', 'hyundai', 'volvo', 'samsung', 'spotify'), true);
-    $items[] = array(
-      'src'  => $has_icon ? 'https://cdn.simpleicons.org/' . $fb['slug'] . '/66717f' : '',
-      'name' => $fb['name'],
-    );
-  }
 endif;
+
+if (empty($items)) {
+  return;
+}
 ?>
 
 <style>

@@ -9,7 +9,7 @@
 $stat_query = new WP_Query(array(
     'post_type'      => 'stat_metric',
     'post_status'    => 'publish',
-    'posts_per_page' => 8,
+    'posts_per_page' => -1,
     'orderby'        => array('menu_order' => 'ASC', 'date' => 'ASC'),
 ));
 
