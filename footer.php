@@ -59,7 +59,7 @@ if (!function_exists('v5_digital_render_footer_column')) {
                         <div class="flex items-center gap-1 font-display">
                             <span class="font-extrabold text-[16px] text-slate-900 tracking-tight">Agence</span>
                             <span class="font-extrabold text-[16px] text-brand-600 tracking-tight">Marketing</span>
-                            <span class="font-light text-[16px] text-slate-400 tracking-tight">Digital</span>
+                            <span class="font-light text-[16px] text-slate-500 tracking-tight">Digital</span>
                         </div>
                     </div>
                     <p class="text-[13px] text-slate-500 leading-relaxed max-w-sm">
@@ -115,10 +115,10 @@ if (!function_exists('v5_digital_render_footer_column')) {
                 ?>
             </div>
             <div class="border-t border-slate-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p class="text-[12px] text-slate-400 font-mono">&copy; <?php echo date('Y'); ?> Agence Marketing Digital. Recherche indépendante.</p>
-                <div class="flex items-center gap-4 text-slate-400">
-                    <a href="#" class="hover:text-slate-500 transition-colors"><i data-lucide="twitter" class="w-4 h-4"></i></a>
-                    <a href="#" class="hover:text-slate-500 transition-colors"><i data-lucide="linkedin" class="w-4 h-4"></i></a>
+                <p class="text-[12px] text-slate-500 font-mono">&copy; <?php echo date('Y'); ?> Agence Marketing Digital. Recherche indépendante.</p>
+                <div class="flex items-center gap-4 text-slate-500">
+                    <a href="#" aria-label="Twitter" class="hover:text-slate-700 transition-colors"><i data-lucide="twitter" class="w-4 h-4" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="LinkedIn" class="hover:text-slate-700 transition-colors"><i data-lucide="linkedin" class="w-4 h-4" aria-hidden="true"></i></a>
                 </div>
             </div>
         </div>
@@ -129,14 +129,14 @@ if (!function_exists('v5_digital_render_footer_column')) {
     <!-- Global Command Palette Search Overlay -->
     <dialog id="search-modal" class="backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm rounded-xl border border-slate-200 shadow-xl max-w-xl w-full p-0 bg-white overflow-hidden outline-none">
         <div class="p-4 border-b border-slate-150 flex items-center gap-3">
-            <i data-lucide="search" class="w-5 h-5 text-slate-400 flex-shrink-0"></i>
+            <i data-lucide="search" class="w-5 h-5 text-slate-500 flex-shrink-0"></i>
             <input type="text" id="search-input" placeholder="Rechercher des agences, des pages, des villes..." class="w-full text-[15px] outline-none text-slate-700 bg-transparent font-sans">
-            <button onclick="closeSearchPalette()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <button onclick="closeSearchPalette()" aria-label="Fermer la recherche" class="text-slate-500 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i></button>
         </div>
         <ul id="search-results" class="max-h-80 overflow-y-auto p-2 space-y-0.5 font-sans">
             <!-- Search results populated dynamically -->
         </ul>
-        <div class="px-4 py-2 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+        <div class="px-4 py-2 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-[11px] text-slate-500 font-mono">
             <span>Appuyez sur ÉCHAP pour fermer</span>
             <span>recherche</span>
         </div>

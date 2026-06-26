@@ -55,7 +55,7 @@ if ($has_home || $has_current || $has_title || $has_desc || $has_cta) :
     <div class="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 pt-16 pb-12 md:pt-20 md:pb-16 text-center">
         <!-- Breadcrumbs & Back -->
         <?php if ($has_home || $has_current) : ?>
-        <div class="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-slate-400 mb-4 tracking-wider uppercase font-mono">
+        <div class="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-slate-500 mb-4 tracking-wider uppercase font-mono">
             <?php if ($has_home) : ?>
                 <a href="<?php echo esc_url(home_url('/')); ?>" class="cursor-pointer hover:text-slate-900 transition-colors"><?php echo esc_html($home_text); ?></a>
             <?php endif; ?>

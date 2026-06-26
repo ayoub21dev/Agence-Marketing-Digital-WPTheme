@@ -78,7 +78,7 @@ $guides_query = new WP_Query($query_args);
                             <span class="text-[11px] font-semibold text-slate-800 uppercase tracking-wider"><?php echo esc_html($badge); ?></span>
                             <h3 class="font-bold text-slate-900 mt-1 mb-2 text-[15px] font-display group-hover:text-brand-600 transition-colors line-clamp-2"><?php the_title(); ?></h3>
                             <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-3"><?php echo esc_html(get_the_excerpt()); ?></p>
-                            <div class="flex items-center gap-2 mt-auto text-[11px] text-slate-400 font-mono">
+                            <div class="flex items-center gap-2 mt-auto text-[11px] text-slate-500 font-mono">
                                 <span>Mis à jour le <?php echo get_the_modified_date('j F Y'); ?></span>
                                 <span>&middot;</span>
                                 <span><?php echo esc_html(strval(max(3, ceil(str_word_count(strip_tags(get_the_content())) / 200)))); ?> min</span>
@@ -110,7 +110,7 @@ $guides_query = new WP_Query($query_args);
                         <span class="text-[11px] font-semibold text-slate-800 uppercase tracking-wider">Classement</span>
                         <h3 class="font-bold text-slate-900 mt-1 mb-2 text-[15px] font-display group-hover:text-brand-600 transition-colors">Top Agences de Marketing Digital au Maroc</h3>
                         <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Notre sélection définitive des meilleures agences de marketing basées sur les avis vérifiés et les données de performance.</p>
-                        <div class="flex items-center gap-2 mt-auto text-[11px] text-slate-400 font-mono">
+                        <div class="flex items-center gap-2 mt-auto text-[11px] text-slate-500 font-mono">
                             <span>Mis à jour Juin 2026</span>
                             <span>&middot;</span>
                             <span>8 min</span>
@@ -126,7 +126,7 @@ $guides_query = new WP_Query($query_args);
                         <span class="text-[11px] font-semibold text-slate-800 uppercase tracking-wider">Guide</span>
                         <h3 class="font-bold text-slate-900 mt-1 mb-2 text-[15px] font-display group-hover:text-brand-600 transition-colors">Meilleures Agences SEO à Casablanca</h3>
                         <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Une liste d'experts en référencement naturel aidant les marques marocaines à se positionner en tête des résultats de recherche.</p>
-                        <div class="flex items-center gap-2 mt-auto text-[11px] text-slate-400 font-mono">
+                        <div class="flex items-center gap-2 mt-auto text-[11px] text-slate-500 font-mono">
                             <span>Mis à jour Mai 2026</span>
                             <span>&middot;</span>
                             <span>6 min</span>
@@ -142,7 +142,7 @@ $guides_query = new WP_Query($query_args);
                         <span class="text-[11px] font-semibold text-slate-800 uppercase tracking-wider">Comparatif</span>
                         <h3 class="font-bold text-slate-900 mt-1 mb-2 text-[15px] font-display group-hover:text-brand-600 transition-colors">Comparatif des Agences Social Media</h3>
                         <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Une comparaison détaillée des meilleures agences de gestion des réseaux sociaux au Maroc, budgets et expertises.</p>
-                        <div class="flex items-center gap-2 mt-auto text-[11px] text-slate-400 font-mono">
+                        <div class="flex items-center gap-2 mt-auto text-[11px] text-slate-500 font-mono">
                             <span>Mis à jour Avril 2026</span>
                             <span>&middot;</span>
                             <span>10 min</span>

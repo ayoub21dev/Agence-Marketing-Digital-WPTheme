@@ -55,7 +55,7 @@ $suggested = new WP_Query(array(
     <section class="err-hero relative z-10">
         <div class="relative z-10 max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-20 md:py-24 text-center">
 
-            <span class="section-label text-slate-400 mb-4 block">404 · Page introuvable</span>
+            <span class="section-label text-slate-500 mb-4 block">404 · Page introuvable</span>
 
             <!-- Wired into the home hero's real animation hook:
                  .hero-focus-word gives the 0 the same blue scale-in + colour
@@ -82,7 +82,7 @@ $suggested = new WP_Query(array(
             </div>
 
             <!-- Mono quick-links, same hover language as home breadcrumbs/links -->
-            <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12px] text-slate-400 font-mono">
+            <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12px] text-slate-500 font-mono">
                 <a href="<?php echo esc_url(home_url('/blog/')); ?>" class="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
                     <i data-lucide="newspaper" class="w-3.5 h-3.5"></i><span>Blog</span>
                 </a>
@@ -133,7 +133,7 @@ $suggested = new WP_Query(array(
                         <div class="p-6 flex flex-col flex-1">
                             <div class="flex items-center justify-between mb-3">
                                 <span class="tag-pill bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono text-[11px] border border-slate-150 uppercase font-bold tracking-wider"><?php echo esc_html($badge); ?></span>
-                                <span class="text-[11px] text-slate-400 font-mono flex items-center gap-1">
+                                <span class="text-[11px] text-slate-500 font-mono flex items-center gap-1">
                                     <i data-lucide="clock" class="w-3 h-3"></i><?php echo esc_html($read_time); ?>
                                 </span>
                             </div>

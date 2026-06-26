@@ -120,7 +120,7 @@ if (!function_exists('theme_render_stars_html')) {
                                 <?php if (!empty($logo_src)) : ?>
                                     <img src="<?php echo esc_url($logo_src); ?>" alt="<?php the_title_attribute(); ?>" class="w-11 h-11 rounded-lg object-cover border border-slate-100 bg-white">
                                 <?php else : ?>
-                                    <div class="w-11 h-11 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center font-bold text-slate-400 uppercase font-mono text-[12px]">
+                                    <div class="w-11 h-11 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center font-bold text-slate-500 uppercase font-mono text-[12px]">
                                         <?php echo esc_html($logo_text ? $logo_text : substr(get_the_title(), 0, 2)); ?>
                                     </div>
                                 <?php endif; ?>
@@ -129,7 +129,7 @@ if (!function_exists('theme_render_stars_html')) {
                                     <div class="flex items-center gap-1">
                                         <?php echo theme_render_stars_html($rating ? $rating : 4.5); ?>
                                         <span class="text-[13px] font-semibold text-slate-700 font-mono"><?php echo esc_html($rating ? $rating : '4.5'); ?></span>
-                                        <span class="text-[11px] text-slate-400 font-mono">(<?php echo esc_html($reviews ? $reviews : '10'); ?>)</span>
+                                        <span class="text-[11px] text-slate-500 font-mono">(<?php echo esc_html($reviews ? $reviews : '10'); ?>)</span>
                                     </div>
                                 </div>
                             </div>
@@ -183,7 +183,7 @@ if (!function_exists('theme_render_stars_html')) {
             else :
                 // Static Fallback Agencies in French
                 ?>
-                <div class="text-center py-10 col-span-3 text-slate-400">Aucune agence répertoriée pour le moment.</div>
+                <div class="text-center py-10 col-span-3 text-slate-500">Aucune agence répertoriée pour le moment.</div>
                 <?php
             endif; 
             ?>

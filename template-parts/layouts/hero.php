@@ -14,7 +14,7 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
     <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pt-8 pb-10 md:pt-12 md:pb-16">
         <div class="max-w-3xl mx-auto text-center mb-8">
             <?php if ($eyebrow) : ?>
-                <span class="section-label text-slate-400 mb-3 block"><?php echo esc_html($eyebrow); ?></span>
+                <span class="section-label text-slate-500 mb-3 block"><?php echo esc_html($eyebrow); ?></span>
             <?php endif; ?>
             
             <?php if ($title) : ?>
@@ -94,7 +94,7 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
             </div>
 
             <!-- Social proof micro-line -->
-            <div class="flex items-center justify-center gap-2 text-[12px] text-slate-400 font-mono mb-5 md:mb-6 -mt-4">
+            <div class="flex items-center justify-center gap-2 text-[12px] text-slate-500 font-mono mb-5 md:mb-6 -mt-4">
                 <span class="flex items-center gap-1">
                     <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i>
                     <span><?php echo esc_html($social_proof_1); ?></span>

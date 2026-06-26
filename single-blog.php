@@ -76,7 +76,7 @@ get_header();
                         
                         <!-- Breadcrumbs & Back -->
                         <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center gap-1.5 text-[12px] text-slate-400 font-mono">
+                            <div class="flex items-center gap-1.5 text-[12px] text-slate-500 font-mono">
                                 <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url(home_url('/')); ?>">Accueil</a>
                                 <i data-lucide="chevron-right" class="w-3 h-3"></i>
                                 <a class="cursor-pointer hover:text-slate-900" href="<?php $bl = get_page_by_path('blog'); echo esc_url($bl ? get_permalink($bl->ID) : home_url('/blog/')); ?>">Blog</a>
@@ -93,7 +93,7 @@ get_header();
                         
                         <h1 class="text-[1.75rem] md:text-[2.25rem] font-extrabold text-slate-900 tracking-tight leading-tight mb-4 font-display"><?php the_title(); ?></h1>
                         
-                        <div class="flex flex-wrap items-center gap-3 text-[12px] text-slate-400 font-mono">
+                        <div class="flex flex-wrap items-center gap-3 text-[12px] text-slate-500 font-mono">
                             <span class="flex items-center gap-1"><i data-lucide="user" class="w-3.5 h-3.5"></i> <span>Par <?php echo esc_html($author); ?></span></span>
                             <span>&middot;</span>
                             <span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span><?php echo get_the_date('d M Y'); ?></span></span>

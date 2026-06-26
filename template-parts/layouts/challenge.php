@@ -134,7 +134,7 @@ if ($has_eyebrow || $has_title || $has_desc || $cards === null || $has_cards || 
                             <?php endif; ?>
                         </div>
                         <?php if (!empty($quote_scope)) : ?>
-                            <span class="text-[12px] text-slate-400"><?php echo esc_html($quote_scope); ?></span>
+                            <span class="text-[12px] text-slate-500"><?php echo esc_html($quote_scope); ?></span>
                         <?php endif; ?>
                     </div>
                     <?php endif; ?>

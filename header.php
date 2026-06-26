@@ -59,7 +59,7 @@
                     <div class="flex items-center gap-1">
                         <span class="font-extrabold text-[16px] text-slate-900 tracking-tight">Agence</span>
                         <span class="font-extrabold text-[16px] text-brand-600 tracking-tight">Marketing</span>
-                        <span class="font-light text-[16px] text-slate-400 tracking-tight">Digital</span>
+                        <span class="font-light text-[16px] text-slate-500 tracking-tight">Digital</span>
                     </div>
                 </div>
                                
@@ -92,8 +92,8 @@
                     
 
  
-                    <button onclick="toggleMobileMenu()" class="md:hidden p-1.5 text-slate-600 hover:text-brand-600 cursor-pointer">
-                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    <button onclick="toggleMobileMenu()" aria-label="Ouvrir le menu" aria-expanded="false" class="md:hidden p-1.5 text-slate-600 hover:text-brand-600 cursor-pointer">
+                        <i data-lucide="menu" class="w-5 h-5" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>

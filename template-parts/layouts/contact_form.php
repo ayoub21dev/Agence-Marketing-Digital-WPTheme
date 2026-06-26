@@ -100,7 +100,7 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                 if ($has_address || $has_email) : 
                 ?>
                 <div>
-                    <span class="block font-mono text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Informations de contact</span>
+                    <span class="block font-mono text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-4">Informations de contact</span>
                     <div class="space-y-6 text-[13.5px] text-slate-500 leading-relaxed font-sans">
                         <?php if ($has_address) : ?>
                         <div class="flex items-start gap-3 <?php echo $has_email ? 'border-b border-slate-200/60 pb-5' : 'pb-2'; ?>">
