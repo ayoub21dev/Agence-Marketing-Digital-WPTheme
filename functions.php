@@ -3234,6 +3234,8 @@ function v5_digital_language_switcher() {
 
     $langs = pll_the_languages(array(
         'raw'           => 1,
+        // Follow Polylang's default rule: only offer a language when the
+        // current page actually has a translation in it.
         'hide_if_empty' => 1,
         'hide_current'  => 0,
     ));
