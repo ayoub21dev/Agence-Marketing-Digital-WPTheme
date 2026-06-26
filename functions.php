@@ -3246,14 +3246,22 @@ function v5_digital_language_switcher() {
 
     $items = array();
     foreach ($langs as $lang) {
-        $code = strtoupper(esc_html($lang['slug']));
-        $cls  = !empty($lang['current_lang'])
-            ? 'text-slate-900 font-semibold'
-            : 'text-slate-500 hover:text-slate-900';
-        $items[] = '<a href="' . esc_url($lang['url']) . '" class="' . $cls . ' transition-colors uppercase" hreflang="' . esc_attr($lang['slug']) . '" lang="' . esc_attr($lang['slug']) . '">' . $code . '</a>';
+        $code   = strtoupper(esc_html($lang['slug']));
+        $active = !empty($lang['current_lang']);
+        $cls    = $active
+            ? 'text-slate-900 font-semibold opacity-100'
+            : 'text-slate-500 hover:text-slate-900 opacity-80 hover:opacity-100';
+        // Polylang returns the flag as a ready <img> in 'flag' (when a flag is
+        // assigned to the language under Langues > Langues). Falls back to just
+        // the language code if no flag is set.
+        $flag = !empty($lang['flag']) ? $lang['flag'] : '';
+        $items[] = '<a href="' . esc_url($lang['url']) . '" class="flex items-center gap-1.5 ' . $cls . ' transition-colors uppercase" hreflang="' . esc_attr($lang['slug']) . '" lang="' . esc_attr($lang['slug']) . '">'
+            . $flag
+            . '<span>' . $code . '</span>'
+            . '</a>';
     }
 
-    echo '<div class="flex items-center gap-1.5 text-[12px] font-medium tracking-wide" role="navigation" aria-label="' . esc_attr(v5_t('Langue')) . '">';
+    echo '<div class="flex items-center gap-2 text-[12px] font-medium tracking-wide" role="navigation" aria-label="' . esc_attr(v5_t('Langue')) . '">';
     echo implode('<span class="text-slate-300" aria-hidden="true">/</span>', $items);
     echo '</div>';
 }
