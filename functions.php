@@ -459,7 +459,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'hero_section' => array(
                         'key' => 'layout_hero_section',
                         'name' => 'hero_section',
-                        'label' => '[Accueil] Grande bannière d\'accroche',
+                        'label' => '[Accueil] Bannière — accroche principale',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -618,7 +618,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'stats_band_section' => array(
                         'key' => 'layout_stats_band_section',
                         'name' => 'stats_band_section',
-                        'label' => '[Accueil] Chiffres clés',
+                        'label' => '[Accueil] Bandeau — chiffres clés',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -636,7 +636,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'search_filter_section' => array(
                         'key' => 'layout_search_filter_section',
                         'name' => 'search_filter_section',
-                        'label' => '[Accueil] Barre de recherche',
+                        'label' => '[Accueil] Recherche — barre + filtres',
                         'display' => 'block',
                         'sub_fields' => array(),
                     ),
@@ -644,7 +644,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'logos_band_section' => array(
                         'key' => 'layout_logos_band_section',
                         'name' => 'logos_band_section',
-                        'label' => '[Commun] Bandeau de logos partenaires',
+                        'label' => '[Commun] Bandeau — logos partenaires',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -660,7 +660,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'challenge_section' => array(
                         'key' => 'layout_challenge_section',
                         'name' => 'challenge_section',
-                        'label' => '[Accueil] Bloc « Le défi »',
+                        'label' => '[Accueil] Bloc — le défi',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -767,7 +767,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'approach_section' => array(
                         'key' => 'layout_approach_section',
                         'name' => 'approach_section',
-                        'label' => '[Accueil] Bloc « Notre approche »',
+                        'label' => '[Accueil] Bloc — notre approche',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -828,7 +828,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'outcomes_section' => array(
                         'key' => 'layout_outcomes_section',
                         'name' => 'outcomes_section',
-                        'label' => '[Accueil] Témoignages clients',
+                        'label' => '[Accueil] Avis — témoignages clients',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -968,7 +968,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'picks_section' => array(
                         'key' => 'layout_picks_section',
                         'name' => 'picks_section',
-                        'label' => '[Accueil] Sélection de l\'éditeur',
+                        'label' => '[Accueil] Grille — sélection de l\'éditeur',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1015,7 +1015,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'specialties_section' => array(
                         'key' => 'layout_specialties_section',
                         'name' => 'specialties_section',
-                        'label' => '[Accueil] Grille des spécialités',
+                        'label' => '[Accueil] Grille — spécialités',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1052,7 +1052,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'guides_section' => array(
                         'key' => 'layout_guides_section',
                         'name' => 'guides_section',
-                        'label' => '[Blog] Liste « Guides & analyses »',
+                        'label' => '[Blog] Liste — guides & analyses',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1099,7 +1099,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'blog_posts_grid_section' => array(
                         'key'     => 'layout_blog_posts_grid_section',
                         'name'    => 'blog_posts_grid_section',
-                        'label'   => '[Blog] Grille d\'articles',
+                        'label'   => '[Blog] Grille — articles',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1150,7 +1150,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'footer_cta_section' => array(
                         'key' => 'layout_footer_cta_section',
                         'name' => 'footer_cta_section',
-                        'label' => '[Commun] CTA bas de page (titre + boutons d\'action)',
+                        'label' => '[Commun] CTA — bas de page (titre + boutons)',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1194,7 +1194,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'common_hero_section' => array(
                         'key' => 'layout_common_hero_section',
                         'name' => 'common_hero_section',
-                        'label' => '[Commun] En-tête de page (titre simple)',
+                        'label' => '[Commun] Bannière — en-tête de page (simple)',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1243,7 +1243,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'contact_form_section' => array(
                         'key' => 'layout_contact_form_section',
                         'name' => 'contact_form_section',
-                        'label' => '[Contact] Formulaire & coordonnées',
+                        'label' => '[Contact] Formulaire — contact & infos',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1330,7 +1330,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'newsletter_cta_section' => array(
                         'key' => 'layout_newsletter_cta_section',
                         'name' => 'newsletter_cta_section',
-                        'label' => '[Commun] Inscription newsletter',
+                        'label' => '[Commun] CTA — newsletter (email)',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1381,7 +1381,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'methodology_process_section' => array(
                         'key' => 'layout_methodology_process_section',
                         'name' => 'methodology_process_section',
-                        'label' => '[Méthodologie] Étapes de validation',
+                        'label' => '[Méthodologie] Étapes — processus de validation',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1459,7 +1459,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'methodology_evidence_section' => array(
                         'key' => 'layout_methodology_evidence_section',
                         'name' => 'methodology_evidence_section',
-                        'label' => '[Méthodologie] Preuves & données',
+                        'label' => '[Méthodologie] Grille — preuves & données',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1504,7 +1504,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'methodology_monitor_section' => array(
                         'key' => 'layout_methodology_monitor_section',
                         'name' => 'methodology_monitor_section',
-                        'label' => '[Méthodologie] Suivi continu',
+                        'label' => '[Méthodologie] Bloc — suivi continu',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1562,7 +1562,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'about_grid_section' => array(
                         'key' => 'layout_about_grid_section',
                         'name' => 'about_grid_section',
-                        'label' => '[À Propos] Grille de présentation',
+                        'label' => '[À Propos] Grille — présentation',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
@@ -1599,7 +1599,7 @@ if (function_exists('acf_add_local_field_group')) {
                     'about_cta_section' => array(
                         'key' => 'layout_about_cta_section',
                         'name' => 'about_cta_section',
-                        'label' => '[À Propos] CTA bas de page (titre + boutons d\'action)',
+                        'label' => '[À Propos] CTA — bas de page (titre + boutons)',
                         'display' => 'block',
                         'sub_fields' => array(
                             array(
