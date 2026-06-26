@@ -72,8 +72,22 @@ endif;
     align-items: center;
     justify-content: center;
     /* Space between logos. */
-    padding: 0 2.75rem;
+    padding: 0 2.25rem;
     height: 2.5rem;
+  }
+  /* Uniform sizing: same height for all, and a width cap so wide wordmarks
+     (Samsung, Volvo…) can't dominate the compact icons (Google, Spotify…). */
+  .v5-logos-item img {
+    height: 1.75rem;
+    width: auto;
+    max-width: 130px;
+    object-fit: contain;
+  }
+  @media (min-width: 768px) {
+    .v5-logos-item img {
+      height: 2rem;
+      max-width: 150px;
+    }
   }
   @keyframes v5-logos-scroll {
     from { transform: translateX(0); }
@@ -98,7 +112,7 @@ endif;
           <?php foreach ($items as $item) : ?>
             <div class="v5-logos-item"<?php echo $copy === 1 ? ' aria-hidden="true"' : ''; ?>>
               <?php if (!empty($item['src'])) : ?>
-                <img src="<?php echo esc_url($item['src']); ?>" alt="<?php echo esc_attr($item['name']); ?>" class="max-h-8 md:max-h-10 w-auto object-contain">
+                <img src="<?php echo esc_url($item['src']); ?>" alt="<?php echo esc_attr($item['name']); ?>">
               <?php else : ?>
                 <span class="text-[15px] font-bold text-slate-500 uppercase font-display select-none whitespace-nowrap"><?php echo esc_html($item['name']); ?></span>
               <?php endif; ?>
