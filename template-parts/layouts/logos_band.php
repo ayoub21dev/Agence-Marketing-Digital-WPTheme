@@ -9,7 +9,7 @@ $logo_query = new WP_Query(array(
   'post_status' => 'publish'
 ));
 ?>
-<section class="py-12 bg-slate-900 border-t border-b border-slate-800">
+<section class="py-12 bg-slate-50 border-t border-b border-slate-200">
   <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
     <?php if ($title): ?>
       <span
@@ -30,7 +30,7 @@ $logo_query = new WP_Query(array(
             <?php if (!empty($logo_src)): ?>
               <img src="<?php echo esc_url($logo_src); ?>" alt="<?php the_title_attribute(); ?>" class="max-h-8 md:max-h-10 w-auto object-contain transition-all duration-300 hover:-translate-y-0.5">
             <?php else: ?>
-              <div class="text-[15px] font-bold text-slate-400 hover:text-white transition-all duration-200 hover:-translate-y-0.5 uppercase font-display select-none cursor-default">
+              <div class="text-[15px] font-bold text-slate-500 hover:text-slate-900 transition-all duration-200 hover:-translate-y-0.5 uppercase font-display select-none cursor-default">
                 <?php the_title(); ?>
               </div>
             <?php endif; ?>
@@ -53,9 +53,9 @@ $logo_query = new WP_Query(array(
           ?>
           <div class="flex items-center justify-center h-10 min-w-[100px] max-w-[150px]">
             <?php if ($has_simple_icon): ?>
-              <img src="https://cdn.simpleicons.org/<?php echo $fallback['slug']; ?>/66717f" alt="<?php echo esc_attr($fallback['name']); ?>" class="max-h-8 md:max-h-10 w-auto object-contain transition-all duration-300 opacity-50 hover:opacity-100 hover:-translate-y-0.5 filter brightness-0 invert">
+              <img src="https://cdn.simpleicons.org/<?php echo $fallback['slug']; ?>/66717f" alt="<?php echo esc_attr($fallback['name']); ?>" class="max-h-8 md:max-h-10 w-auto object-contain transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-0.5">
             <?php else: ?>
-              <div class="text-[15px] font-bold text-slate-400 hover:text-white transition-all duration-200 hover:-translate-y-0.5 uppercase font-display select-none cursor-default">
+              <div class="text-[15px] font-bold text-slate-500 hover:text-slate-900 transition-all duration-200 hover:-translate-y-0.5 uppercase font-display select-none cursor-default">
                 <?php echo esc_html($fallback['name']); ?>
               </div>
             <?php endif; ?>
