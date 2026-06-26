@@ -3251,10 +3251,15 @@ function v5_digital_language_switcher() {
         $cls    = $active
             ? 'text-slate-900 font-semibold opacity-100'
             : 'text-slate-500 hover:text-slate-900 opacity-80 hover:opacity-100';
-        // Polylang returns the flag as a ready <img> in 'flag' (when a flag is
-        // assigned to the language under Langues > Langues). Falls back to just
-        // the language code if no flag is set.
-        $flag = !empty($lang['flag']) ? $lang['flag'] : '';
+        // Build the flag <img> ourselves from the flag URL. Polylang's 'flag'
+        // value is inconsistent across versions (Polylang Pro returns the URL,
+        // not an <img>), so relying on it printed the raw URL as text. Using
+        // flag_url and our own <img> renders the flag reliably. Inline styles
+        // keep it independent of the compiled Tailwind classes.
+        $flag = '';
+        if (!empty($lang['flag_url'])) {
+            $flag = '<img src="' . esc_url($lang['flag_url']) . '" alt="" style="width:16px;height:auto;display:inline-block;border-radius:2px;" />';
+        }
         $items[] = '<a href="' . esc_url($lang['url']) . '" class="flex items-center gap-1.5 ' . $cls . ' transition-colors uppercase" hreflang="' . esc_attr($lang['slug']) . '" lang="' . esc_attr($lang['slug']) . '">'
             . $flag
             . '<span>' . $code . '</span>'
