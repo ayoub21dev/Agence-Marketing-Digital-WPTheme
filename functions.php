@@ -2370,23 +2370,12 @@ function v5_digital_setup_theme_content() {
                 $polylang_options['nav_menus'][$theme_slug] = array();
             }
             
-            // Map primary
+            // Map primary (header nav) only. Footer locations are deliberately
+            // NOT written here: persisting them into Polylang made Polylang the
+            // authority and reverted any footer change made in WordPress > Menus.
+            // The footer is now managed entirely from WordPress.
             $polylang_options['nav_menus'][$theme_slug]['primary']['fr'] = $menu_id;
-            
-            // Map footer menus
-            if (isset($locations['footer_explore'])) {
-                $polylang_options['nav_menus'][$theme_slug]['footer_explore']['fr'] = $locations['footer_explore'];
-            }
-            if (isset($locations['footer_resources'])) {
-                $polylang_options['nav_menus'][$theme_slug]['footer_resources']['fr'] = $locations['footer_resources'];
-            }
-            if (isset($locations['footer_villes'])) {
-                $polylang_options['nav_menus'][$theme_slug]['footer_villes']['fr'] = $locations['footer_villes'];
-            }
-            if (isset($locations['footer_legal'])) {
-                $polylang_options['nav_menus'][$theme_slug]['footer_legal']['fr'] = $locations['footer_legal'];
-            }
-            
+
             update_option('polylang', $polylang_options);
         }
     }
@@ -3809,8 +3798,44 @@ add_action('save_post', 'v5_digital_mirror_author_name_on_save', 20);
  * migration version: bump V5_DIGITAL_MIGRATION_VERSION to force a re-run after
  * changing any of the routines or their seed data.
  */
+/**
+ * One-time: hand footer menu control back to WordPress.
+ *
+ * The theme used to persist the footer menu→location assignments into
+ * Polylang's own "nav_menus" option, which made Polylang re-apply them on every
+ * load and silently revert any footer change made in WordPress > Menus (e.g.
+ * unassigning the "Villes" column kept snapping back). We remove those stored
+ * footer entries so the footer locations become fully editable from WordPress.
+ * The header "primary" mapping is intentionally left untouched.
+ */
+function v5_digital_release_footer_menu_locations() {
+    $polylang = get_option('polylang');
+    if (!is_array($polylang) || empty($polylang['nav_menus']) || !is_array($polylang['nav_menus'])) {
+        return;
+    }
+
+    $footer_locations = array('footer_explore', 'footer_resources', 'footer_villes', 'footer_legal');
+    $changed = false;
+
+    foreach ($polylang['nav_menus'] as $theme_slug => $locations) {
+        if (!is_array($locations)) {
+            continue;
+        }
+        foreach ($footer_locations as $loc) {
+            if (isset($polylang['nav_menus'][$theme_slug][$loc])) {
+                unset($polylang['nav_menus'][$theme_slug][$loc]);
+                $changed = true;
+            }
+        }
+    }
+
+    if ($changed) {
+        update_option('polylang', $polylang);
+    }
+}
+
 if (!defined('V5_DIGITAL_MIGRATION_VERSION')) {
-    define('V5_DIGITAL_MIGRATION_VERSION', '2026.06.26-authors');
+    define('V5_DIGITAL_MIGRATION_VERSION', '2026.06.26-footer');
 }
 
 function v5_digital_run_data_migrations() {
@@ -3828,6 +3853,7 @@ function v5_digital_run_data_migrations() {
     v5_digital_backfill_post_categories();
     v5_digital_fix_corrupted_menu_names();
     v5_digital_sync_post_authors();
+    v5_digital_release_footer_menu_locations();
 
     update_option('v5_digital_migration_version', V5_DIGITAL_MIGRATION_VERSION);
 }
@@ -3927,25 +3953,10 @@ function v5_digital_setup_footer_menus_once() {
     set_theme_mod('nav_menu_locations', $locations);
     update_option('nav_menu_locations', $locations);
 
-    // Mirror assignments into Polylang's own mapping if present.
-    if (function_exists('pll_languages_list')) {
-        $polylang_options = get_option('polylang');
-        if (is_array($polylang_options)) {
-            $theme_slug = get_stylesheet();
-            if (!isset($polylang_options['nav_menus'])) {
-                $polylang_options['nav_menus'] = array();
-            }
-            if (!isset($polylang_options['nav_menus'][$theme_slug])) {
-                $polylang_options['nav_menus'][$theme_slug] = array();
-            }
-            foreach ($footer_menus as $location => $cfg) {
-                if (!empty($locations[$location])) {
-                    $polylang_options['nav_menus'][$theme_slug][$location]['fr'] = (int) $locations[$location];
-                }
-            }
-            update_option('polylang', $polylang_options);
-        }
-    }
+    // NOTE: we intentionally do NOT mirror these assignments into Polylang's
+    // own "nav_menus" option. Doing so made Polylang re-apply them on every load
+    // and silently revert footer changes made in WordPress > Menus. The footer
+    // locations are now assigned once here and then left to WordPress.
 
     update_option('v5_footer_menus_setup_v1_done', 1);
 }
