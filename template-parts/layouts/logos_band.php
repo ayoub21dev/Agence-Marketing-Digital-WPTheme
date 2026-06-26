@@ -105,11 +105,27 @@ endif;
     </div>
   <?php endif; ?>
 
-  <?php if (!empty($items)) : ?>
+  <?php
+  if (!empty($items)) :
+    // Repeat the set so ONE "half" comfortably exceeds the screen width. Two
+    // identical halves animated by exactly -50% make the loop perfectly
+    // seamless: a logo leaving the left edge is already re-entering on the
+    // right, with no gap and no jump at the wrap point.
+    $repeat = max(1, (int) ceil(12 / count($items)));
+    $half   = array();
+    for ($r = 0; $r < $repeat; $r++) {
+      foreach ($items as $it) {
+        $half[] = $it;
+      }
+    }
+    // Keep the scroll SPEED constant no matter how many logos there are
+    // (~3s of travel per logo), so it always feels the same.
+    $duration = max(20, count($half) * 3);
+  ?>
     <div class="v5-logos-marquee">
-      <div class="v5-logos-track">
+      <div class="v5-logos-track" style="animation-duration: <?php echo (int) $duration; ?>s;">
         <?php for ($copy = 0; $copy < 2; $copy++) : ?>
-          <?php foreach ($items as $item) : ?>
+          <?php foreach ($half as $item) : ?>
             <div class="v5-logos-item"<?php echo $copy === 1 ? ' aria-hidden="true"' : ''; ?>>
               <?php if (!empty($item['src'])) : ?>
                 <img src="<?php echo esc_url($item['src']); ?>" alt="<?php echo esc_attr($item['name']); ?>">
