@@ -3320,9 +3320,23 @@ function v5_digital_get_primary_menu_items() {
         return array();
     }
 
-    // Drop the Polylang language switcher placeholder.
+    // Drop Polylang's language switcher in any form. Besides the raw
+    // "#pll_switcher" placeholder, Polylang EXPANDS the switcher into one menu
+    // item per language whose title is a flag <img>; those carry a "lang-item"
+    // CSS class. We render menu titles as plain text, so leaving them in would
+    // print the raw <img> markup. The theme has its own switcher instead.
     return array_values(array_filter($items, function ($item) {
-        return $item->url !== '#pll_switcher' && strpos($item->url, 'pll_switcher') === false;
+        if ($item->url === '#pll_switcher' || strpos($item->url, 'pll_switcher') !== false) {
+            return false;
+        }
+        if (!empty($item->classes) && is_array($item->classes)) {
+            foreach ($item->classes as $class) {
+                if (strpos($class, 'lang-item') !== false) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }));
 }
 
