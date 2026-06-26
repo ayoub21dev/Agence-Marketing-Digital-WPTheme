@@ -39,10 +39,24 @@ function initMotionSystem() {
         gsap.registerPlugin(ScrollTrigger);
     }
 
+    // Hero entrance runs immediately (before first paint) to avoid any flash.
     animatePageEntrance();
-    initChallengeTitleAnimation();
-    initApproachTitleAnimation();
-    observeDynamicContent();
+
+    // The scroll-triggered setups create ScrollTriggers, which read element
+    // geometry (offsetHeight / getBoundingClientRect). Running that during the
+    // initial load forces a synchronous layout (Lighthouse "forced reflow").
+    // Defer them until the browser is idle — they only fire on scroll anyway,
+    // and the affected sections are fully visible meanwhile.
+    const setupScrollAnimations = () => {
+        initChallengeTitleAnimation();
+        initApproachTitleAnimation();
+        observeDynamicContent();
+    };
+    if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(setupScrollAnimations, { timeout: 600 });
+    } else {
+        window.setTimeout(setupScrollAnimations, 200);
+    }
 }
 
 function animatePageEntrance() {
