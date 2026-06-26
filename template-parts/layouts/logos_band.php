@@ -28,7 +28,7 @@ $logo_query = new WP_Query(array(
           ?>
           <div class="flex items-center justify-center h-10 min-w-[100px] max-w-[150px]">
             <?php if (!empty($logo_src)): ?>
-              <img src="<?php echo esc_url($logo_src); ?>" alt="<?php the_title_attribute(); ?>" class="max-h-8 md:max-h-10 w-auto object-contain transition-all duration-300 opacity-50 hover:opacity-100 hover:-translate-y-0.5 filter brightness-0 invert">
+              <img src="<?php echo esc_url($logo_src); ?>" alt="<?php the_title_attribute(); ?>" class="max-h-8 md:max-h-10 w-auto object-contain transition-all duration-300 hover:-translate-y-0.5">
             <?php else: ?>
               <div class="text-[15px] font-bold text-slate-400 hover:text-white transition-all duration-200 hover:-translate-y-0.5 uppercase font-display select-none cursor-default">
                 <?php the_title(); ?>
