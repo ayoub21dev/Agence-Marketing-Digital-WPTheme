@@ -1,9 +1,9 @@
 <?php
 /**
  * Logos Band Layout (agence-marketing-digital)
- * Infinite horizontal marquee: the logo row scrolls continuously and loops
- * seamlessly. The row is rendered twice and the track is animated -50% so the
- * second copy takes over exactly where the first ends.
+ * Infinite horizontal marquee. CSS keeps it looping as a fallback; JS enhances
+ * it so hovering pauses the loop, dragging controls the whole strip, and
+ * leaving the band resumes the automatic loop.
  */
 $title = v5_get_field_default('section_title', 'ILS NOUS FONT CONFIANCE');
 
@@ -39,15 +39,26 @@ if (empty($items)) {
   .v5-logos-marquee {
     width: 100%;
     overflow: hidden;
+    cursor: grab;
+    user-select: none;
+    touch-action: pan-y;
     /* Soft fade on both edges so logos appear/disappear smoothly. */
     -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
             mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .v5-logos-marquee.is-dragging {
+    cursor: grabbing;
   }
   .v5-logos-track {
     display: flex;
     width: max-content;
     align-items: center;
     animation: v5-logos-scroll 35s linear infinite;
+    will-change: transform;
+  }
+  .v5-logos-marquee.is-js-marquee .v5-logos-track {
+    animation: none;
+    transform: translate3d(var(--v5-logos-offset, 0px), 0, 0);
   }
   /* Pause when the visitor hovers the band. */
   .v5-logos-marquee:hover .v5-logos-track {
@@ -109,7 +120,7 @@ if (empty($items)) {
     // (~3s of travel per logo), so it always feels the same.
     $duration = max(20, count($half) * 3);
   ?>
-    <div class="v5-logos-marquee">
+    <div class="v5-logos-marquee" data-logo-marquee data-duration="<?php echo (int) $duration; ?>">
       <div class="v5-logos-track" style="animation-duration: <?php echo (int) $duration; ?>s;">
         <?php for ($copy = 0; $copy < 2; $copy++) : ?>
           <?php foreach ($half as $item) : ?>

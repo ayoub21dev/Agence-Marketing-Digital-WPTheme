@@ -9,7 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. Initialise Custom Select Dropdowns
     initCustomSelects();
 
-    // 3. Initialise Search / Command Palette and Matchmaker bindings
+    // 3. Enhance logo marquees
+    initLogoMarquees();
+
+    // 4. Initialise Search / Command Palette and Matchmaker bindings
     initModalBindings();
 });
 
@@ -23,6 +26,125 @@ const motionState = {
 
 function canUseMotion() {
     return typeof gsap !== "undefined" && !motionState.reduced;
+}
+
+function initLogoMarquees() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    document.querySelectorAll("[data-logo-marquee]").forEach((marquee) => {
+        const track = marquee.querySelector(".v5-logos-track");
+        if (!track) return;
+
+        const state = {
+            offset: 0,
+            halfWidth: 0,
+            speed: 0,
+            lastTime: 0,
+            hovered: false,
+            dragging: false,
+            dragStartX: 0,
+            dragStartOffset: 0
+        };
+
+        const wrapOffset = (offset) => {
+            if (!state.halfWidth) return 0;
+            let wrapped = offset % state.halfWidth;
+            if (wrapped > 0) wrapped -= state.halfWidth;
+            return wrapped;
+        };
+
+        const applyOffset = () => {
+            track.style.setProperty("--v5-logos-offset", `${state.offset}px`);
+        };
+
+        const measure = () => {
+            const duration = Math.max(1, parseFloat(marquee.dataset.duration || "35"));
+            state.halfWidth = track.scrollWidth / 2;
+            state.speed = state.halfWidth / duration;
+            state.offset = wrapOffset(state.offset);
+            applyOffset();
+        };
+
+        const tick = (time) => {
+            if (!state.lastTime) state.lastTime = time;
+            const delta = (time - state.lastTime) / 1000;
+            state.lastTime = time;
+
+            if (!state.hovered && !state.dragging && state.halfWidth) {
+                state.offset = wrapOffset(state.offset - state.speed * delta);
+                applyOffset();
+            }
+
+            window.requestAnimationFrame(tick);
+        };
+
+        const endDrag = (event) => {
+            if (!state.dragging) return;
+
+            state.dragging = false;
+            marquee.classList.remove("is-dragging");
+
+            if (event.pointerId !== undefined && marquee.hasPointerCapture(event.pointerId)) {
+                marquee.releasePointerCapture(event.pointerId);
+            }
+
+            if (event.pointerType !== "mouse") {
+                state.hovered = false;
+            }
+        };
+
+        marquee.classList.add("is-js-marquee");
+        measure();
+        window.requestAnimationFrame(tick);
+
+        marquee.addEventListener("pointerenter", () => {
+            state.hovered = true;
+        });
+
+        marquee.addEventListener("pointerleave", () => {
+            state.hovered = false;
+        });
+
+        marquee.addEventListener("pointerdown", (event) => {
+            if (event.button !== undefined && event.button !== 0) return;
+
+            state.hovered = true;
+            state.dragging = true;
+            state.dragStartX = event.clientX;
+            state.dragStartOffset = state.offset;
+            marquee.classList.add("is-dragging");
+            marquee.setPointerCapture(event.pointerId);
+            event.preventDefault();
+        });
+
+        marquee.addEventListener("pointermove", (event) => {
+            if (!state.dragging) return;
+
+            const delta = event.clientX - state.dragStartX;
+            state.offset = wrapOffset(state.dragStartOffset + delta);
+            applyOffset();
+        });
+
+        marquee.addEventListener("pointerup", endDrag);
+        marquee.addEventListener("pointercancel", endDrag);
+
+        marquee.addEventListener("wheel", (event) => {
+            if (!state.hovered || !state.halfWidth) return;
+
+            event.preventDefault();
+            const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+            state.offset = wrapOffset(state.offset - delta);
+            applyOffset();
+        }, { passive: false });
+
+        window.addEventListener("resize", measure);
+        track.querySelectorAll("img").forEach((img) => {
+            if (!img.complete) {
+                img.addEventListener("load", measure, { once: true });
+            }
+        });
+    });
 }
 
 function initMotionSystem() {
