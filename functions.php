@@ -3721,7 +3721,7 @@ add_action('template_redirect', function() {
  */
 /**
  * Resolve a blog post's display category/badge dynamically.
- * Priority: the ACF "badge" field → first real assigned category →
+ * Priority: first real assigned category → the ACF "badge" field →
  * the provided default. The WordPress default "Uncategorized" term is
  * skipped so it never shows on the front-end.
  */
@@ -3730,19 +3730,20 @@ function v5_digital_get_post_badge($post_id = null, $default = 'Guide') {
         $post_id = get_the_ID();
     }
 
-    $badge = v5_digital_get_field('badge', $post_id);
-    if (!empty($badge)) {
-        return $badge;
-    }
-
     $categories = get_the_category($post_id);
     if (!empty($categories)) {
+        $default_cat = (int) get_option('default_category');
         foreach ($categories as $cat) {
-            if ((int) $cat->term_id === 1 || $cat->slug === 'uncategorized' || strtolower($cat->name) === 'uncategorized' || strtolower($cat->name) === 'non classé') {
+            if (($default_cat && (int) $cat->term_id === $default_cat) || $cat->slug === 'uncategorized' || strtolower($cat->name) === 'uncategorized' || strtolower($cat->name) === 'non classé') {
                 continue;
             }
             return $cat->name;
         }
+    }
+
+    $badge = v5_digital_get_field('badge', $post_id);
+    if (!empty($badge)) {
+        return $badge;
     }
 
     return $default;

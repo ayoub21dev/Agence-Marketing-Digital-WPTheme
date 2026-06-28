@@ -44,6 +44,57 @@ $blog_query = new WP_Query(array(
     'order'          => 'DESC',
 ));
 $post_count = $blog_query->found_posts;
+
+$is_default_blog_category = function ($category) {
+    if (!$category || is_wp_error($category)) {
+        return true;
+    }
+
+    $default_category_id = (int) get_option('default_category');
+
+    return ($default_category_id && (int) $category->term_id === $default_category_id)
+        || $category->slug === 'uncategorized'
+        || strtolower($category->name) === 'uncategorized'
+        || strtolower($category->name) === 'non classé';
+};
+
+$get_post_blog_categories = function ($post_id) use ($is_default_blog_category) {
+    $categories = get_the_category($post_id);
+    $valid_categories = array();
+
+    if (!empty($categories) && !is_wp_error($categories)) {
+        foreach ($categories as $category) {
+            if (!$is_default_blog_category($category)) {
+                $valid_categories[$category->term_id] = $category;
+            }
+        }
+    }
+
+    if (!empty($valid_categories)) {
+        return array_values($valid_categories);
+    }
+
+    $badge = v5_digital_get_post_badge($post_id, '');
+    if (!empty($badge)) {
+        $fallback = new stdClass();
+        $fallback->term_id = 'badge-' . sanitize_title($badge);
+        $fallback->name = $badge;
+        $fallback->slug = sanitize_title($badge);
+        return array($fallback);
+    }
+
+    return array();
+};
+
+$blog_categories = array();
+foreach ($blog_query->posts as $blog_post) {
+    foreach ($get_post_blog_categories($blog_post->ID) as $category) {
+        $blog_categories[$category->slug] = $category;
+    }
+}
+uasort($blog_categories, function ($a, $b) {
+    return strcasecmp($a->name, $b->name);
+});
 ?>
 
 <style>
@@ -222,10 +273,9 @@ $post_count = $blog_query->found_posts;
         <div class="blog-grid-wrap">
             <div style="display:flex;align-items:center;gap:8px;padding:12px 0;overflow-x:auto;" id="blg-topic-pills">
                 <button class="blg-topic-pill active flex-shrink-0" onclick="blgFilterTopic(this,'all')">Tout voir</button>
-                <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'Classement')">Classements</button>
-                <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'Guide')">Guides</button>
-                <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'Audit SEO')">Audits SEO</button>
-                <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'Comparatif')">Comparatifs</button>
+                <?php foreach ($blog_categories as $category) : ?>
+                    <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'<?php echo esc_js($category->slug); ?>')"><?php echo esc_html($category->name); ?></button>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
@@ -273,11 +323,18 @@ $post_count = $blog_query->found_posts;
                             $badge_cls = 'blg-badge-comparison';
                         }
 
+                        $post_categories = $get_post_blog_categories(get_the_ID());
+                        $category_slugs = array();
+                        foreach ($post_categories as $category) {
+                            $category_slugs[] = $category->slug;
+                        }
+
                         $excerpt = get_the_excerpt();
                         if (strlen($excerpt) > 115) $excerpt = substr($excerpt, 0, 115) . '…';
                         ?>
                         <article class="blg-article-card blg-post-item"
                                  data-badge="<?php echo esc_attr($badge); ?>"
+                                 data-categories="<?php echo esc_attr(implode(' ', $category_slugs)); ?>"
                                  onclick="window.location.href='<?php the_permalink(); ?>'">
                             <div class="blg-card-img" style="height:210px;">
                                 <img src="<?php echo esc_url($cover_image); ?>"
@@ -351,8 +408,8 @@ $post_count = $blog_query->found_posts;
         var visibleCount = 0;
 
         cards.forEach(function (card) {
-            var badge = (card.getAttribute('data-badge') || '').toLowerCase();
-            var match = (topic === 'all' || badge.indexOf(topic.toLowerCase()) !== -1);
+            var categories = (card.getAttribute('data-categories') || '').split(/\s+/);
+            var match = (topic === 'all' || categories.indexOf(topic) !== -1);
             card.style.display = match ? '' : 'none';
             if (match) visibleCount++;
         });

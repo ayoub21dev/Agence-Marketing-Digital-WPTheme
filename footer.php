@@ -50,6 +50,32 @@ if (!function_exists('v5_digital_render_footer_column')) {
         <?php
     }
 }
+
+$matchmaker_services = array();
+if (taxonomy_exists('agency_service')) {
+    $matchmaker_service_terms = get_terms(array(
+        'taxonomy'   => 'agency_service',
+        'hide_empty' => false,
+        'orderby'    => 'name',
+        'order'      => 'ASC',
+    ));
+    if (!is_wp_error($matchmaker_service_terms) && !empty($matchmaker_service_terms)) {
+        foreach ($matchmaker_service_terms as $service_term) {
+            $matchmaker_services[] = array(
+                'value' => $service_term->name,
+                'label' => $service_term->name,
+            );
+        }
+    }
+}
+if (empty($matchmaker_services)) {
+    $matchmaker_services = array(
+        array('value' => 'SEO', 'label' => 'SEO (Référencement naturel)'),
+        array('value' => 'Paid Ads', 'label' => 'Publicité Payante (Ads)'),
+        array('value' => 'Social Media', 'label' => 'Réseaux Sociaux / Influence'),
+        array('value' => 'Web Design', 'label' => 'Création & Design Web'),
+    );
+}
 ?>
     <footer class="bg-white border-t border-slate-200">
         <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-10">
@@ -160,22 +186,12 @@ if (!function_exists('v5_digital_render_footer_column')) {
             <div class="matching-wizard__step active" data-step="1">
                 <p class="text-[13px] font-semibold text-slate-500 mb-3 uppercase tracking-wider">1. Quel service recherchez-vous ?</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 step-options">
-                    <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="SEO">
-                        <span>SEO (Référencement naturel)</span>
-                        <i data-lucide="check" class="w-4 h-4 text-brand-600 hidden select-check-icon"></i>
-                    </button>
-                    <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="Paid Ads">
-                        <span>Publicité Payante (Ads)</span>
-                        <i data-lucide="check" class="w-4 h-4 text-brand-600 hidden select-check-icon"></i>
-                    </button>
-                    <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="Social Media">
-                        <span>Réseaux Sociaux / Influence</span>
-                        <i data-lucide="check" class="w-4 h-4 text-brand-600 hidden select-check-icon"></i>
-                    </button>
-                    <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="Web Design">
-                        <span>Création & Design Web</span>
-                        <i data-lucide="check" class="w-4 h-4 text-brand-600 hidden select-check-icon"></i>
-                    </button>
+                    <?php foreach ($matchmaker_services as $service) : ?>
+                        <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="<?php echo esc_attr($service['value']); ?>">
+                            <span><?php echo esc_html($service['label']); ?></span>
+                            <i data-lucide="check" class="w-4 h-4 text-brand-600 hidden select-check-icon"></i>
+                        </button>
+                    <?php endforeach; ?>
                 </div>
                 <button class="next-step-btn mt-6 w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg text-[13px] transition-colors flex items-center justify-center gap-1.5 cursor-pointer" disabled>
                     <span>Étape suivante</span>
