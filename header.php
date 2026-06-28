@@ -49,6 +49,11 @@
     <?php wp_head(); ?>
 </head>
 <body <?php body_class('text-slate-800 antialiased min-h-screen flex flex-col justify-between'); ?>>
+<?php
+if (function_exists('wp_body_open')) {
+    wp_body_open();
+}
+?>
 
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-200">
         <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
