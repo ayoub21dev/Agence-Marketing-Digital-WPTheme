@@ -3297,59 +3297,6 @@ function v5_digital_setup_theme_content($destructive = false) {
 }
 add_action('after_switch_theme', 'v5_digital_setup_theme_content');
 
-// 4.7. Force-seed trigger — administrators only, CSRF-protected via ?force_seed=1 + nonce.
-add_action('admin_init', function() {
-    if (!isset($_GET['force_seed'])) {
-        return;
-    }
-
-    // Destructive full reseed: deletes terms/menus and overwrites content.
-    // Restricted to administrators and protected against CSRF with a nonce.
-    if (!current_user_can('manage_options')) {
-        return;
-    }
-
-    $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
-    if (!wp_verify_nonce($nonce, 'v5_digital_force_seed')) {
-        wp_die(esc_html__('Lien de réinitialisation invalide ou expiré. Veuillez relancer depuis le tableau de bord.', 'agence-marketing-digital'));
-    }
-    if (!v5_digital_acf_is_active()) {
-        wp_die(esc_html__('Advanced Custom Fields must be active before reseeding theme content.', 'agence-marketing-digital'));
-    }
-
-    v5_digital_setup_theme_content(true);
-
-    wp_safe_redirect(admin_url('?seeding_completed=1'));
-    exit;
-});
-
-// Offer administrators a safe, nonce-protected link to trigger a full reseed.
-add_action('admin_notices', function() {
-    if (!current_user_can('manage_options')) {
-        return;
-    }
-    if (!v5_digital_acf_is_active()) {
-        return;
-    }
-    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
-    if (!$screen || $screen->id !== 'dashboard') {
-        return;
-    }
-    $url = wp_nonce_url(admin_url('?force_seed=1'), 'v5_digital_force_seed');
-    echo '<div class="notice notice-info"><p>'
-        . esc_html__('Thème Agence Marketing Digital :', 'agence-marketing-digital') . ' '
-        . '<a href="' . esc_url($url) . '" onclick="return confirm(\'' . esc_js(__('Réinitialiser tout le contenu de démonstration ? Cette action écrase les pages, menus et taxonomies.', 'agence-marketing-digital')) . '\');">'
-        . esc_html__('Réinitialiser le contenu du thème', 'agence-marketing-digital')
-        . '</a></p></div>';
-});
-
-// Admin notice on successful seeding
-add_action('admin_notices', function() {
-    if (isset($_GET['seeding_completed']) && $_GET['seeding_completed'] === '1') {
-        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Le contenu initial de la base de données a été ré-initialisé et configuré avec succès !', 'agence-marketing-digital') . '</p></div>';
-    }
-});
-
 // ----------------------------------------------------
 // 5. NAVIGATION MENUS & THEME SETUP
 // ----------------------------------------------------
