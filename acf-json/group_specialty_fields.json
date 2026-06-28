@@ -1,0 +1,94 @@
+{
+    "key": "group_specialty_fields",
+    "title": "Détails de la Spécialité",
+    "fields": [
+        {
+            "key": "field_specialty_icon_svg",
+            "label": "Code SVG de l'icône",
+            "name": "icon_svg",
+            "type": "textarea",
+            "rows": 4,
+            "menu_order": 0,
+            "aria-label": "",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_specialty_link_param",
+            "label": "Paramètre de filtre de lien direct",
+            "name": "direct_link_parameter",
+            "type": "text",
+            "instructions": "e.g. \"seo\", \"ppc\", \"social\", \"branding\"",
+            "menu_order": 1,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_specialty_sub_services",
+            "label": "Liste des sous-services",
+            "name": "sub_services",
+            "type": "repeater",
+            "layout": "table",
+            "button_label": "Ajouter un service",
+            "sub_fields": [
+                {
+                    "key": "field_sub_service_name",
+                    "label": "Nom du service",
+                    "name": "service_name",
+                    "type": "text",
+                    "required": 1,
+                    "menu_order": 0,
+                    "aria-label": "",
+                    "instructions": "",
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    }
+                }
+            ],
+            "menu_order": 2,
+            "aria-label": "",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "specialty_hub"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1782654416
+}

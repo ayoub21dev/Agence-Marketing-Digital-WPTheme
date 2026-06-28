@@ -258,10 +258,35 @@ function v5_digital_register_cpts() {
 add_action('init', 'v5_digital_register_cpts');
 
 // ----------------------------------------------------
-// 2. REGISTER ACF LOCAL FIELD GROUPS
+// 2. ACF FIELD GROUPS
 // ----------------------------------------------------
 
-if (function_exists('acf_add_local_field_group')) {
+function v5_digital_acf_json_path() {
+    return get_stylesheet_directory() . '/acf-json';
+}
+
+function v5_digital_acf_json_save_path($path) {
+    return v5_digital_acf_json_path();
+}
+add_filter('acf/settings/save_json', 'v5_digital_acf_json_save_path');
+
+function v5_digital_acf_json_load_paths($paths) {
+    $path = v5_digital_acf_json_path();
+    if (!in_array($path, $paths, true)) {
+        $paths[] = $path;
+    }
+    return $paths;
+}
+add_filter('acf/settings/load_json', 'v5_digital_acf_json_load_paths');
+
+function v5_digital_acf_has_json_field_groups() {
+    $files = glob(v5_digital_acf_json_path() . '/group_*.json');
+    return !empty($files);
+}
+
+// Fallback only: the canonical ACF field groups now live in /acf-json so they can
+// be synced and edited from ACF > Field Groups while still staying in theme code.
+if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_field_groups()) {
 
     // 2.1 CPT Fields: Stat Metrics
     acf_add_local_field_group(array(
