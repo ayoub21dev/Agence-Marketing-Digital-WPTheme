@@ -3521,15 +3521,32 @@ function v5_digital_menu_item_is_language_switcher($item) {
 }
 
 function v5_digital_primary_menu_has_language_switcher() {
-    $menu_id = v5_digital_get_primary_menu_id();
-    $items = $menu_id ? wp_get_nav_menu_items($menu_id) : array();
-    if (!is_array($items)) {
-        return false;
+    $menu_ids = array();
+
+    $current_menu_id = v5_digital_get_primary_menu_id();
+    if ($current_menu_id > 0) {
+        $menu_ids[] = $current_menu_id;
     }
 
-    foreach ($items as $item) {
-        if (v5_digital_menu_item_is_language_switcher($item)) {
-            return true;
+    $locations = get_nav_menu_locations();
+    if (is_array($locations)) {
+        foreach ($locations as $location => $menu_id) {
+            if ($menu_id > 0 && ($location === 'primary' || strpos($location, 'primary___') === 0)) {
+                $menu_ids[] = (int) $menu_id;
+            }
+        }
+    }
+
+    foreach (array_unique($menu_ids) as $menu_id) {
+        $items = wp_get_nav_menu_items($menu_id);
+        if (!is_array($items)) {
+            continue;
+        }
+
+        foreach ($items as $item) {
+            if (v5_digital_menu_item_is_language_switcher($item)) {
+                return true;
+            }
         }
     }
 
