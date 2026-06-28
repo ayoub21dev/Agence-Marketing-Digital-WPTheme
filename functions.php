@@ -2000,10 +2000,55 @@ add_action('wp_enqueue_scripts', 'v5_digital_enqueue_assets');
 // 4. THEME SWITCH AUTOMATION (INITIALIZE PAGES & SITE DATA)
 // ----------------------------------------------------
 
-function v5_digital_setup_theme_content() {
+function v5_digital_find_seeded_post_id($post_type, $title = '', $slug = '') {
+    if ($slug !== '') {
+        $post = get_page_by_path($slug, OBJECT, $post_type);
+        if ($post) {
+            return (int) $post->ID;
+        }
+    }
+
+    if ($title === '') {
+        return 0;
+    }
+
+    $posts = get_posts(array(
+        'post_type'      => $post_type,
+        'post_status'    => 'any',
+        'title'          => $title,
+        'posts_per_page' => 1,
+        'fields'         => 'ids',
+    ));
+
+    return !empty($posts) ? (int) $posts[0] : 0;
+}
+
+function v5_digital_find_nav_menu_id($menu_name) {
+    $all_menus = wp_get_nav_menus();
+    if (empty($all_menus) || is_wp_error($all_menus)) {
+        return 0;
+    }
+
+    $menu_slug = sanitize_title($menu_name);
+    foreach ($all_menus as $menu) {
+        if ($menu->name === $menu_name || $menu->slug === $menu_slug) {
+            return (int) $menu->term_id;
+        }
+    }
+
+    return 0;
+}
+
+function v5_digital_nav_menu_has_items($menu_id) {
+    $items = wp_get_nav_menu_items($menu_id);
+    return !empty($items) && !is_wp_error($items);
+}
+
+function v5_digital_setup_theme_content($destructive = false) {
     if (!v5_digital_acf_is_active()) {
         return;
     }
+    $destructive = (bool) $destructive;
 
     // 4.1 Set up Polylang default language (French)
     if (class_exists('PLL_Model')) {
@@ -2028,27 +2073,28 @@ function v5_digital_setup_theme_content() {
         }
     }
 
-    // 4.1.2 PURGE EXISTING SEEDED CONTENT TO AVOID CONFLICTS
-    // Native WordPress posts are intentionally excluded — they are user-managed.
-    $posts_to_purge = get_posts(array(
-        'post_type' => array('partner_logo', 'stat_metric', 'specialty_hub', 'agency', 'testimonial'),
-        'numberposts' => -1,
-        'post_status' => 'any',
-        'lang' => '', // Purge all languages to avoid duplicate items
-    ));
-    foreach ($posts_to_purge as $p) {
-        wp_delete_post($p->ID, true);
-    }
-
-    $taxonomies = array('agency_service', 'agency_city');
-    foreach ($taxonomies as $tax) {
-        $terms = get_terms(array(
-            'taxonomy' => $tax,
-            'hide_empty' => false,
+    if ($destructive) {
+        // Destructive reseed only: never run on normal theme activation.
+        $posts_to_purge = get_posts(array(
+            'post_type'   => array('partner_logo', 'stat_metric', 'specialty_hub', 'agency', 'testimonial'),
+            'numberposts' => -1,
+            'post_status' => 'any',
+            'lang'        => '',
         ));
-        if (!is_wp_error($terms) && !empty($terms)) {
-            foreach ($terms as $term) {
-                wp_delete_term($term->term_id, $tax);
+        foreach ($posts_to_purge as $p) {
+            wp_delete_post($p->ID, true);
+        }
+
+        $taxonomies = array('agency_service', 'agency_city');
+        foreach ($taxonomies as $tax) {
+            $terms = get_terms(array(
+                'taxonomy'   => $tax,
+                'hide_empty' => false,
+            ));
+            if (!is_wp_error($terms) && !empty($terms)) {
+                foreach ($terms as $term) {
+                    wp_delete_term($term->term_id, $tax);
+                }
             }
         }
     }
@@ -2056,6 +2102,7 @@ function v5_digital_setup_theme_content() {
     // 4.2 Setup static homepage settings
     $homepage_title = 'Accueil';
     $homepage = get_page_by_title($homepage_title);
+    $homepage_created = false;
 
     if (!$homepage) {
         $homepage_id = wp_insert_post(array(
@@ -2064,9 +2111,10 @@ function v5_digital_setup_theme_content() {
             'post_status'  => 'publish',
             'post_type'    => 'page',
         ));
+        $homepage_created = true;
     } else {
         $homepage_id = $homepage->ID;
-        if (isset($_GET['force_seed'])) {
+        if ($destructive) {
             wp_update_post(array(
                 'ID'           => $homepage_id,
                 'post_content' => '',
@@ -2074,13 +2122,14 @@ function v5_digital_setup_theme_content() {
         }
     }
 
-    if (function_exists('pll_set_post_language')) {
+    if (($homepage_created || $destructive) && function_exists('pll_set_post_language')) {
         pll_set_post_language($homepage_id, 'fr');
     }
 
-    // Assign front page setting
-    update_option('show_on_front', 'page');
-    update_option('page_on_front', $homepage_id);
+    if ($destructive) {
+        update_option('show_on_front', 'page');
+        update_option('page_on_front', $homepage_id);
+    }
 
     // Seed standard pages — blog is now a static Page (not a CPT archive)
     $pages_to_seed = array(
@@ -2095,6 +2144,7 @@ function v5_digital_setup_theme_content() {
 
     foreach ($pages_to_seed as $slug => $title) {
         $p_obj = get_page_by_path($slug);
+        $page_created = false;
         if (!$p_obj) {
             $p_id = wp_insert_post(array(
                 'post_title'  => $title,
@@ -2103,9 +2153,10 @@ function v5_digital_setup_theme_content() {
                 'post_status' => 'publish',
                 'post_type'   => 'page',
             ));
+            $page_created = true;
         } else {
             $p_id = $p_obj->ID;
-            if (isset($_GET['force_seed'])) {
+            if ($destructive) {
                 wp_update_post(array(
                     'ID'           => $p_id,
                     'post_content' => '',
@@ -2114,13 +2165,13 @@ function v5_digital_setup_theme_content() {
         }
         if ($p_id) {
             $seeded_page_ids[$slug] = $p_id;
-            if (function_exists('pll_set_post_language')) {
+            if (($page_created || $destructive) && function_exists('pll_set_post_language')) {
                 pll_set_post_language($p_id, 'fr');
             }
             // Seed specific layout templates for core pages
             if (function_exists('update_field')) {
                 $existing_layouts = v5_digital_get_field('field_page_layouts', $p_id);
-                if (empty($existing_layouts) || isset($_GET['force_seed'])) {
+                if (empty($existing_layouts) || $destructive) {
                     if ($slug === 'blog') {
                         update_field('field_page_layouts', array(
                             array(
@@ -2321,8 +2372,8 @@ function v5_digital_setup_theme_content() {
             }
         }
     }
-    // Cleanup old conflicting 'methodology' page and update menu items
-    if (isset($_GET['force_seed'])) {
+    // Cleanup old conflicting 'methodology' page and update menu items.
+    if ($destructive) {
         $old_methodology = get_page_by_path('methodology');
         if ($old_methodology && isset($seeded_page_ids['methodologie']) && $old_methodology->ID !== $seeded_page_ids['methodologie']) {
             wp_delete_post($old_methodology->ID, true);
@@ -2354,18 +2405,27 @@ function v5_digital_setup_theme_content() {
 
     // 4.3 Create and Assign Primary Navigation Menu
     $menu_name = 'Primary Navigation Menu';
-    $all_menus = wp_get_nav_menus();
-    if (!empty($all_menus)) {
-        foreach ($all_menus as $m) {
-            if ($m->name === $menu_name || $m->slug === sanitize_title($menu_name)) {
-                wp_delete_nav_menu($m->term_id);
+    if ($destructive) {
+        $all_menus = wp_get_nav_menus();
+        if (!empty($all_menus) && !is_wp_error($all_menus)) {
+            foreach ($all_menus as $m) {
+                if ($m->name === $menu_name || $m->slug === sanitize_title($menu_name)) {
+                    wp_delete_nav_menu($m->term_id);
+                }
             }
         }
     }
-    
-    $menu_id = wp_create_nav_menu($menu_name);
-    if (!is_wp_error($menu_id)) {
-        if (function_exists('pll_set_term_language')) {
+
+    $menu_id = v5_digital_find_nav_menu_id($menu_name);
+    $menu_created = false;
+    if (!$menu_id) {
+        $menu_id = wp_create_nav_menu($menu_name);
+        $menu_created = !is_wp_error($menu_id);
+    }
+
+    if (!is_wp_error($menu_id) && $menu_id) {
+        $menu_id = (int) $menu_id;
+        if (($menu_created || $destructive) && function_exists('pll_set_term_language')) {
             pll_set_term_language($menu_id, 'fr');
         }
         
@@ -2378,86 +2438,54 @@ function v5_digital_setup_theme_content() {
             array('title' => __('contact', 'agence-marketing-digital'), 'slug' => 'contact'),
         );
         
-        $position = 1;
-        foreach ($menu_structure as $m_item) {
-            if ($m_item['slug'] === 'blog') {
-                wp_update_nav_menu_item($menu_id, 0, array(
-                    'menu-item-title'     => $m_item['title'],
-                    'menu-item-url'       => home_url('/blog/'),
-                    'menu-item-type'      => 'custom',
-                    'menu-item-status'    => 'publish',
-                    'menu-item-position'  => $position++,
-                ));
-            } elseif (isset($seeded_page_ids[$m_item['slug']])) {
-                wp_update_nav_menu_item($menu_id, 0, array(
-                    'menu-item-title'     => $m_item['title'],
-                    'menu-item-object'    => 'page',
-                    'menu-item-object-id' => $seeded_page_ids[$m_item['slug']],
-                    'menu-item-type'      => 'post_type',
-                    'menu-item-status'    => 'publish',
-                    'menu-item-position'  => $position++,
-                ));
+        if ($destructive || $menu_created || !v5_digital_nav_menu_has_items($menu_id)) {
+            $position = 1;
+            foreach ($menu_structure as $m_item) {
+                if ($m_item['slug'] === 'blog') {
+                    wp_update_nav_menu_item($menu_id, 0, array(
+                        'menu-item-title'     => $m_item['title'],
+                        'menu-item-url'       => home_url('/blog/'),
+                        'menu-item-type'      => 'custom',
+                        'menu-item-status'    => 'publish',
+                        'menu-item-position'  => $position++,
+                    ));
+                } elseif (isset($seeded_page_ids[$m_item['slug']])) {
+                    wp_update_nav_menu_item($menu_id, 0, array(
+                        'menu-item-title'     => $m_item['title'],
+                        'menu-item-object'    => 'page',
+                        'menu-item-object-id' => $seeded_page_ids[$m_item['slug']],
+                        'menu-item-type'      => 'post_type',
+                        'menu-item-status'    => 'publish',
+                        'menu-item-position'  => $position++,
+                    ));
+                }
             }
         }
-        
+
         // Assign menu to the location
         $locations = get_theme_mod('nav_menu_locations');
         if (!is_array($locations)) {
             $locations = array();
         }
-        $locations['primary'] = $menu_id;
-        
-        // Find existing footer menus to map them automatically
-        if (!empty($all_menus)) {
-            foreach ($all_menus as $m) {
-                $is_explore = (stripos($m->slug, 'footer-explore') !== false || stripos($m->name, 'Footer Explore') !== false);
-                $is_resources = (stripos($m->slug, 'footer-resources') !== false || stripos($m->name, 'Footer Resources') !== false);
-                $is_villes = (stripos($m->slug, 'footer-company') !== false || stripos($m->name, 'Footer Company') !== false || stripos($m->slug, 'footer-villes') !== false || stripos($m->name, 'Footer Cities') !== false);
-                $is_legal = (stripos($m->slug, 'footer-legal') !== false || stripos($m->name, 'Footer Legal') !== false);
-                
-                if ($is_explore) {
-                    $locations['footer_explore'] = $m->term_id;
-                }
-                if ($is_resources) {
-                    $locations['footer_resources'] = $m->term_id;
-                }
-                if ($is_villes) {
-                    $locations['footer_villes'] = $m->term_id;
-                }
-                if ($is_legal) {
-                    $locations['footer_legal'] = $m->term_id;
-                }
-            }
+        $locations_changed = false;
+        if ($destructive || empty($locations['primary'])) {
+            $locations['primary'] = $menu_id;
+            $locations_changed = true;
         }
 
         if (function_exists('pll_languages_list')) {
             foreach (pll_languages_list() as $lang) {
-                $locations['primary___' . $lang] = $menu_id;
-                if (!empty($all_menus)) {
-                    foreach ($all_menus as $m) {
-                        $is_explore = (stripos($m->slug, 'footer-explore') !== false || stripos($m->name, 'Footer Explore') !== false);
-                        $is_resources = (stripos($m->slug, 'footer-resources') !== false || stripos($m->name, 'Footer Resources') !== false);
-                        $is_villes = (stripos($m->slug, 'footer-company') !== false || stripos($m->name, 'Footer Company') !== false || stripos($m->slug, 'footer-villes') !== false || stripos($m->name, 'Footer Cities') !== false);
-                        $is_legal = (stripos($m->slug, 'footer-legal') !== false || stripos($m->name, 'Footer Legal') !== false);
-
-                        if ($is_explore) {
-                            $locations['footer_explore___' . $lang] = $m->term_id;
-                        }
-                        if ($is_resources) {
-                            $locations['footer_resources___' . $lang] = $m->term_id;
-                        }
-                        if ($is_villes) {
-                            $locations['footer_villes___' . $lang] = $m->term_id;
-                        }
-                        if ($is_legal) {
-                            $locations['footer_legal___' . $lang] = $m->term_id;
-                        }
-                    }
+                $language_location = 'primary___' . $lang;
+                if ($destructive || empty($locations[$language_location])) {
+                    $locations[$language_location] = $menu_id;
+                    $locations_changed = true;
                 }
             }
         }
-        set_theme_mod('nav_menu_locations', $locations);
-        update_option('nav_menu_locations', $locations);
+        if ($locations_changed) {
+            set_theme_mod('nav_menu_locations', $locations);
+            update_option('nav_menu_locations', $locations);
+        }
 
         // Map locations in Polylang options if class exists
         if (class_exists('PLL_Model') || function_exists('pll_languages_list')) {
@@ -2473,14 +2501,18 @@ function v5_digital_setup_theme_content() {
             if (!isset($polylang_options['nav_menus'][$theme_slug])) {
                 $polylang_options['nav_menus'][$theme_slug] = array();
             }
+            if (!isset($polylang_options['nav_menus'][$theme_slug]['primary']) || !is_array($polylang_options['nav_menus'][$theme_slug]['primary'])) {
+                $polylang_options['nav_menus'][$theme_slug]['primary'] = array();
+            }
             
             // Map primary (header nav) only. Footer locations are deliberately
             // NOT written here: persisting them into Polylang made Polylang the
             // authority and reverted any footer change made in WordPress > Menus.
             // The footer is now managed entirely from WordPress.
-            $polylang_options['nav_menus'][$theme_slug]['primary']['fr'] = $menu_id;
-
-            update_option('polylang', $polylang_options);
+            if ($destructive || empty($polylang_options['nav_menus'][$theme_slug]['primary']['fr'])) {
+                $polylang_options['nav_menus'][$theme_slug]['primary']['fr'] = $menu_id;
+                update_option('polylang', $polylang_options);
+            }
         }
     }
 
@@ -2489,11 +2521,24 @@ function v5_digital_setup_theme_content() {
     // Partner Logos seeding
     $logos = array('nestle', 'google', 'hyundai', 'l\'oreal', 'volvo', 'samsung');
     foreach ($logos as $logo) {
-        $post_id = wp_insert_post(array(
-            'post_title'  => $logo,
-            'post_status' => 'publish',
-            'post_type'   => 'partner_logo',
-        ));
+        $post_id = v5_digital_find_seeded_post_id('partner_logo', $logo);
+        if ($post_id && !$destructive) {
+            continue;
+        }
+
+        if ($post_id) {
+            wp_update_post(array(
+                'ID'          => $post_id,
+                'post_title'  => $logo,
+                'post_status' => 'publish',
+            ));
+        } else {
+            $post_id = wp_insert_post(array(
+                'post_title'  => $logo,
+                'post_status' => 'publish',
+                'post_type'   => 'partner_logo',
+            ));
+        }
         if ($post_id && function_exists('pll_set_post_language')) {
             pll_set_post_language($post_id, 'fr');
         }
@@ -2507,11 +2552,25 @@ function v5_digital_setup_theme_content() {
         array('num' => '0', 'lbl' => 'Placements payants ou rangs sponsorisés'),
     );
     foreach ($stats_data as $stat) {
-        $post_id = wp_insert_post(array(
-            'post_title'  => $stat['num'] . ' - ' . $stat['lbl'],
-            'post_status' => 'publish',
-            'post_type'   => 'stat_metric',
-        ));
+        $stat_title = $stat['num'] . ' - ' . $stat['lbl'];
+        $post_id = v5_digital_find_seeded_post_id('stat_metric', $stat_title);
+        if ($post_id && !$destructive) {
+            continue;
+        }
+
+        if ($post_id) {
+            wp_update_post(array(
+                'ID'          => $post_id,
+                'post_title'  => $stat_title,
+                'post_status' => 'publish',
+            ));
+        } else {
+            $post_id = wp_insert_post(array(
+                'post_title'  => $stat_title,
+                'post_status' => 'publish',
+                'post_type'   => 'stat_metric',
+            ));
+        }
         if ($post_id) {
             if (function_exists('pll_set_post_language')) {
                 pll_set_post_language($post_id, 'fr');
@@ -2536,10 +2595,13 @@ function v5_digital_setup_theme_content() {
     );
     $service_ids = array();
     foreach ($service_slugs as $slug => $name) {
+        $term_id = 0;
+        $term_created = false;
         $inserted = wp_insert_term($name, 'agency_service', array('slug' => $slug));
         if (!is_wp_error($inserted)) {
             $term_id = $inserted['term_id'];
             $service_ids[$slug] = $term_id;
+            $term_created = true;
         } else {
             $term = get_term_by('slug', $slug, 'agency_service');
             if ($term) {
@@ -2547,7 +2609,7 @@ function v5_digital_setup_theme_content() {
                 $service_ids[$slug] = $term_id;
             }
         }
-        if (isset($term_id) && function_exists('pll_set_term_language')) {
+        if ($term_id && ($term_created || $destructive) && function_exists('pll_set_term_language')) {
             pll_set_term_language($term_id, 'fr');
         }
     }
@@ -2561,10 +2623,13 @@ function v5_digital_setup_theme_content() {
     );
     $city_ids = array();
     foreach ($city_slugs as $slug => $name) {
+        $term_id = 0;
+        $term_created = false;
         $inserted = wp_insert_term($name, 'agency_city', array('slug' => $slug));
         if (!is_wp_error($inserted)) {
             $term_id = $inserted['term_id'];
             $city_ids[$slug] = $term_id;
+            $term_created = true;
         } else {
             $term = get_term_by('slug', $slug, 'agency_city');
             if ($term) {
@@ -2572,7 +2637,7 @@ function v5_digital_setup_theme_content() {
                 $city_ids[$slug] = $term_id;
             }
         }
-        if (isset($term_id) && function_exists('pll_set_term_language')) {
+        if ($term_id && ($term_created || $destructive) && function_exists('pll_set_term_language')) {
             pll_set_term_language($term_id, 'fr');
         }
     }
@@ -2599,11 +2664,24 @@ function v5_digital_setup_theme_content() {
         ),
     );
     foreach ($hubs_data as $hub) {
-        $post_id = wp_insert_post(array(
-            'post_title'  => $hub['title'],
-            'post_status' => 'publish',
-            'post_type'   => 'specialty_hub',
-        ));
+        $post_id = v5_digital_find_seeded_post_id('specialty_hub', $hub['title']);
+        if ($post_id && !$destructive) {
+            continue;
+        }
+
+        if ($post_id) {
+            wp_update_post(array(
+                'ID'          => $post_id,
+                'post_title'  => $hub['title'],
+                'post_status' => 'publish',
+            ));
+        } else {
+            $post_id = wp_insert_post(array(
+                'post_title'  => $hub['title'],
+                'post_status' => 'publish',
+                'post_type'   => 'specialty_hub',
+            ));
+        }
         if ($post_id) {
             if (function_exists('pll_set_post_language')) {
                 pll_set_post_language($post_id, 'fr');
@@ -2711,13 +2789,28 @@ function v5_digital_setup_theme_content() {
 
 
     foreach ($agencies_data as $agency) {
-        $post_id = wp_insert_post(array(
-            'post_title'   => $agency['name'],
-            'post_content' => $agency['content'],
-            'post_excerpt' => $agency['excerpt'],
-            'post_status'  => 'publish',
-            'post_type'    => 'agency',
-        ));
+        $post_id = v5_digital_find_seeded_post_id('agency', $agency['name']);
+        if ($post_id && !$destructive) {
+            continue;
+        }
+
+        if ($post_id) {
+            wp_update_post(array(
+                'ID'           => $post_id,
+                'post_title'   => $agency['name'],
+                'post_content' => $agency['content'],
+                'post_excerpt' => $agency['excerpt'],
+                'post_status'  => 'publish',
+            ));
+        } else {
+            $post_id = wp_insert_post(array(
+                'post_title'   => $agency['name'],
+                'post_content' => $agency['content'],
+                'post_excerpt' => $agency['excerpt'],
+                'post_status'  => 'publish',
+                'post_type'    => 'agency',
+            ));
+        }
         if ($post_id) {
             if (function_exists('pll_set_post_language')) {
                 pll_set_post_language($post_id, 'fr');
@@ -2797,12 +2890,27 @@ function v5_digital_setup_theme_content() {
 
     $testimonial_ids = array();
     foreach ($testimonials_data as $t) {
-        $t_post_id = wp_insert_post(array(
-            'post_title'   => $t['author'],
-            'post_content' => $t['quote'],
-            'post_status'  => 'publish',
-            'post_type'    => 'testimonial',
-        ));
+        $t_post_id = v5_digital_find_seeded_post_id('testimonial', $t['author']);
+        if ($t_post_id && !$destructive) {
+            $testimonial_ids[] = $t_post_id;
+            continue;
+        }
+
+        if ($t_post_id) {
+            wp_update_post(array(
+                'ID'           => $t_post_id,
+                'post_title'   => $t['author'],
+                'post_content' => $t['quote'],
+                'post_status'  => 'publish',
+            ));
+        } else {
+            $t_post_id = wp_insert_post(array(
+                'post_title'   => $t['author'],
+                'post_content' => $t['quote'],
+                'post_status'  => 'publish',
+                'post_type'    => 'testimonial',
+            ));
+        }
         if ($t_post_id) {
             $testimonial_ids[] = $t_post_id;
             if (function_exists('pll_set_post_language')) {
@@ -2981,7 +3089,7 @@ function v5_digital_setup_theme_content() {
             )
         );
         $existing_homepage_layouts = v5_digital_get_field('field_page_layouts', $homepage_id);
-        if (empty($existing_homepage_layouts) || isset($_GET['force_seed'])) {
+        if (empty($existing_homepage_layouts) || $destructive) {
             update_field('field_page_layouts', $layouts, $homepage_id);
         }
 
@@ -3113,6 +3221,7 @@ function v5_digital_setup_theme_content() {
 
         foreach ($articles as $art) {
             $art_post = get_page_by_path($art['slug'], OBJECT, 'post');
+            $article_created = false;
             if (!$art_post) {
                 $post_id = wp_insert_post(array(
                     'post_title'   => $art['title'],
@@ -3121,11 +3230,12 @@ function v5_digital_setup_theme_content() {
                     'post_status'  => 'publish',
                     'post_type'    => 'post',
                 ));
+                $article_created = true;
             } else {
                 $post_id = $art_post->ID;
             }
 
-            if ($post_id) {
+            if ($post_id && ($article_created || $destructive)) {
                 if (function_exists('pll_set_post_language')) {
                     pll_set_post_language($post_id, 'fr');
                 }
@@ -3207,7 +3317,7 @@ add_action('admin_init', function() {
         wp_die(esc_html__('Advanced Custom Fields must be active before reseeding theme content.', 'agence-marketing-digital'));
     }
 
-    v5_digital_setup_theme_content();
+    v5_digital_setup_theme_content(true);
 
     wp_safe_redirect(admin_url('?seeding_completed=1'));
     exit;
@@ -4100,15 +4210,17 @@ function v5_digital_run_data_migrations() {
 add_action('admin_init', 'v5_digital_run_data_migrations');
 
 /**
- * One-time setup: rebuild the footer menus cleanly and assign each to its
- * location. Removes the tangled/duplicate footer menus, creates 4 properly
- * organized menus, and wires them to their locations (Polylang-aware).
+ * One-time setup: create missing footer menus and assign empty locations.
  *
- * Runs ONCE (guarded by an option) so that afterwards the footer is fully
- * managed from WordPress — your manual edits/assignments are never overwritten.
+ * Runs once for administrators and never deletes or overwrites existing menu
+ * assignments. After this setup, footer menus remain managed from WordPress.
  */
 function v5_digital_setup_footer_menus_once() {
     if (get_option('v5_footer_menus_setup_v1_done')) {
+        return;
+    }
+
+    if (!current_user_can('manage_options')) {
         return;
     }
 
@@ -4116,17 +4228,7 @@ function v5_digital_setup_footer_menus_once() {
         return;
     }
 
-    // 1. Remove the existing (tangled) footer menus so we start clean.
-    $all = wp_get_nav_menus();
-    if (!empty($all) && !is_wp_error($all)) {
-        foreach ($all as $m) {
-            if (stripos($m->name, 'footer') !== false) {
-                wp_delete_nav_menu($m->term_id);
-            }
-        }
-    }
-
-    // 2. Define the 4 clean footer menus, keyed by their theme location.
+    // Define the 4 default footer menus, keyed by their theme location.
     $footer_menus = array(
         'footer_explore' => array(
             'name'  => 'Footer Découvrir',
@@ -4165,33 +4267,59 @@ function v5_digital_setup_footer_menus_once() {
     if (!is_array($locations)) {
         $locations = array();
     }
+    $locations_changed = false;
 
     foreach ($footer_menus as $location => $cfg) {
-        $menu_id = wp_create_nav_menu($cfg['name']);
+        $menu_id = !empty($locations[$location]) ? (int) $locations[$location] : 0;
+        $found_named_menu = false;
+        $menu_created = false;
+
+        if (!$menu_id) {
+            $menu_id = v5_digital_find_nav_menu_id($cfg['name']);
+            $found_named_menu = (bool) $menu_id;
+        }
+
+        if (!$menu_id) {
+            $menu_id = wp_create_nav_menu($cfg['name']);
+            $menu_created = !is_wp_error($menu_id);
+        }
+
         if (is_wp_error($menu_id)) {
             continue;
         }
+        $menu_id = (int) $menu_id;
 
-        if (function_exists('pll_set_term_language')) {
+        if ($menu_created && function_exists('pll_set_term_language')) {
             pll_set_term_language($menu_id, 'fr');
         }
 
-        foreach ($cfg['items'] as $item) {
-            wp_update_nav_menu_item($menu_id, 0, array(
-                'menu-item-title'  => $item['title'],
-                'menu-item-url'    => $item['url'],
-                'menu-item-status' => 'publish',
-                'menu-item-type'   => 'custom',
-            ));
+        if ($menu_created || ($found_named_menu && !v5_digital_nav_menu_has_items($menu_id))) {
+            foreach ($cfg['items'] as $item) {
+                wp_update_nav_menu_item($menu_id, 0, array(
+                    'menu-item-title'  => $item['title'],
+                    'menu-item-url'    => $item['url'],
+                    'menu-item-status' => 'publish',
+                    'menu-item-type'   => 'custom',
+                ));
+            }
         }
 
-        // Assign to the location (base + Polylang FR suffix).
-        $locations[$location] = (int) $menu_id;
-        $locations[$location . '___fr'] = (int) $menu_id;
+        if (empty($locations[$location])) {
+            $locations[$location] = $menu_id;
+            $locations_changed = true;
+        }
+
+        $language_location = $location . '___fr';
+        if (empty($locations[$language_location])) {
+            $locations[$language_location] = $menu_id;
+            $locations_changed = true;
+        }
     }
 
-    set_theme_mod('nav_menu_locations', $locations);
-    update_option('nav_menu_locations', $locations);
+    if ($locations_changed) {
+        set_theme_mod('nav_menu_locations', $locations);
+        update_option('nav_menu_locations', $locations);
+    }
 
     // NOTE: we intentionally do NOT mirror these assignments into Polylang's
     // own "nav_menus" option. Doing so made Polylang re-apply them on every load
