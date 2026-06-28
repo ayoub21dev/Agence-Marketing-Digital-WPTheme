@@ -7,7 +7,8 @@
  * Sub-fields (from page_layouts flexible content):
  *   grid_title        — hero heading (HTML allowed)
  *   grid_subtitle     — hero lede text
-  *   show_filters      — boolean: show category pills
+ *   show_filters      — boolean: show category pills
+ *   display_categories — optional WP categories to include
  *   posts_per_page    — how many posts to fetch (-1 = all)
  */
 
@@ -15,6 +16,7 @@
 $grid_title       = v5_digital_get_sub_field('grid_title');
 $grid_subtitle    = v5_digital_get_sub_field('grid_subtitle');
 $show_filters     = v5_digital_get_sub_field('show_filters');
+$display_categories = v5_digital_get_sub_field('display_categories');
 $posts_per_page   = v5_digital_get_sub_field('posts_per_page');
 
 // Sensible defaults
@@ -22,6 +24,35 @@ if (!$grid_title)     $grid_title     = 'Intelligence <span class="quiet">Agence
 if (!$grid_subtitle)  $grid_subtitle  = 'Notes techniques sur les agences marocaines, la visibilité organique, Core Web Vitals, et les preuves qui séparent les vrais opérateurs SEO des argumentaires commerciaux polis.';
 if ($show_filters    === null || $show_filters    === '') $show_filters    = true;
 if (!$posts_per_page || $posts_per_page == 0) $posts_per_page = -1;
+
+$normalize_blog_category_ids = function ($categories) {
+    if (empty($categories)) {
+        return array();
+    }
+
+    if (!is_array($categories)) {
+        $categories = array($categories);
+    }
+
+    $category_ids = array();
+    foreach ($categories as $category) {
+        if (is_object($category) && isset($category->term_id)) {
+            $term_id = (int) $category->term_id;
+        } elseif (is_array($category) && isset($category['term_id'])) {
+            $term_id = (int) $category['term_id'];
+        } else {
+            $term_id = (int) $category;
+        }
+
+        if ($term_id > 0) {
+            $category_ids[$term_id] = $term_id;
+        }
+    }
+
+    return array_values($category_ids);
+};
+
+$display_category_ids = $normalize_blog_category_ids($display_categories);
 
 $blog_page = get_page_by_path('blog');
 $layouts = $blog_page ? v5_digital_get_field('page_layouts', $blog_page->ID) : v5_digital_get_field('page_layouts');
@@ -36,13 +67,17 @@ if (is_array($layouts)) {
 }
 
 // ── Query blog posts ──────────────────────────────────────────────────────────
-$blog_query = new WP_Query(array(
+$blog_query_args = array(
     'post_type'      => 'post',
     'posts_per_page' => (int) $posts_per_page,
     'post_status'    => 'publish',
     'orderby'        => 'date',
     'order'          => 'DESC',
-));
+);
+if (!empty($display_category_ids)) {
+    $blog_query_args['category__in'] = $display_category_ids;
+}
+$blog_query = new WP_Query($blog_query_args);
 $post_count = $blog_query->found_posts;
 
 $is_default_blog_category = function ($category) {
@@ -87,9 +122,25 @@ $get_post_blog_categories = function ($post_id) use ($is_default_blog_category) 
 };
 
 $blog_categories = array();
-foreach ($blog_query->posts as $blog_post) {
-    foreach ($get_post_blog_categories($blog_post->ID) as $category) {
-        $blog_categories[$category->slug] = $category;
+if (!empty($display_category_ids)) {
+    $selected_terms = get_terms(array(
+        'taxonomy'   => 'category',
+        'include'    => $display_category_ids,
+        'hide_empty' => false,
+        'orderby'    => 'include',
+    ));
+    if (!is_wp_error($selected_terms) && !empty($selected_terms)) {
+        foreach ($selected_terms as $category) {
+            if (!$is_default_blog_category($category)) {
+                $blog_categories[$category->slug] = $category;
+            }
+        }
+    }
+} else {
+    foreach ($blog_query->posts as $blog_post) {
+        foreach ($get_post_blog_categories($blog_post->ID) as $category) {
+            $blog_categories[$category->slug] = $category;
+        }
     }
 }
 uasort($blog_categories, function ($a, $b) {
