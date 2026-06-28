@@ -3444,12 +3444,12 @@ function v5_digital_language_switcher() {
             ? 'bg-white text-slate-950 shadow-sm'
             : 'text-slate-500 hover:bg-white/70 hover:text-slate-900';
 
-        $items[] = '<a href="' . esc_url($lang['url']) . '" class="inline-flex h-8 min-w-8 items-center justify-center rounded-lg px-2.5 text-[12px] font-semibold leading-none transition-colors uppercase ' . $cls . '" hreflang="' . esc_attr($lang['slug']) . '" lang="' . esc_attr($lang['slug']) . '"' . ($active ? ' aria-current="true"' : '') . '>'
+        $items[] = '<a href="' . esc_url($lang['url']) . '" class="inline-flex h-6 min-w-7 items-center justify-center rounded-md px-2 text-[11px] font-semibold leading-none transition-colors uppercase ' . $cls . '" hreflang="' . esc_attr($lang['slug']) . '" lang="' . esc_attr($lang['slug']) . '"' . ($active ? ' aria-current="true"' : '') . '>'
             . '<span>' . $code . '</span>'
             . '</a>';
     }
 
-    echo '<div class="inline-flex items-center gap-0.5 rounded-xl border border-slate-200 bg-slate-100 p-1 shadow-sm" role="navigation" aria-label="' . esc_attr(v5_t('Langue')) . '">';
+    echo '<div class="inline-flex items-center gap-0.5 rounded-lg border border-slate-200/80 bg-slate-100 p-0.5" role="navigation" aria-label="' . esc_attr(v5_t('Langue')) . '">';
     echo implode('', $items);
     echo '</div>';
 }
