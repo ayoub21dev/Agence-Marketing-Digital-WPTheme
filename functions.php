@@ -3425,11 +3425,12 @@ function v5_digital_language_switcher() {
     }
 
     $langs = pll_the_languages(array(
-        'raw'           => 1,
-        // Follow Polylang's default rule: only offer a language when the
-        // current page actually has a translation in it.
-        'hide_if_empty' => 1,
-        'hide_current'  => 0,
+        'raw'                    => 1,
+        // Keep the header control stable across FR/EN. If the current page is
+        // not translated, Polylang falls back to the language homepage.
+        'hide_if_empty'          => 0,
+        'hide_if_no_translation' => 0,
+        'hide_current'           => 0,
     ));
 
     if (empty($langs) || !is_array($langs) || count($langs) < 2) {
@@ -3501,20 +3502,24 @@ function v5_digital_get_primary_menu_id() {
 }
 
 function v5_digital_menu_item_is_language_switcher($item) {
-    if (!$item || empty($item->url)) {
+    if (!$item) {
+        return false;
+    }
+
+    if (!empty($item->classes) && is_array($item->classes)) {
+        foreach ($item->classes as $class) {
+            if (strpos($class, 'lang-item') !== false || strpos($class, 'pll-parent-menu-item') !== false) {
+                return true;
+            }
+        }
+    }
+
+    if (empty($item->url)) {
         return false;
     }
 
     if ($item->url === '#pll_switcher' || strpos($item->url, 'pll_switcher') !== false) {
         return true;
-    }
-
-    if (!empty($item->classes) && is_array($item->classes)) {
-        foreach ($item->classes as $class) {
-            if (strpos($class, 'lang-item') !== false) {
-                return true;
-            }
-        }
     }
 
     return false;
@@ -3539,6 +3544,19 @@ function v5_digital_primary_menu_has_language_switcher() {
 
     foreach (array_unique($menu_ids) as $menu_id) {
         $items = wp_get_nav_menu_items($menu_id);
+        if (!is_array($items)) {
+            continue;
+        }
+
+        foreach ($items as $item) {
+            if (v5_digital_menu_item_is_language_switcher($item)) {
+                return true;
+            }
+        }
+    }
+
+    foreach (wp_get_nav_menus() as $menu) {
+        $items = wp_get_nav_menu_items($menu->term_id);
         if (!is_array($items)) {
             continue;
         }
