@@ -63,7 +63,7 @@ $guides_query = new WP_Query($query_args);
                     $thumbnail_url = get_the_post_thumbnail_url($post_id, 'medium');
                     if (empty($thumbnail_url)) {
                         // Attempt to fallback to seeded cover image url field
-                        $seeded_image = get_field('cover_image_url', $post_id);
+                        $seeded_image = v5_digital_get_field('cover_image_url', $post_id);
                         $thumbnail_url = !empty($seeded_image) ? $seeded_image : 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
                     }
                     

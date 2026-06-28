@@ -173,16 +173,16 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                         $t_id   = get_the_ID();
                         $quote  = get_the_content();
                         $author = get_the_title();
-                        $rating = get_field('rating', $t_id);
-                        $role   = get_field('author_role', $t_id);
-                        $image_media = get_field('author_image_media', $t_id);
-                        $image_url   = get_field('author_image', $t_id);
+                        $rating = v5_digital_get_field('rating', $t_id);
+                        $role   = v5_digital_get_field('author_role', $t_id);
+                        $image_media = v5_digital_get_field('author_image_media', $t_id);
+                        $image_url   = v5_digital_get_field('author_image', $t_id);
                         $image = !empty($image_media) ? (is_array($image_media) ? $image_media['url'] : $image_media) : $image_url;
-                        $agency_name = get_field('hired_agency_name', $t_id);
-                        $agency_slug = get_field('hired_agency_slug', $t_id);
-                        $agency_url  = get_field('hired_agency_url', $t_id);
-                        $project = get_field('project', $t_id);
-                        $result  = get_field('result', $t_id);
+                        $agency_name = v5_digital_get_field('hired_agency_name', $t_id);
+                        $agency_slug = v5_digital_get_field('hired_agency_slug', $t_id);
+                        $agency_url  = v5_digital_get_field('hired_agency_url', $t_id);
+                        $project = v5_digital_get_field('project', $t_id);
+                        $result  = v5_digital_get_field('result', $t_id);
 
                         // Fallbacks
                         $rating = $rating ? intval($rating) : 5;

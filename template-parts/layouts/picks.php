@@ -91,13 +91,13 @@ if (!function_exists('theme_render_stars_html')) {
                 $index = 0;
                 while ($picks_query->have_posts()) : $picks_query->the_post(); 
                     $post_id     = get_the_ID();
-                    $rating      = get_field('rating_value', $post_id);
-                    $reviews     = get_field('review_count', $post_id);
-                    $rank        = get_field('agency_rank', $post_id);
-                    $logo_image  = get_field('logo_image', $post_id);
-                    $logo_url    = get_field('logo_image_url', $post_id);
+                    $rating      = v5_digital_get_field('rating_value', $post_id);
+                    $reviews     = v5_digital_get_field('review_count', $post_id);
+                    $rank        = v5_digital_get_field('agency_rank', $post_id);
+                    $logo_image  = v5_digital_get_field('logo_image', $post_id);
+                    $logo_url    = v5_digital_get_field('logo_image_url', $post_id);
                     $logo_src    = !empty($logo_image) ? (is_array($logo_image) ? $logo_image['url'] : $logo_image) : $logo_url;
-                    $logo_text   = get_field('logo_text', $post_id);
+                    $logo_text   = v5_digital_get_field('logo_text', $post_id);
                     
                     // Get taxonomy values
                     $services = wp_get_post_terms($post_id, 'agency_service', array('fields' => 'names'));

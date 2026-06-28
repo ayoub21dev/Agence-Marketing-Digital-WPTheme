@@ -10,7 +10,7 @@ if (have_posts()) :
         <main class="flex-grow">
             <?php
             // Output normal WordPress content editor block if used
-            if (get_the_content() && !have_rows('page_layouts')) {
+            if (get_the_content() && !v5_digital_have_rows('page_layouts')) {
                 ?>
                 <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-10">
                     <h1 class="font-display text-[2.25rem] font-bold text-slate-900 leading-tight mb-5 text-center"><?php the_title(); ?></h1>
@@ -22,9 +22,9 @@ if (have_posts()) :
             }
 
             // Output flexible layouts
-            if (have_rows('page_layouts')) :
-                while (have_rows('page_layouts')) : the_row();
-                    $layout = get_row_layout();
+            if (v5_digital_have_rows('page_layouts')) :
+                while (v5_digital_have_rows('page_layouts')) : v5_digital_the_row();
+                    $layout = v5_digital_get_row_layout();
                     $layout_clean = str_replace('_section', '', $layout);
                     get_template_part('template-parts/layouts/' . $layout_clean);
                 endwhile;

@@ -89,12 +89,12 @@ if ($total_steps > 0) {
         </div>
         <?php endif; ?>
 
-        <?php if (have_rows('steps')) : ?>
+        <?php if (v5_digital_have_rows('steps')) : ?>
             <div class="monitor-strip">
-                <?php while (have_rows('steps')) : the_row();
-                    $step_icon  = get_sub_field('step_icon');
-                    $step_title = get_sub_field('step_title');
-                    $step_desc  = get_sub_field('step_description');
+                <?php while (v5_digital_have_rows('steps')) : v5_digital_the_row();
+                    $step_icon  = v5_digital_get_sub_field('step_icon');
+                    $step_title = v5_digital_get_sub_field('step_title');
+                    $step_desc  = v5_digital_get_sub_field('step_description');
                     $step_index = get_row_index();
                     ?>
                     <?php if ($step_index > 1) : ?>

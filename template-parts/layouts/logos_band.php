@@ -20,8 +20,8 @@ if ($logo_query->have_posts()) :
   while ($logo_query->have_posts()) :
     $logo_query->the_post();
     $logo_id    = get_the_ID();
-    $logo_media = get_field('logo_image_media', $logo_id);
-    $logo_url   = get_field('logo_image_url', $logo_id);
+    $logo_media = v5_digital_get_field('logo_image_media', $logo_id);
+    $logo_url   = v5_digital_get_field('logo_image_url', $logo_id);
     $items[] = array(
       'src'  => !empty($logo_media) ? $logo_media : $logo_url,
       'name' => get_the_title(),

@@ -142,11 +142,11 @@ if ($has_label || $has_title || $evidence_rows === null || $has_rows) :
                     <h2 class="section-title" style="margin-bottom:20px;"><?php echo esc_html($title); ?></h2>
                 <?php endif; ?>
                 
-                <?php if (have_rows('evidence_rows')) : ?>
+                <?php if (v5_digital_have_rows('evidence_rows')) : ?>
                     <div class="evidence-list">
-                        <?php while (have_rows('evidence_rows')) : the_row();
-                            $row_title = get_sub_field('row_title');
-                            $row_desc  = get_sub_field('row_description');
+                        <?php while (v5_digital_have_rows('evidence_rows')) : v5_digital_the_row();
+                            $row_title = v5_digital_get_sub_field('row_title');
+                            $row_desc  = v5_digital_get_sub_field('row_description');
                             ?>
                             <div class="evidence-row">
                                 <strong><?php echo esc_html($row_title); ?></strong>

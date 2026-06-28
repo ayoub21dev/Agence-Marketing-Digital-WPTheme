@@ -10,9 +10,9 @@ if (have_posts()) :
         ?>
         <main class="flex-grow">
             <?php
-            if (have_rows('page_layouts')) :
-                while (have_rows('page_layouts')) : the_row();
-                    $layout = get_row_layout();
+            if (v5_digital_have_rows('page_layouts')) :
+                while (v5_digital_have_rows('page_layouts')) : v5_digital_the_row();
+                    $layout = v5_digital_get_row_layout();
                     // Strip '_section' suffix to match physical files (e.g. hero_section -> hero.php)
                     $layout_clean = str_replace('_section', '', $layout);
                     get_template_part('template-parts/layouts/' . $layout_clean);

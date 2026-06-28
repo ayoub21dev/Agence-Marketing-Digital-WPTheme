@@ -142,17 +142,17 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
         </div>
         <?php endif; ?>
 
-        <?php if (have_rows('stages')) : ?>
+        <?php if (v5_digital_have_rows('stages')) : ?>
             <div class="process-grid">
-                <?php while (have_rows('stages')) : the_row();
-                    $stage_num         = get_sub_field('stage_num');
-                    $stage_title       = get_sub_field('stage_title');
-                    $stage_description = get_sub_field('stage_description');
-                    $stage_tags_raw    = get_sub_field('stage_tags');
+                <?php while (v5_digital_have_rows('stages')) : v5_digital_the_row();
+                    $stage_num         = v5_digital_get_sub_field('stage_num');
+                    $stage_title       = v5_digital_get_sub_field('stage_title');
+                    $stage_description = v5_digital_get_sub_field('stage_description');
+                    $stage_tags_raw    = v5_digital_get_sub_field('stage_tags');
                     $stage_tags        = $stage_tags_raw ? array_map('trim', explode(',', $stage_tags_raw)) : array();
                     $stage_index       = get_row_index();
-                    $stage_image       = get_sub_field('stage_image');
-                    $stage_icon        = get_sub_field('stage_icon');
+                    $stage_image       = v5_digital_get_sub_field('stage_image');
+                    $stage_icon        = v5_digital_get_sub_field('stage_icon');
                     ?>
                     <article class="process-stage">
                         <div>

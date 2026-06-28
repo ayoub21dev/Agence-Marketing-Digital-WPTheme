@@ -3,6 +3,55 @@
  * agence-marketing-digital Theme Functions and Definitions
  */
 
+if (!defined('V5_DIGITAL_ACF_ACTIVE')) {
+    define(
+        'V5_DIGITAL_ACF_ACTIVE',
+        function_exists('get_field')
+        && function_exists('get_sub_field')
+        && function_exists('have_rows')
+        && function_exists('update_field')
+    );
+}
+
+function v5_digital_acf_is_active() {
+    return (bool) V5_DIGITAL_ACF_ACTIVE;
+}
+
+function v5_digital_get_field($selector, $post_id = false, $format_value = true, $escape_html = false) {
+    return v5_digital_acf_is_active() ? get_field($selector, $post_id, $format_value, $escape_html) : null;
+}
+
+function v5_digital_get_sub_field($selector, $format_value = true, $escape_html = false) {
+    return v5_digital_acf_is_active() ? get_sub_field($selector, $format_value, $escape_html) : null;
+}
+
+function v5_digital_have_rows($selector, $post_id = false) {
+    return v5_digital_acf_is_active() ? have_rows($selector, $post_id) : false;
+}
+
+function v5_digital_the_row($format = false) {
+    return v5_digital_acf_is_active() ? the_row($format) : false;
+}
+
+function v5_digital_get_row_layout() {
+    return v5_digital_acf_is_active() ? get_row_layout() : '';
+}
+
+function v5_digital_update_field($selector, $value, $post_id = false) {
+    return v5_digital_acf_is_active() ? update_field($selector, $value, $post_id) : false;
+}
+
+function v5_digital_acf_missing_admin_notice() {
+    if (v5_digital_acf_is_active() || !current_user_can('activate_plugins')) {
+        return;
+    }
+
+    echo '<div class="notice notice-warning"><p>'
+        . esc_html__('Agence Marketing Digital requires Advanced Custom Fields for editable page layouts. The theme is using fallback rendering until ACF is activated.', 'agence-marketing-digital')
+        . '</p></div>';
+}
+add_action('admin_notices', 'v5_digital_acf_missing_admin_notice');
+
 // Helper to get dynamic domain-based contact email
 function v5_digital_get_dynamic_email() {
     $host = parse_url(home_url(), PHP_URL_HOST);
@@ -1952,6 +2001,10 @@ add_action('wp_enqueue_scripts', 'v5_digital_enqueue_assets');
 // ----------------------------------------------------
 
 function v5_digital_setup_theme_content() {
+    if (!v5_digital_acf_is_active()) {
+        return;
+    }
+
     // 4.1 Set up Polylang default language (French)
     if (class_exists('PLL_Model')) {
         $model = PLL();
@@ -2066,7 +2119,7 @@ function v5_digital_setup_theme_content() {
             }
             // Seed specific layout templates for core pages
             if (function_exists('update_field')) {
-                $existing_layouts = get_field('field_page_layouts', $p_id);
+                $existing_layouts = v5_digital_get_field('field_page_layouts', $p_id);
                 if (empty($existing_layouts) || isset($_GET['force_seed'])) {
                     if ($slug === 'blog') {
                         update_field('field_page_layouts', array(
@@ -2927,7 +2980,7 @@ function v5_digital_setup_theme_content() {
                 'secondary_cta_text' => 'none',
             )
         );
-        $existing_homepage_layouts = get_field('field_page_layouts', $homepage_id);
+        $existing_homepage_layouts = v5_digital_get_field('field_page_layouts', $homepage_id);
         if (empty($existing_homepage_layouts) || isset($_GET['force_seed'])) {
             update_field('field_page_layouts', $layouts, $homepage_id);
         }
@@ -3150,6 +3203,9 @@ add_action('admin_init', function() {
     if (!wp_verify_nonce($nonce, 'v5_digital_force_seed')) {
         wp_die(esc_html__('Lien de réinitialisation invalide ou expiré. Veuillez relancer depuis le tableau de bord.', 'agence-marketing-digital'));
     }
+    if (!v5_digital_acf_is_active()) {
+        wp_die(esc_html__('Advanced Custom Fields must be active before reseeding theme content.', 'agence-marketing-digital'));
+    }
 
     v5_digital_setup_theme_content();
 
@@ -3160,6 +3216,9 @@ add_action('admin_init', function() {
 // Offer administrators a safe, nonce-protected link to trigger a full reseed.
 add_action('admin_notices', function() {
     if (!current_user_can('manage_options')) {
+        return;
+    }
+    if (!v5_digital_acf_is_active()) {
         return;
     }
     $screen = function_exists('get_current_screen') ? get_current_screen() : null;
@@ -3519,7 +3578,7 @@ function v5_digital_get_post_badge($post_id = null, $default = 'Guide') {
         $post_id = get_the_ID();
     }
 
-    $badge = function_exists('get_field') ? get_field('badge', $post_id) : '';
+    $badge = v5_digital_get_field('badge', $post_id);
     if (!empty($badge)) {
         return $badge;
     }
@@ -3538,7 +3597,11 @@ function v5_digital_get_post_badge($post_id = null, $default = 'Guide') {
 }
 
 function v5_get_field_default($field_name, $default_value = '', $is_sub_field = true) {
-    $value = $is_sub_field ? get_sub_field($field_name) : get_field($field_name);
+    if (!v5_digital_acf_is_active()) {
+        return $default_value;
+    }
+
+    $value = $is_sub_field ? v5_digital_get_sub_field($field_name) : v5_digital_get_field($field_name);
     if ($value === null || $value === false) {
         return $default_value;
     }
@@ -3551,7 +3614,7 @@ function v5_get_field_default($field_name, $default_value = '', $is_sub_field = 
  * overwriting user-entered values.
  */
 function v5_digital_backfill_homepage_hero_fields() {
-    if (!function_exists('get_field') || !function_exists('update_field')) {
+    if (!v5_digital_acf_is_active()) {
         return;
     }
 
@@ -3565,7 +3628,7 @@ function v5_digital_backfill_homepage_hero_fields() {
         return;
     }
 
-    $layouts = get_field('page_layouts', $homepage_id);
+    $layouts = v5_digital_get_field('page_layouts', $homepage_id);
     if (empty($layouts) || !is_array($layouts)) {
         return;
     }
@@ -3676,7 +3739,7 @@ function v5_digital_backfill_homepage_hero_fields() {
  * Ensure the outcomes section has editable testimonial posts available.
  */
 function v5_digital_backfill_testimonials() {
-    if (!function_exists('update_field')) {
+    if (!v5_digital_acf_is_active()) {
         return;
     }
 
@@ -3775,7 +3838,7 @@ function v5_digital_migrate_blog_cpt_to_posts() {
  * fixes any new post left uncategorized.
  */
 function v5_digital_backfill_post_categories() {
-    if (!function_exists('get_field')) {
+    if (!v5_digital_acf_is_active()) {
         return;
     }
 
@@ -3793,7 +3856,7 @@ function v5_digital_backfill_post_categories() {
     ));
 
     foreach ($posts as $post_id) {
-        $badge = get_field('badge', $post_id);
+        $badge = v5_digital_get_field('badge', $post_id);
         if (empty($badge)) {
             continue;
         }
@@ -3893,7 +3956,7 @@ function v5_digital_get_or_create_author($name) {
  * profile. Idempotent: only writes when the assignment actually differs.
  */
 function v5_digital_sync_post_authors() {
-    if (!function_exists('get_field')) {
+    if (!v5_digital_acf_is_active()) {
         return;
     }
 
@@ -3905,7 +3968,7 @@ function v5_digital_sync_post_authors() {
     ));
 
     foreach ($posts as $post_id) {
-        $author_name = get_field('author_name', $post_id);
+        $author_name = v5_digital_get_field('author_name', $post_id);
         if (empty($author_name)) {
             continue;
         }
@@ -3943,7 +4006,7 @@ function v5_digital_mirror_author_name_on_save($post_id) {
     if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) {
         return;
     }
-    if (get_post_type($post_id) !== 'post' || !function_exists('update_field')) {
+    if (get_post_type($post_id) !== 'post' || !v5_digital_acf_is_active()) {
         return;
     }
 
@@ -3957,7 +4020,7 @@ function v5_digital_mirror_author_name_on_save($post_id) {
         return;
     }
 
-    if ((string) get_field('author_name', $post_id) !== $display) {
+    if ((string) v5_digital_get_field('author_name', $post_id) !== $display) {
         update_field('field_blog_author_name', $display, $post_id);
     }
 }
@@ -4015,6 +4078,9 @@ if (!defined('V5_DIGITAL_MIGRATION_VERSION')) {
 function v5_digital_run_data_migrations() {
     // Only an administrator hitting wp-admin should ever trigger these.
     if (!current_user_can('manage_options')) {
+        return;
+    }
+    if (!v5_digital_acf_is_active()) {
         return;
     }
     if (get_option('v5_digital_migration_version') === V5_DIGITAL_MIGRATION_VERSION) {
@@ -4135,4 +4201,3 @@ function v5_digital_setup_footer_menus_once() {
     update_option('v5_footer_menus_setup_v1_done', 1);
 }
 add_action('admin_init', 'v5_digital_setup_footer_menus_once');
-

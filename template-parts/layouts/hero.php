@@ -32,16 +32,16 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
             <!-- Dynamic CTA Actions -->
             <div class="flex flex-col sm:flex-row gap-3 justify-center mb-10 hero-actions">
                 <?php 
-                if (have_rows('hero_ctas')) :
-                    while (have_rows('hero_ctas')) : the_row();
-                        $text       = get_sub_field('text');
-                        $link_type  = get_sub_field('link_type');
-                        $url        = get_sub_field('url');
-                        $page       = get_sub_field('page');
-                        $style      = get_sub_field('style');
-                        $bg_color   = get_sub_field('bg_color');
-                        $text_color = get_sub_field('text_color');
-                        $icon       = get_sub_field('icon');
+                if (v5_digital_have_rows('hero_ctas')) :
+                    while (v5_digital_have_rows('hero_ctas')) : v5_digital_the_row();
+                        $text       = v5_digital_get_sub_field('text');
+                        $link_type  = v5_digital_get_sub_field('link_type');
+                        $url        = v5_digital_get_sub_field('url');
+                        $page       = v5_digital_get_sub_field('page');
+                        $style      = v5_digital_get_sub_field('style');
+                        $bg_color   = v5_digital_get_sub_field('bg_color');
+                        $text_color = v5_digital_get_sub_field('text_color');
+                        $icon       = v5_digital_get_sub_field('icon');
 
                         // Resolve link URL
                         $link = ($link_type === 'page' && !empty($page)) ? $page : $url;

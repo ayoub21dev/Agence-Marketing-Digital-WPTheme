@@ -51,16 +51,16 @@ get_header();
             // Fetch fields
             $badge = v5_digital_get_post_badge(get_the_ID(), 'Guide');
             
-            $read_time = get_field('read_time');
+            $read_time = v5_digital_get_field('read_time');
             if (!$read_time) $read_time = '5 min de lecture';
             
             $author = get_the_author();
-            if (!$author) $author = get_field('author_name');
+            if (!$author) $author = v5_digital_get_field('author_name');
             
             // Image logic
-            $cover_image = get_field('cover_image_media');
+            $cover_image = v5_digital_get_field('cover_image_media');
             if (!$cover_image) {
-                $cover_image = get_field('cover_image_url');
+                $cover_image = v5_digital_get_field('cover_image_url');
             }
             if (!$cover_image && has_post_thumbnail()) {
                 $cover_image = get_the_post_thumbnail_url(null, 'large');
@@ -112,20 +112,20 @@ get_header();
                     <!-- Main prose content via Flexible Content -->
                     <div class="article-prose">
                         <?php
-                        if (have_rows('blog_layouts')) :
-                            while (have_rows('blog_layouts')) : the_row();
-                                $layout = get_row_layout();
+                        if (v5_digital_have_rows('blog_layouts')) :
+                            while (v5_digital_have_rows('blog_layouts')) : v5_digital_the_row();
+                                $layout = v5_digital_get_row_layout();
                                 
                                 if ($layout === 'wysiwyg_block') :
-                                    the_sub_field('content');
+                                    echo wp_kses_post(v5_digital_get_sub_field('content'));
                                     
                                 elseif ($layout === 'heading_block') :
-                                    $tag = get_sub_field('heading_level');
-                                    $text = get_sub_field('heading_text');
+                                    $tag = v5_digital_get_sub_field('heading_level');
+                                    $text = v5_digital_get_sub_field('heading_text');
                                     echo '<' . esc_attr($tag) . '>' . esc_html($text) . '</' . esc_attr($tag) . '>';
                                     
                                 elseif ($layout === 'agency_reviews_block') :
-                                    $reviews = get_sub_field('reviews_list');
+                                    $reviews = v5_digital_get_sub_field('reviews_list');
                                     if (!empty($reviews)) :
                                         ?>
                                         <div class="mt-10 pt-8 border-t border-slate-200">
@@ -139,9 +139,9 @@ get_header();
                                                     if (!$agency_post) continue;
 
                                                     // Logo: ACF media → ACF URL field → fallback text avatar
-                                                    $logo_image_field = get_field('logo_image', $agency_id);
-                                                    $logo_image_url   = get_field('logo_image_url', $agency_id);
-                                                    $logo_text        = get_field('logo_text', $agency_id) ?: strtoupper(substr($agency_post->post_title, 0, 3));
+                                                    $logo_image_field = v5_digital_get_field('logo_image', $agency_id);
+                                                    $logo_image_url   = v5_digital_get_field('logo_image_url', $agency_id);
+                                                    $logo_text        = v5_digital_get_field('logo_text', $agency_id) ?: strtoupper(substr($agency_post->post_title, 0, 3));
                                                     if (!empty($logo_image_field)) {
                                                         $logo_src = is_array($logo_image_field) ? $logo_image_field['url'] : $logo_image_field;
                                                     } elseif (!empty($logo_image_url)) {

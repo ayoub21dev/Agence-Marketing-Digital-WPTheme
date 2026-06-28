@@ -12,10 +12,10 @@
  */
 
 // ── Pull sub-fields ───────────────────────────────────────────────────────────
-$grid_title       = get_sub_field('grid_title');
-$grid_subtitle    = get_sub_field('grid_subtitle');
-$show_filters     = get_sub_field('show_filters');
-$posts_per_page   = get_sub_field('posts_per_page');
+$grid_title       = v5_digital_get_sub_field('grid_title');
+$grid_subtitle    = v5_digital_get_sub_field('grid_subtitle');
+$show_filters     = v5_digital_get_sub_field('show_filters');
+$posts_per_page   = v5_digital_get_sub_field('posts_per_page');
 
 // Sensible defaults
 if (!$grid_title)     $grid_title     = 'Intelligence <span class="quiet">Agences.</span>';
@@ -24,7 +24,7 @@ if ($show_filters    === null || $show_filters    === '') $show_filters    = tru
 if (!$posts_per_page || $posts_per_page == 0) $posts_per_page = -1;
 
 $blog_page = get_page_by_path('blog');
-$layouts = $blog_page ? get_field('page_layouts', $blog_page->ID) : get_field('page_layouts');
+$layouts = $blog_page ? v5_digital_get_field('page_layouts', $blog_page->ID) : v5_digital_get_field('page_layouts');
 $has_common_hero = false;
 if (is_array($layouts)) {
     foreach ($layouts as $l) {
@@ -251,12 +251,12 @@ $post_count = $blog_query->found_posts;
                     while ($blog_query->have_posts()) : $blog_query->the_post();
 
                         $badge      = v5_digital_get_post_badge(get_the_ID(), 'Guide');
-                        $read_time  = get_field('read_time') ?: '5 min de lecture';
-                        $author     = get_the_author() ?: get_field('author_name');
+                        $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
+                        $author     = get_the_author() ?: v5_digital_get_field('author_name');
 
                         // Cover image priority: media field → URL field → post thumbnail → placeholder
-                        $cover_image = get_field('cover_image_media');
-                        if (!$cover_image) $cover_image = get_field('cover_image_url');
+                        $cover_image = v5_digital_get_field('cover_image_media');
+                        if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
                         if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'large');
                         if (!$cover_image) $cover_image = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
 
