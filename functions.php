@@ -3415,7 +3415,7 @@ function v5_t($string) {
 }
 
 /**
- * Render a compact language switcher (e.g. FR / EN). Outputs nothing unless
+ * Render a compact language switcher (e.g. FR EN). Outputs nothing unless
  * Polylang is active with at least two languages, so it stays invisible on a
  * single-language site.
  */
@@ -3441,25 +3441,16 @@ function v5_digital_language_switcher() {
         $code   = strtoupper(esc_html($lang['slug']));
         $active = !empty($lang['current_lang']);
         $cls    = $active
-            ? 'text-slate-900 font-semibold opacity-100'
-            : 'text-slate-500 hover:text-slate-900 opacity-80 hover:opacity-100';
-        // Build the flag <img> ourselves from the flag URL. Polylang's 'flag'
-        // value is inconsistent across versions (Polylang Pro returns the URL,
-        // not an <img>), so relying on it printed the raw URL as text. Using
-        // flag_url and our own <img> renders the flag reliably. Inline styles
-        // keep it independent of the compiled Tailwind classes.
-        $flag = '';
-        if (!empty($lang['flag_url'])) {
-            $flag = '<img src="' . esc_url($lang['flag_url']) . '" alt="" style="width:16px;height:auto;display:inline-block;border-radius:2px;" />';
-        }
-        $items[] = '<a href="' . esc_url($lang['url']) . '" class="flex items-center gap-1.5 ' . $cls . ' transition-colors uppercase" hreflang="' . esc_attr($lang['slug']) . '" lang="' . esc_attr($lang['slug']) . '">'
-            . $flag
+            ? 'bg-white text-slate-950 shadow-sm'
+            : 'text-slate-500 hover:bg-white/70 hover:text-slate-900';
+
+        $items[] = '<a href="' . esc_url($lang['url']) . '" class="inline-flex h-8 min-w-8 items-center justify-center rounded-lg px-2.5 text-[12px] font-semibold leading-none transition-colors uppercase ' . $cls . '" hreflang="' . esc_attr($lang['slug']) . '" lang="' . esc_attr($lang['slug']) . '"' . ($active ? ' aria-current="true"' : '') . '>'
             . '<span>' . $code . '</span>'
             . '</a>';
     }
 
-    echo '<div class="flex items-center gap-2 text-[12px] font-medium tracking-wide" role="navigation" aria-label="' . esc_attr(v5_t('Langue')) . '">';
-    echo implode('<span class="text-slate-300" aria-hidden="true">/</span>', $items);
+    echo '<div class="inline-flex items-center gap-0.5 rounded-xl border border-slate-200 bg-slate-100 p-1 shadow-sm" role="navigation" aria-label="' . esc_attr(v5_t('Langue')) . '">';
+    echo implode('', $items);
     echo '</div>';
 }
 
