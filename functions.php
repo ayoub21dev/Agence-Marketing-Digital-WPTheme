@@ -103,6 +103,10 @@ add_action('admin_head', 'v5_digital_svg_admin_thumb_css');
 // ----------------------------------------------------
 
 function v5_digital_register_cpts() {
+    if (v5_digital_acf_json_manages_content_types()) {
+        return;
+    }
+
     // Partner Logos
     register_post_type('partner_logo', array(
         'labels' => array(
@@ -255,7 +259,16 @@ function v5_digital_register_cpts() {
     ));
 
 }
-add_action('init', 'v5_digital_register_cpts');
+
+function v5_digital_acf_json_manages_content_types() {
+    if (!function_exists('acf_get_local_json_files')) {
+        return false;
+    }
+
+    $files = glob(v5_digital_acf_json_path() . '/{post_type_,taxonomy_}*.json', GLOB_BRACE);
+    return !empty($files);
+}
+add_action('init', 'v5_digital_register_cpts', 20);
 
 // ----------------------------------------------------
 // 2. ACF FIELD GROUPS
@@ -3450,13 +3463,7 @@ function v5_digital_language_switcher() {
     echo '</div>';
 }
 
-/**
- * Resolve the primary navigation menu items (Polylang-aware), with the language
- * switcher placeholder stripped out. Returns an array of nav menu item objects
- * (empty array when no menu is assigned). Shared by the desktop and mobile navs
- * so the resolution logic lives in one place.
- */
-function v5_digital_get_primary_menu_items() {
+function v5_digital_get_primary_menu_id() {
     $menu_id = 0;
 
     if (function_exists('pll_get_nav_menu_theme_loc')) {
@@ -3499,6 +3506,53 @@ function v5_digital_get_primary_menu_items() {
         }
     }
 
+    return (int) $menu_id;
+}
+
+function v5_digital_menu_item_is_language_switcher($item) {
+    if (!$item || empty($item->url)) {
+        return false;
+    }
+
+    if ($item->url === '#pll_switcher' || strpos($item->url, 'pll_switcher') !== false) {
+        return true;
+    }
+
+    if (!empty($item->classes) && is_array($item->classes)) {
+        foreach ($item->classes as $class) {
+            if (strpos($class, 'lang-item') !== false) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function v5_digital_primary_menu_has_language_switcher() {
+    $menu_id = v5_digital_get_primary_menu_id();
+    $items = $menu_id ? wp_get_nav_menu_items($menu_id) : array();
+    if (!is_array($items)) {
+        return false;
+    }
+
+    foreach ($items as $item) {
+        if (v5_digital_menu_item_is_language_switcher($item)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Resolve the primary navigation menu items (Polylang-aware), with the language
+ * switcher placeholder stripped out. Returns an array of nav menu item objects
+ * (empty array when no menu is assigned). Shared by the desktop and mobile navs
+ * so the resolution logic lives in one place.
+ */
+function v5_digital_get_primary_menu_items() {
+    $menu_id = v5_digital_get_primary_menu_id();
     $items = $menu_id ? wp_get_nav_menu_items($menu_id) : array();
     if (!is_array($items)) {
         return array();
@@ -3510,17 +3564,7 @@ function v5_digital_get_primary_menu_items() {
     // CSS class. We render menu titles as plain text, so leaving them in would
     // print the raw <img> markup. The theme has its own switcher instead.
     return array_values(array_filter($items, function ($item) {
-        if ($item->url === '#pll_switcher' || strpos($item->url, 'pll_switcher') !== false) {
-            return false;
-        }
-        if (!empty($item->classes) && is_array($item->classes)) {
-            foreach ($item->classes as $class) {
-                if (strpos($class, 'lang-item') !== false) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return !v5_digital_menu_item_is_language_switcher($item);
     }));
 }
 
