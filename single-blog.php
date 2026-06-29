@@ -55,7 +55,9 @@ get_header();
             if (!$read_time) $read_time = '5 min de lecture';
             
             $author = get_the_author();
-            if (!$author) $author = v5_digital_get_field('author_name');
+
+            $blog_page = get_page_by_path('blog');
+            $blog_url  = $blog_page ? get_permalink($blog_page->ID) : home_url('/blog/');
             
             // Image logic
             $cover_image = v5_digital_get_field('cover_image_media');
@@ -79,11 +81,11 @@ get_header();
                             <div class="flex items-center gap-1.5 text-[12px] text-slate-500 font-mono">
                                 <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url(home_url('/')); ?>">Accueil</a>
                                 <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                                <a class="cursor-pointer hover:text-slate-900" href="<?php $bl = get_page_by_path('blog'); echo esc_url($bl ? get_permalink($bl->ID) : home_url('/blog/')); ?>">Blog</a>
+                                <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url($blog_url); ?>">Blog</a>
                                 <i data-lucide="chevron-right" class="w-3 h-3"></i>
                                 <span class="text-slate-900 font-semibold truncate max-w-[150px] sm:max-w-xs"><?php the_title(); ?></span>
                             </div>
-                            <a href="<?php $bl = get_page_by_path('blog'); echo esc_url($bl ? get_permalink($bl->ID) : home_url('/blog/')); ?>" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] text-slate-600 flex items-center gap-1 transition-all no-underline">
+                            <a href="<?php echo esc_url($blog_url); ?>" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] text-slate-600 flex items-center gap-1 transition-all no-underline">
                                 <i data-lucide="arrow-left" class="w-3 h-3"></i> <span>retour aux articles</span>
                             </a>
                         </div>
@@ -158,6 +160,10 @@ get_header();
                                                     // Agency website from postmeta
                                                     $website = get_post_meta($agency_id, 'website', true);
                                                     $rank    = intval($rev['rank']);
+                                                    $link_text = isset($rev['link_text']) ? trim((string) $rev['link_text']) : '';
+                                                    if ($link_text === '') {
+                                                        $link_text = 'Visiter le Site';
+                                                    }
                                                     ?>
                                                     <div class="border border-slate-200 rounded-xl p-5 md:p-6 bg-slate-50/30 hover:bg-slate-50/50 transition-colors shadow-sm relative">
                                                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-100">
@@ -184,7 +190,7 @@ get_header();
                                                                 <a href="<?php echo esc_url(strpos($website, 'http') === 0 ? $website : 'https://' . $website); ?>"
                                                                    target="_blank" rel="noopener noreferrer"
                                                                    class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-4 py-2 rounded-lg text-[12px] transition-colors font-mono flex items-center gap-1.5 no-underline">
-                                                                    <span>Visiter le Site</span>
+                                                                    <span><?php echo esc_html($link_text); ?></span>
                                                                     <i data-lucide="external-link" class="w-3.5 h-3.5 text-white/80"></i>
                                                                 </a>
                                                             <?php endif; ?>
