@@ -2075,6 +2075,7 @@ function v5_digital_setup_theme_content($destructive = false) {
                 'slug'       => 'fr',
                 'rtl'        => 0,
                 'term_group' => 0,
+                'flag'       => 'fr', // country flag code, else French shows no flag
             ));
             
             // Set options
