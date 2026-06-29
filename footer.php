@@ -79,8 +79,8 @@ if (empty($matchmaker_services)) {
 ?>
     <footer class="bg-white border-t border-slate-200">
         <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-10">
-            <div class="grid grid-cols-2 md:grid-cols-6 gap-6 mb-8">
-                <div class="col-span-2">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-8 md:gap-12 mb-8">
+                <div class="md:max-w-xs xl:max-w-sm shrink-0">
                     <div class="flex items-center gap-2 mb-3 cursor-pointer" onclick="window.location.href='<?php echo esc_url(home_url('/')); ?>'">
                         <div class="flex items-center gap-1 font-display">
                             <span class="font-extrabold text-[16px] text-slate-900 tracking-tight">Agence</span>
@@ -88,57 +88,59 @@ if (empty($matchmaker_services)) {
                             <span class="font-light text-[16px] text-slate-500 tracking-tight">Digital</span>
                         </div>
                     </div>
-                    <p class="text-[13px] text-slate-500 leading-relaxed max-w-sm">
+                    <p class="text-[13px] text-slate-500 leading-relaxed">
                         <?php
                         $tagline = get_bloginfo('description');
                         echo !empty($tagline) ? esc_html($tagline) : esc_html(v5_t('Analyses indépendantes des agences de marketing digital au Maroc. Évaluations objectives, guides de sélection pratiques et absence d\'influence publicitaire.'));
                         ?>
                     </p>
                 </div>
-                <?php 
-                v5_digital_render_footer_column(
-                    'footer_explore', 
-                    'agence-footer-explore', 
-                    'Découvrir', 
-                    array(
-                        'Accueil' => home_url('/'),
-                        'Annuaire' => home_url('/annuaire/'),
-                        'Blog' => home_url('/blog/')
-                    )
-                );
-                
-                v5_digital_render_footer_column(
-                    'footer_resources', 
-                    'agence-footer-resources', 
-                    'Ressources', 
-                    array(
-                        'Méthodologie' => home_url('/methodologie/'),
-                        'Contact' => home_url('/contact/')
-                    )
-                );
-                
-                v5_digital_render_footer_column(
-                    'footer_villes', 
-                    'agence-footer-company', 
-                    'Villes', 
-                    array(
-                        'Casablanca' => home_url('/annuaire/?city=Casablanca'),
-                        'Rabat' => home_url('/annuaire/?city=Rabat'),
-                        'Tanger' => home_url('/annuaire/?city=Tangier'),
-                        'Marrakech' => home_url('/annuaire/?city=Marrakech')
-                    )
-                );
-                
-                v5_digital_render_footer_column(
-                    'footer_legal', 
-                    'agence-footer-legal', 
-                    'Légal', 
-                    array(
-                        'Politique de Confidentialité' => '#',
-                        'Conditions d\'Utilisation' => '#'
-                    )
-                );
-                ?>
+                <div class="flex-1 flex flex-wrap justify-between gap-8 md:gap-12 max-w-2xl w-full">
+                    <?php 
+                    v5_digital_render_footer_column(
+                        'footer_explore', 
+                        'agence-footer-explore', 
+                        'Découvrir', 
+                        array(
+                            'Accueil' => home_url('/'),
+                            'Annuaire' => home_url('/annuaire/'),
+                            'Blog' => home_url('/blog/')
+                        )
+                    );
+                    
+                    v5_digital_render_footer_column(
+                        'footer_resources', 
+                        'agence-footer-resources', 
+                        'Ressources', 
+                        array(
+                            'Méthodologie' => home_url('/methodologie/'),
+                            'Contact' => home_url('/contact/')
+                        )
+                    );
+                    
+                    v5_digital_render_footer_column(
+                        'footer_villes', 
+                        'agence-footer-company', 
+                        'Villes', 
+                        array(
+                            'Casablanca' => home_url('/annuaire/?city=Casablanca'),
+                            'Rabat' => home_url('/annuaire/?city=Rabat'),
+                            'Tanger' => home_url('/annuaire/?city=Tangier'),
+                            'Marrakech' => home_url('/annuaire/?city=Marrakech')
+                        )
+                    );
+                    
+                    v5_digital_render_footer_column(
+                        'footer_legal', 
+                        'agence-footer-legal', 
+                        'Légal', 
+                        array(
+                            'Politique de Confidentialité' => '#',
+                            'Conditions d\'Utilisation' => '#'
+                        )
+                    );
+                    ?>
+                </div>
             </div>
             <div class="border-t border-slate-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-[12px] text-slate-500 font-mono">&copy; <?php echo esc_html(date('Y')); ?> Agence Marketing Digital. <?php echo esc_html(v5_t('Recherche indépendante')); ?>.</p>
