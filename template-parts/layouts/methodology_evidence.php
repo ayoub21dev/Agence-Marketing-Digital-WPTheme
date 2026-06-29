@@ -23,7 +23,6 @@ if ($has_label || $has_title || $evidence_rows === null || $has_rows) :
         --blue: #2463eb;
         
         padding: clamp(32px, 4vw, 52px) 0;
-        border-top: 1px solid var(--line);
         background: #ffffff;
     }
     .evidence-layout {

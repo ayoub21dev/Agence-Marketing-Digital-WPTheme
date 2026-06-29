@@ -29,7 +29,7 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
         background: #ffffff;
     }
     .method-wrap {
-        width: min(1120px, calc(100% - 40px));
+        width: min(1200px, calc(100% - 40px));
         margin: 0 auto;
     }
     #process .section-head {
@@ -66,7 +66,7 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
         overflow: hidden;
         border-radius: 14px;
         box-shadow: 0 1px 3px rgba(16, 20, 24, 0.04), 0 0 0 1px rgba(16, 20, 24, 0.06);
-        max-width: 1120px;
+        max-width: 1200px;
         margin: 0 auto;
     }
     .process-stage {
@@ -99,17 +99,18 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
     .stage-tags {
         display: flex;
         flex-wrap: wrap;
-        gap: 6px;
+        gap: 5px;
         margin-top: 22px;
     }
     .stage-tags span {
         background: #f1f4f8;
         color: #4f5c6b;
         border-radius: 999px;
-        padding: 4px 10px;
-        font-size: 10.5px;
+        padding: 4px 8px;
+        font-size: 10px;
         font-weight: 600;
         font-family: 'JetBrains Mono', monospace;
+        white-space: nowrap;
     }
 
     @media (max-width: 980px) {

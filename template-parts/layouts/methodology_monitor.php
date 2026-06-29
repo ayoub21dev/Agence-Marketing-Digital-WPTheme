@@ -38,7 +38,6 @@ if ($total_steps > 0) {
         --blue: #2463eb;
         
         padding: clamp(32px, 4vw, 52px) 0;
-        border-top: 1px solid var(--line);
         background: #ffffff;
     }
     .monitor-strip {

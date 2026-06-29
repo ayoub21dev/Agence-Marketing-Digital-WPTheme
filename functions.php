@@ -3464,11 +3464,29 @@ function v5_digital_get_primary_menu_id() {
     if (!$menu_id) {
         $menus = wp_get_nav_menus();
         if (!empty($menus)) {
+            // Prefer a menu that is clearly the primary navigation (by slug/name).
+            // This guards against Polylang blanking the 'primary' location on the
+            // front-end, which would otherwise drop us to "first menu with items"
+            // and silently grab a Footer menu (alphabetically first).
             foreach ($menus as $m) {
-                $items = wp_get_nav_menu_items($m->term_id);
-                if (!empty($items)) {
+                $is_primary = (stripos($m->slug, 'primary') !== false)
+                    || (stripos($m->name, 'primary') !== false)
+                    || (stripos($m->name, 'principal') !== false);
+                if ($is_primary && !empty(wp_get_nav_menu_items($m->term_id))) {
                     $menu_id = $m->term_id;
                     break;
+                }
+            }
+            // Last resort: first NON-footer menu that has items.
+            if (!$menu_id) {
+                foreach ($menus as $m) {
+                    if (stripos($m->slug, 'footer') === 0) {
+                        continue;
+                    }
+                    if (!empty(wp_get_nav_menu_items($m->term_id))) {
+                        $menu_id = $m->term_id;
+                        break;
+                    }
                 }
             }
         }
