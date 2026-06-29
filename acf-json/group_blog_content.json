@@ -33,7 +33,7 @@
                                         "agency"
                                     ],
                                     "return_format": "id",
-                                    "required": 1,
+                                    "required": 0,
                                     "menu_order": 0,
                                     "aria-label": "",
                                     "instructions": "",
@@ -50,7 +50,7 @@
                                     "name": "rank",
                                     "type": "number",
                                     "default_value": 1,
-                                    "required": 1,
+                                    "required": 0,
                                     "menu_order": 1,
                                     "aria-label": "",
                                     "instructions": "",
@@ -67,7 +67,7 @@
                                     "name": "badge",
                                     "type": "text",
                                     "default_value": "Leader SEO (Score : 98/100)",
-                                    "required": 1,
+                                    "required": 0,
                                     "menu_order": 2,
                                     "aria-label": "",
                                     "instructions": "",
@@ -84,7 +84,7 @@
                                     "name": "description",
                                     "type": "textarea",
                                     "rows": 3,
-                                    "required": 1,
+                                    "required": 0,
                                     "menu_order": 3,
                                     "aria-label": "",
                                     "instructions": "",
@@ -101,7 +101,7 @@
                                     "name": "link_text",
                                     "type": "text",
                                     "default_value": "voir le site de l'agence →",
-                                    "required": 1,
+                                    "required": 0,
                                     "menu_order": 4,
                                     "aria-label": "",
                                     "instructions": "",
@@ -157,5 +157,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1782654416
+    "modified": 1782752031
 }
