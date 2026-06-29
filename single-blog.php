@@ -118,6 +118,8 @@ get_header();
                             the_content();
                         endif;
 
+                        $agency_reviews = array();
+
                         if (v5_digital_have_rows('blog_layouts')) :
                             while (v5_digital_have_rows('blog_layouts')) : v5_digital_the_row();
                                 $layout = v5_digital_get_row_layout();
@@ -133,12 +135,22 @@ get_header();
                                     
                                 elseif ($layout === 'agency_reviews_block') :
                                     $reviews = v5_digital_get_sub_field('reviews_list');
-                                    if (!empty($reviews)) :
+                                    if (!empty($reviews) && is_array($reviews)) :
+                                        foreach ($reviews as $review) {
+                                            $agency_reviews[] = $review;
+                                        }
+                                    endif;
+                                    endif;
+
+                            endwhile;
+                        endif;
+
+                        if (!empty($agency_reviews)) :
                                         ?>
                                         <div class="mt-10 pt-8 border-t border-slate-200">
                                             <h3 class="font-extrabold text-[16px] text-slate-900 uppercase font-display tracking-wide mb-6">Analyses Éditoriales</h3>
                                             <div class="space-y-4">
-                                                <?php foreach ($reviews as $rev) :
+                                                <?php foreach ($agency_reviews as $rev) :
                                                     $agency_id = $rev['agency'];
                                                     if (!$agency_id) continue;
 
@@ -200,10 +212,6 @@ get_header();
                                             </div>
                                         </div>
                                         <?php
-                                    endif;
-                                    endif;
-
-                            endwhile;
                         endif;
                         ?>
                     </div>

@@ -265,7 +265,12 @@ function v5_digital_acf_json_manages_content_types() {
         return false;
     }
 
-    $files = glob(v5_digital_acf_json_path() . '/{post_type_,taxonomy_}*.json', GLOB_BRACE);
+    $path = v5_digital_acf_json_path();
+    $files = array_merge(
+        (array) glob($path . '/post_type_*.json'),
+        (array) glob($path . '/taxonomy_*.json')
+    );
+    $files = array_filter($files);
     return !empty($files);
 }
 add_action('init', 'v5_digital_register_cpts', 20);
@@ -1878,64 +1883,19 @@ if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_fie
         'fields' => array(
             array(
                 'key' => 'field_blog_layouts',
-                'label' => 'Mises en page de l\'Article',
+                'label' => 'Agences a inclure dans l\'article',
                 'name' => 'blog_layouts',
                 'type' => 'flexible_content',
-                'button_label' => 'Ajouter un bloc',
+                'instructions' => 'Le contenu normal de l\'article se redige dans l\'editeur WordPress. Utilisez ce champ seulement pour choisir les agences a afficher.',
+                'button_label' => 'Ajouter une section agences',
                 'layouts' => array(
-                    // WYSIWYG Editor Block
-                    'wysiwyg_block' => array(
-                        'key' => 'layout_blog_wysiwyg',
-                        'name' => 'wysiwyg_block',
-                        'label' => 'Contenu Éditeur (Texte, Images, etc.)',
-                        'display' => 'block',
-                        'sub_fields' => array(
-                            array(
-                                'key' => 'field_blog_wysiwyg_content',
-                                'label' => 'Contenu',
-                                'name' => 'content',
-                                'type' => 'wysiwyg',
-                                'required' => 1,
-                                'tabs' => 'all',
-                                'toolbar' => 'full',
-                                'media_upload' => 1,
-                            ),
-                        ),
-                    ),
-                    // Heading Block
-                    'heading_block' => array(
-                        'key' => 'layout_blog_heading',
-                        'name' => 'heading_block',
-                        'label' => 'Titre de Section (H2 / H3)',
-                        'display' => 'block',
-                        'sub_fields' => array(
-                            array(
-                                'key' => 'field_blog_heading_text',
-                                'label' => 'Texte du titre',
-                                'name' => 'heading_text',
-                                'type' => 'text',
-                                'required' => 1,
-                            ),
-                            array(
-                                'key' => 'field_blog_heading_level',
-                                'label' => 'Niveau du titre',
-                                'name' => 'heading_level',
-                                'type' => 'select',
-                                'choices' => array(
-                                    'h2' => 'En-tête H2',
-                                    'h3' => 'En-tête H3',
-                                ),
-                                'default_value' => 'h2',
-                                'required' => 1,
-                            ),
-                        ),
-                    ),
                     // Embedded Listings / Recommended Agencies Block
                     'agency_reviews_block' => array(
                         'key' => 'layout_blog_reviews',
                         'name' => 'agency_reviews_block',
-                        'label' => 'Analyses Éditoriales (Sélection d\'Agences)',
+                        'label' => 'Agences a inclure',
                         'display' => 'block',
+                        'max' => 1,
                         'sub_fields' => array(
                             array(
                                 'key' => 'field_blog_reviews_list',
@@ -3307,20 +3267,16 @@ function v5_digital_setup_theme_content($destructive = false) {
                     ));
                 }
 
-                // Build layout fields
+                // Build normal post content and keep ACF only for agency selections.
+                $post_content_parts = array();
                 $layout_data = array();
                 foreach ($art['content_layouts'] as $layout) {
                     if ($layout['acf_fc_layout'] === 'wysiwyg_block') {
-                        $layout_data[] = array(
-                            'acf_fc_layout' => 'wysiwyg_block',
-                            'content' => $layout['content'],
-                        );
+                        $post_content_parts[] = $layout['content'];
                     } elseif ($layout['acf_fc_layout'] === 'heading_block') {
-                        $layout_data[] = array(
-                            'acf_fc_layout' => 'heading_block',
-                            'heading_text' => $layout['heading_text'],
-                            'heading_level' => $layout['heading_level'],
-                        );
+                        $heading_level = isset($layout['heading_level']) ? $layout['heading_level'] : 'h2';
+                        $heading_level = in_array($heading_level, array('h2', 'h3'), true) ? $heading_level : 'h2';
+                        $post_content_parts[] = '<' . $heading_level . '>' . esc_html($layout['heading_text']) . '</' . $heading_level . '>';
                     } elseif ($layout['acf_fc_layout'] === 'agency_reviews_block') {
                         $reviews_list = array();
                         foreach ($layout['reviews_list'] as $rev) {
@@ -3341,6 +3297,12 @@ function v5_digital_setup_theme_content($destructive = false) {
                             'reviews_list' => $reviews_list,
                         );
                     }
+                }
+                if (!empty($post_content_parts)) {
+                    wp_update_post(array(
+                        'ID'           => $post_id,
+                        'post_content' => implode("\n\n", $post_content_parts),
+                    ));
                 }
                 update_field('field_blog_layouts', $layout_data, $post_id);
             }

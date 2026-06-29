@@ -4,88 +4,17 @@
     "fields": [
         {
             "key": "field_blog_layouts",
-            "label": "Mises en page de l'Article",
+            "label": "Agences a inclure dans l'article",
             "name": "blog_layouts",
             "type": "flexible_content",
-            "button_label": "Ajouter un bloc",
+            "button_label": "Ajouter une section agences",
             "layouts": {
-                "wysiwyg_block": {
-                    "key": "layout_blog_wysiwyg",
-                    "name": "wysiwyg_block",
-                    "label": "Contenu Éditeur (Texte, Images, etc.)",
-                    "display": "block",
-                    "sub_fields": [
-                        {
-                            "key": "field_blog_wysiwyg_content",
-                            "label": "Contenu",
-                            "name": "content",
-                            "type": "wysiwyg",
-                            "required": 1,
-                            "tabs": "all",
-                            "toolbar": "full",
-                            "media_upload": 1,
-                            "menu_order": 0,
-                            "aria-label": "",
-                            "instructions": "",
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            }
-                        }
-                    ]
-                },
-                "heading_block": {
-                    "key": "layout_blog_heading",
-                    "name": "heading_block",
-                    "label": "Titre de Section (H2 / H3)",
-                    "display": "block",
-                    "sub_fields": [
-                        {
-                            "key": "field_blog_heading_text",
-                            "label": "Texte du titre",
-                            "name": "heading_text",
-                            "type": "text",
-                            "required": 1,
-                            "menu_order": 0,
-                            "aria-label": "",
-                            "instructions": "",
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            }
-                        },
-                        {
-                            "key": "field_blog_heading_level",
-                            "label": "Niveau du titre",
-                            "name": "heading_level",
-                            "type": "select",
-                            "choices": {
-                                "h2": "En-tête H2",
-                                "h3": "En-tête H3"
-                            },
-                            "default_value": "h2",
-                            "required": 1,
-                            "menu_order": 1,
-                            "aria-label": "",
-                            "instructions": "",
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            }
-                        }
-                    ]
-                },
                 "agency_reviews_block": {
                     "key": "layout_blog_reviews",
                     "name": "agency_reviews_block",
-                    "label": "Analyses Éditoriales (Sélection d'Agences)",
+                    "label": "Agences a inclure",
                     "display": "block",
+                    "max": 1,
                     "sub_fields": [
                         {
                             "key": "field_blog_reviews_list",
@@ -200,7 +129,7 @@
             },
             "menu_order": 0,
             "aria-label": "",
-            "instructions": "",
+            "instructions": "Le contenu normal de l'article se redige dans l'editeur WordPress. Utilisez ce champ seulement pour choisir les agences a afficher.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
