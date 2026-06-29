@@ -3749,17 +3749,7 @@ function v5_digital_get_post_badge($post_id = null, $default = 'Guide') {
         $post_id = get_the_ID();
     }
 
-    $categories = get_the_category($post_id);
-    if (!empty($categories)) {
-        $default_cat = (int) get_option('default_category');
-        foreach ($categories as $cat) {
-            if (($default_cat && (int) $cat->term_id === $default_cat) || $cat->slug === 'uncategorized' || strtolower($cat->name) === 'uncategorized' || strtolower($cat->name) === 'non classé') {
-                continue;
-            }
-            return $cat->name;
-        }
-    }
-
+    // Priority 1: ACF Badge field
     $badge = v5_digital_get_field('badge', $post_id);
     if (!empty($badge)) {
         if (is_object($badge) && isset($badge->name)) {
@@ -3770,12 +3760,24 @@ function v5_digital_get_post_badge($post_id = null, $default = 'Guide') {
             if (is_object($first) && isset($first->name)) {
                 return $first->name;
             }
-            if (is_string($first)) {
+            if (is_string($first) && !empty($first)) {
                 return $first;
             }
         }
-        if (is_string($badge)) {
+        if (is_string($badge) && !empty($badge)) {
             return $badge;
+        }
+    }
+
+    // Priority 2: Native assigned WordPress category
+    $categories = get_the_category($post_id);
+    if (!empty($categories)) {
+        $default_cat = (int) get_option('default_category');
+        foreach ($categories as $cat) {
+            if (($default_cat && (int) $cat->term_id === $default_cat) || $cat->slug === 'uncategorized' || strtolower($cat->name) === 'uncategorized' || strtolower($cat->name) === 'non classé') {
+                continue;
+            }
+            return $cat->name;
         }
     }
 
