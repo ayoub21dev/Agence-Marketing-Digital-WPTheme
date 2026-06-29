@@ -141,14 +141,16 @@ if (!function_exists('theme_render_stars_html')) {
                         <p class="text-[13px] text-slate-500 mb-4 leading-relaxed min-h-[42px] overflow-hidden">
                             <?php echo esc_html(get_the_excerpt()); ?>
                         </p>
-                        <div class="flex flex-wrap gap-1 mb-4 min-h-[24px]">
+                        <div class="flex flex-wrap gap-1.5 mb-4 min-h-[24px]">
                             <?php 
                             $tag_count = 0;
                             foreach ($services as $service_name) {
                                 $tag_count++;
                                 if ($tag_count > 3) break;
+                                // Clean up long service names for sleek pill formatting
+                                $clean_name = str_replace(array('Optimisation (CRO)', ' (CRO)', ' (Référencement naturel)'), array('CRO', '', ''), $service_name);
                                 ?>
-                                <span class="tag-pill bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono text-[11px] border border-slate-150"><?php echo esc_html($service_name); ?></span>
+                                <span class="tag-pill bg-slate-100/90 text-slate-600 px-2 py-0.5 rounded-md font-sans font-medium text-[11.5px] border border-slate-200/60"><?php echo esc_html($clean_name); ?></span>
                                 <?php
                             }
                             ?>
@@ -159,19 +161,19 @@ if (!function_exists('theme_render_stars_html')) {
                         $btn_link = $website ? (strpos($website, 'http') === 0 ? $website : 'https://' . $website) : home_url('/annuaire/?id=' . get_post_field('post_name', $post_id));
                         $is_external = !empty($website);
                         ?>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-auto">
-                            <span class="text-[12px] text-slate-500 flex items-center gap-1 font-mono">
-                                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                        <div class="flex items-center justify-between pt-3.5 border-t border-slate-100 mt-auto">
+                            <span class="text-[12px] text-slate-500 flex items-center gap-1 font-sans font-medium">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
                                 <?php echo esc_html($city_name); ?>
                             </span>
                             <a href="<?php echo esc_url($btn_link); ?>" 
                                <?php echo $is_external ? 'target="_blank" rel="noopener"' : ''; ?> 
-                               class="text-[12.5px] font-bold text-brand-600 hover:text-brand-700 transition-colors font-mono flex items-center gap-1">
+                               class="text-[13px] font-semibold text-brand-600 hover:text-brand-700 transition-all font-sans flex items-center gap-1.5 group-hover:gap-2">
                                 <span><?php echo esc_html($btn_text); ?></span>
                                 <?php if ($is_external) : ?>
-                                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-brand-500"></i>
+                                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-brand-600"></i>
                                 <?php else : ?>
-                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-brand-500"></i>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-brand-600"></i>
                                 <?php endif; ?>
                             </a>
                         </div>
