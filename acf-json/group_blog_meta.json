@@ -6,8 +6,8 @@
             "key": "field_blog_badge",
             "label": "Badge / Catégorie",
             "name": "badge",
-            "type": "taxonomy",
-            "instructions": "Sélectionnez ou créez la catégorie officielle de cet article.",
+            "type": "select",
+            "instructions": "Sélectionnez le badge visuel affiché sur la carte de l'article.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -15,15 +15,20 @@
                 "class": "",
                 "id": ""
             },
-            "taxonomy": "category",
-            "add_term": 1,
-            "save_terms": 0,
-            "load_terms": 1,
-            "return_format": "object",
-            "field_type": "checkbox",
-            "allow_null": 1,
-            "bidirectional": 0,
-            "multiple": 1
+            "choices": {
+                "Guide": "Guide",
+                "Classement": "Classement",
+                "Audit SEO": "Audit SEO",
+                "Comparatif": "Comparatif",
+                "Analyse": "Analyse"
+            },
+            "default_value": "Guide",
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 1,
+            "ajax": 0,
+            "return_format": "value",
+            "placeholder": ""
         },
         {
             "key": "field_blog_read_time",
