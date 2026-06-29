@@ -17,13 +17,13 @@
             },
             "taxonomy": "category",
             "add_term": 1,
-            "save_terms": 1,
+            "save_terms": 0,
             "load_terms": 1,
             "return_format": "object",
-            "field_type": "select",
+            "field_type": "checkbox",
             "allow_null": 1,
             "bidirectional": 0,
-            "multiple": 0
+            "multiple": 1
         },
         {
             "key": "field_blog_read_time",
