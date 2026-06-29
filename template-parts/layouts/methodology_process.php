@@ -32,10 +32,10 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
         width: min(1120px, calc(100% - 40px));
         margin: 0 auto;
     }
-    .section-head {
+    #process .section-head {
         max-width: 760px;
-        margin: 0 auto 34px;
-        text-align: center;
+        margin: 0 0 34px;
+        text-align: left;
     }
     .section-label {
         font-size: 11px;
@@ -51,12 +51,12 @@ if ($has_label || $has_title || $has_desc || $stages === null || $has_stages) :
         font-weight: 800;
         color: var(--ink);
     }
-    .section-copy {
+    #process .section-copy {
         color: var(--muted);
         font-size: 15px;
         line-height: 1.72;
         max-width: 620px;
-        margin: 14px auto 0;
+        margin: 14px 0 0;
     }
     .process-grid {
         display: grid;
