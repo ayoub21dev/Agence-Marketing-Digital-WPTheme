@@ -58,15 +58,6 @@ get_header();
 
             $blog_page = get_page_by_path('blog');
             $blog_url  = $blog_page ? get_permalink($blog_page->ID) : home_url('/blog/');
-            
-            // Image logic
-            $cover_image = v5_digital_get_field('cover_image_media');
-            if (!$cover_image) {
-                $cover_image = v5_digital_get_field('cover_image_url');
-            }
-            if (!$cover_image && has_post_thumbnail()) {
-                $cover_image = get_the_post_thumbnail_url(null, 'large');
-            }
             ?>
             <!-- ==================== ARTICLE DETAIL PAGE ==================== -->
             <div class="page" id="page-article">
@@ -103,12 +94,6 @@ get_header();
                 </div>
 
                 <div class="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8">
-                    <?php if ($cover_image) : ?>
-                        <!-- Cover Image -->
-                        <div class="h-64 sm:h-80 overflow-hidden rounded-2xl mb-8 bg-slate-100 border border-slate-200">
-                            <img src="<?php echo esc_url($cover_image); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover">
-                        </div>
-                    <?php endif; ?>
 
                     <!-- Native editor content plus optional Flexible Content blocks -->
                     <div class="article-prose">
