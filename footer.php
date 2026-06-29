@@ -35,7 +35,7 @@ if (!function_exists('v5_digital_render_footer_column')) {
             return;
         }
         ?>
-        <div>
+        <div class="flex flex-col items-center text-center">
             <h4 class="font-semibold text-slate-900 text-[13px] mb-3 font-display"><?php echo esc_html($default_title); ?></h4>
             <ul class="space-y-2 text-[13px]">
                 <?php foreach ($menu_items as $item) : ?>
@@ -80,7 +80,7 @@ if (empty($matchmaker_services)) {
     <footer class="bg-white border-t border-slate-200">
         <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-10">
             <div class="grid grid-cols-2 md:grid-cols-6 gap-6 mb-8">
-                <div class="col-span-2">
+                <div class="col-span-2 flex flex-col items-center text-center">
                     <div class="flex items-center gap-2 mb-3 cursor-pointer" onclick="window.location.href='<?php echo esc_url(home_url('/')); ?>'">
                         <div class="flex items-center gap-1 font-display">
                             <span class="font-extrabold text-[16px] text-slate-900 tracking-tight">Agence</span>
