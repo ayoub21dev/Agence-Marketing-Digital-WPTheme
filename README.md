@@ -75,7 +75,8 @@ Agence-Marketing-Digital-WPTheme/
 
 ### Workflow du Dynamic Page Builder
 Le thème utilise un système de dispatch automatique. Tout bloc ajouté dans l'administration via le champ flexible `page_layouts` est automatiquement chargé depuis le fichier correspondant dans `template-parts/layouts/` :
-$$\text{ACF Layout Slug } \texttt{foo\_section} \implies \text{Fichier } \texttt{template-parts/layouts/foo.php}$$
+
+`ACF Layout Slug: foo_section` ➔ `Fichier: template-parts/layouts/foo.php`
 
 ---
 
@@ -124,8 +125,8 @@ Le projet intègre un déploiement automatisé via **GitHub Actions** (`.github/
 
 Ce thème a été pensé, conçu et développé par :
 
-- **Ayoub JALYTA** — [*Développeur Full Stack & Lead Tech*](https://ayoub-jlita.vercel.app/)
-- **Anouar BENYEKHLEF** — [*Développeur Web & Architecte Solution*](https://anouar-benyekhlef-portfolio.vercel.app/)
+- **Ayoub JALYTA** — [*Développeur Full Stack*](https://ayoub-jlita.vercel.app/)
+- **Anouar BENYEKHLEF** — [*Développeur Full Stack*](https://anouar-benyekhlef-portfolio.vercel.app/)
 
 ---
 
