@@ -2138,7 +2138,10 @@ function v5_digital_setup_theme_content($destructive = false) {
         pll_set_post_language($homepage_id, 'fr');
     }
 
-    if ($destructive) {
+    // Set the static front page on first setup (fresh install or just-created
+    // homepage), or when no front page is configured yet. Never override an
+    // existing front-page choice on reactivation.
+    if ($destructive || $homepage_created || (int) get_option('page_on_front') < 1) {
         update_option('show_on_front', 'page');
         update_option('page_on_front', $homepage_id);
     }
@@ -3309,7 +3312,16 @@ function v5_digital_setup_theme_content($destructive = false) {
         }
     }
 }
-add_action('after_switch_theme', 'v5_digital_setup_theme_content');
+// IMPORTANT: wrap in a closure that forces $destructive = false.
+// WordPress fires `after_switch_theme` with the PREVIOUS theme's name as the
+// first argument. Hooking the function directly would pass that name straight
+// into $destructive, and `(bool) "Some Theme Name"` is true — so every
+// reactivation would purge CPT content and overwrite page layouts/meta with
+// the seeded defaults (a full "reset"). The seeder must only ever fill in
+// what is MISSING on activation, never overwrite existing content.
+add_action('after_switch_theme', function () {
+    v5_digital_setup_theme_content(false);
+});
 
 // ----------------------------------------------------
 // 5. NAVIGATION MENUS & THEME SETUP
