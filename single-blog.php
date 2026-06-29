@@ -54,7 +54,7 @@ get_header();
             $read_time = v5_digital_get_field('read_time');
             if (!$read_time) $read_time = '5 min de lecture';
             
-            $author = get_the_author();
+            $author = get_the_author() ?: (v5_digital_get_field('author_name') ?: 'Rédaction');
 
             $blog_page = get_page_by_path('blog');
             $blog_url  = $blog_page ? get_permalink($blog_page->ID) : home_url('/blog/');

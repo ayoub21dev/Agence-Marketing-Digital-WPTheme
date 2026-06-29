@@ -1823,10 +1823,16 @@ if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_fie
                 'key' => 'field_blog_badge',
                 'label' => 'Badge / Catégorie',
                 'name' => 'badge',
-                'type' => 'text',
-                'required' => 1,
-                'default_value' => 'Guide',
-                'instructions' => 'Exemples : Classement, Guide, Audit SEO, Comparatif',
+                'type' => 'taxonomy',
+                'taxonomy' => 'category',
+                'field_type' => 'select',
+                'allow_null' => 1,
+                'add_term' => 1,
+                'save_terms' => 1,
+                'load_terms' => 1,
+                'return_format' => 'object',
+                'required' => 0,
+                'instructions' => 'Sélectionnez ou créez la catégorie officielle de cet article.',
             ),
             array(
                 'key' => 'field_blog_read_time',
@@ -3750,7 +3756,21 @@ function v5_digital_get_post_badge($post_id = null, $default = 'Guide') {
 
     $badge = v5_digital_get_field('badge', $post_id);
     if (!empty($badge)) {
-        return $badge;
+        if (is_object($badge) && isset($badge->name)) {
+            return $badge->name;
+        }
+        if (is_array($badge)) {
+            $first = reset($badge);
+            if (is_object($first) && isset($first->name)) {
+                return $first->name;
+            }
+            if (is_string($first)) {
+                return $first;
+            }
+        }
+        if (is_string($badge)) {
+            return $badge;
+        }
     }
 
     return $default;
