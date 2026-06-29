@@ -60,20 +60,23 @@ $guides_query = new WP_Query($query_args);
             if ($guides_query->have_posts()) : 
                 while ($guides_query->have_posts()) : $guides_query->the_post(); 
                     $post_id = get_the_ID();
-                    $thumbnail_url = get_the_post_thumbnail_url($post_id, 'medium');
-                    if (empty($thumbnail_url)) {
-                        // Attempt to fallback to seeded cover image url field
-                        $seeded_image = v5_digital_get_field('cover_image_url', $post_id);
-                        $thumbnail_url = !empty($seeded_image) ? $seeded_image : 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
+                    $thumbnail_url = v5_digital_get_field('cover_image_media', $post_id);
+                    if (!$thumbnail_url) {
+                        $thumbnail_url = v5_digital_get_field('cover_image_url', $post_id);
+                    }
+                    if (!$thumbnail_url && has_post_thumbnail($post_id)) {
+                        $thumbnail_url = get_the_post_thumbnail_url($post_id, 'medium');
                     }
                     
                     // Retrieve category/tag name or fallback (skips "Uncategorized")
                     $badge = v5_digital_get_post_badge($post_id, 'Analyse');
                     ?>
                     <div onclick="window.location.href='<?php the_permalink(); ?>'" class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
-                        <div class="h-48 overflow-hidden bg-slate-100 flex-shrink-0">
-                            <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        </div>
+                        <?php if ($thumbnail_url) : ?>
+                            <div class="h-48 overflow-hidden bg-slate-100 flex-shrink-0">
+                                <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            </div>
+                        <?php endif; ?>
                         <div class="p-5 flex flex-col flex-grow">
                             <span class="text-[11px] font-semibold text-slate-800 uppercase tracking-wider"><?php echo esc_html($badge); ?></span>
                             <h3 class="font-bold text-slate-900 mt-1 mb-2 text-[15px] font-display group-hover:text-brand-600 transition-colors line-clamp-2"><?php the_title(); ?></h3>
@@ -103,9 +106,7 @@ $guides_query = new WP_Query($query_args);
                 }
                 ?>
                 <div onclick="window.location.href='<?php echo esc_url($fallback_links['top-agencies']); ?>'" class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
-                    <div class="h-48 overflow-hidden bg-slate-100 flex-shrink-0">
-                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop" alt="Top Agences de Marketing" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                    </div>
+
                     <div class="p-5 flex flex-col flex-grow">
                         <span class="text-[11px] font-semibold text-slate-800 uppercase tracking-wider">Classement</span>
                         <h3 class="font-bold text-slate-900 mt-1 mb-2 text-[15px] font-display group-hover:text-brand-600 transition-colors">Top Agences de Marketing Digital au Maroc</h3>
