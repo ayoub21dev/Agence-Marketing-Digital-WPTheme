@@ -1,0 +1,2563 @@
+{
+    "key": "group_homepage_fields",
+    "title": "Mises en page de la Page",
+    "position": "normal",
+    "fields": [
+        {
+            "key": "field_page_layouts",
+            "label": "Mises en page",
+            "name": "page_layouts",
+            "type": "flexible_content",
+            "button_label": "Ajouter une Section",
+            "layouts": {
+                "hero_section": {
+                    "key": "layout_hero_section",
+                    "name": "hero_section",
+                    "label": "[Accueil] Bannière — accroche principale",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_hero_eyebrow",
+                            "label": "Texte de surbrillance (Sourcil)",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "default_value": "01 · MATCH & DISCOVER",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_hero_title",
+                            "label": "Titre de la Hero (HTML)",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Trouvez les <span class=\"hero-focus-word\">meilleures</span> agences de marketing digital au <span class=\"hero-location-word\">Maroc</span>",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_hero_description",
+                            "label": "Description lede",
+                            "name": "description",
+                            "type": "textarea",
+                            "default_value": "Comparez les agences digitales marocaines grâce à des recherches éditoriales, des scores techniques de vitesse et des avis clients vérifiés.",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_hero_ctas",
+                            "label": "Boutons d'action (CTA)",
+                            "name": "hero_ctas",
+                            "type": "repeater",
+                            "layout": "block",
+                            "button_label": "Ajouter un bouton",
+                            "sub_fields": [
+                                {
+                                    "key": "field_hero_cta_text_val",
+                                    "label": "Texte du bouton",
+                                    "name": "text",
+                                    "type": "text",
+                                    "required": 1,
+                                    "menu_order": 0,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_hero_cta_link_type",
+                                    "label": "Type de lien",
+                                    "name": "link_type",
+                                    "type": "select",
+                                    "choices": {
+                                        "page": "Lien vers page interne",
+                                        "url": "Lien URL personnalisé"
+                                    },
+                                    "default_value": "page",
+                                    "menu_order": 1,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_hero_cta_url",
+                                    "label": "URL personnalisée",
+                                    "name": "url",
+                                    "type": "text",
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_hero_cta_link_type",
+                                                "operator": "==",
+                                                "value": "url"
+                                            }
+                                        ]
+                                    ],
+                                    "menu_order": 2,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_hero_cta_page",
+                                    "label": "Page interne",
+                                    "name": "page",
+                                    "type": "page_link",
+                                    "allow_null": 1,
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_hero_cta_link_type",
+                                                "operator": "==",
+                                                "value": "page"
+                                            }
+                                        ]
+                                    ],
+                                    "menu_order": 3,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_hero_cta_style",
+                                    "label": "Style du bouton",
+                                    "name": "style",
+                                    "type": "select",
+                                    "choices": {
+                                        "primary": "Bouton Principal (Bleu)",
+                                        "secondary": "Bouton Secondaire (Blanc)",
+                                        "custom": "Couleurs personnalisées"
+                                    },
+                                    "default_value": "primary",
+                                    "menu_order": 4,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_hero_cta_bg_color",
+                                    "label": "Couleur de fond",
+                                    "name": "bg_color",
+                                    "type": "color_picker",
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_hero_cta_style",
+                                                "operator": "==",
+                                                "value": "custom"
+                                            }
+                                        ]
+                                    ],
+                                    "menu_order": 5,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_hero_cta_text_color",
+                                    "label": "Couleur du texte",
+                                    "name": "text_color",
+                                    "type": "color_picker",
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_hero_cta_style",
+                                                "operator": "==",
+                                                "value": "custom"
+                                            }
+                                        ]
+                                    ],
+                                    "menu_order": 6,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_hero_cta_icon",
+                                    "label": "Icône Lucide",
+                                    "name": "icon",
+                                    "type": "select",
+                                    "choices": {
+                                        "none": "Pas d'icône",
+                                        "sparkles": "Étincelles (sparkles)",
+                                        "home": "Maison (home)",
+                                        "arrow-right": "Flèche (arrow-right)",
+                                        "mail": "Enveloppe (mail)"
+                                    },
+                                    "default_value": "none",
+                                    "menu_order": 7,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                }
+                            ],
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_hero_social_proof_1",
+                            "label": "Preuve sociale 1",
+                            "name": "social_proof_1",
+                            "type": "text",
+                            "default_value": "150+ agences évaluées",
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_hero_social_proof_2",
+                            "label": "Preuve sociale 2",
+                            "name": "social_proof_2",
+                            "type": "text",
+                            "default_value": "Référencement 100% éditorial",
+                            "menu_order": 5,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "stats_band_section": {
+                    "key": "layout_stats_band_section",
+                    "name": "stats_band_section",
+                    "label": "[Accueil] Bandeau — chiffres clés",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_stats_band_info",
+                            "label": "Statistiques",
+                            "name": "stats_band_info",
+                            "type": "message",
+                            "message": "Les chiffres affichés ici sont gérés dans le menu « Statistiques » (à gauche). Modifiez-y la valeur, le libellé et l'ordre.\n\nCette section reste déplaçable : placez-la où vous voulez sur la page (ou ajoutez-la à une autre page) pour positionner le bloc de statistiques.",
+                            "esc_html": 0,
+                            "new_lines": "wpautop",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "search_filter_section": {
+                    "key": "layout_search_filter_section",
+                    "name": "search_filter_section",
+                    "label": "[Accueil] Recherche — barre + filtres",
+                    "display": "block",
+                    "sub_fields": []
+                },
+                "logos_band_section": {
+                    "key": "layout_logos_band_section",
+                    "name": "logos_band_section",
+                    "label": "[Commun] Bandeau — logos partenaires",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_logos_title",
+                            "label": "Titre de la section",
+                            "name": "section_title",
+                            "type": "text",
+                            "default_value": "Annuaire de confiance utilisé par les acheteurs de :",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "challenge_section": {
+                    "key": "layout_challenge_section",
+                    "name": "challenge_section",
+                    "label": "[Accueil] Bloc — le défi",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_challenge_eyebrow",
+                            "label": "Sourcil",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "default_value": "Le Défi",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_title",
+                            "label": "Titre (HTML)",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "La plupart des entreprises choisissent la <span class=\"challenge-focus-word\">mauvaise agence</span> en <span class=\"challenge-time-word\">48 heures</span>.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_desc",
+                            "label": "Description de sous-titre",
+                            "name": "description",
+                            "type": "textarea",
+                            "default_value": "Le marché des agences de marketing digital au Maroc est encombré, bruyant et opaque. Les beaux sites cachent souvent un travail médiocre. Les témoignages élogieux sont rarement vérifiés.",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_cards",
+                            "label": "Cartes de points faibles",
+                            "name": "cards",
+                            "type": "repeater",
+                            "layout": "block",
+                            "button_label": "Ajouter une Carte",
+                            "sub_fields": [
+                                {
+                                    "key": "field_challenge_card_title",
+                                    "label": "Titre de la carte",
+                                    "name": "title",
+                                    "type": "text",
+                                    "required": 1,
+                                    "menu_order": 0,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_challenge_card_desc",
+                                    "label": "Description",
+                                    "name": "description",
+                                    "type": "textarea",
+                                    "required": 1,
+                                    "menu_order": 1,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_challenge_card_icon",
+                                    "label": "Icône SVG",
+                                    "name": "icon_svg",
+                                    "type": "textarea",
+                                    "menu_order": 2,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                }
+                            ],
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_quote_text",
+                            "label": "Texte de la Citation",
+                            "name": "quote_text",
+                            "type": "textarea",
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_quote_author",
+                            "label": "Auteur de la citation",
+                            "name": "quote_author",
+                            "type": "text",
+                            "menu_order": 5,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_quote_role",
+                            "label": "Rôle de l'auteur",
+                            "name": "quote_role",
+                            "type": "text",
+                            "menu_order": 6,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_quote_verified",
+                            "label": "Tag vérifié",
+                            "name": "quote_verified",
+                            "type": "text",
+                            "menu_order": 7,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_quote_scope",
+                            "label": "Tag d'étendue du projet",
+                            "name": "quote_scope",
+                            "type": "text",
+                            "menu_order": 8,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_quote_image_media",
+                            "label": "Image de l'auteur (Médiathèque)",
+                            "name": "quote_image_media",
+                            "type": "image",
+                            "return_format": "url",
+                            "preview_size": "thumbnail",
+                            "library": "all",
+                            "required": 0,
+                            "menu_order": 9,
+                            "aria-label": "",
+                            "instructions": "",
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_challenge_quote_image",
+                            "label": "Image de l'auteur (Lien URL externe)",
+                            "name": "quote_image",
+                            "type": "text",
+                            "required": 0,
+                            "menu_order": 10,
+                            "aria-label": "",
+                            "instructions": "",
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "approach_section": {
+                    "key": "layout_approach_section",
+                    "name": "approach_section",
+                    "label": "[Accueil] Bloc — notre approche",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_app_eyebrow",
+                            "label": "Sourcil",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "default_value": "Notre Approche",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_app_title",
+                            "label": "Titre (HTML)",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Une <span class=\"approach-focus-word\">meilleure façon</span> de <span class=\"approach-action-word\">choisir</span> une agence.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_app_desc",
+                            "label": "Description de sous-titre",
+                            "name": "description",
+                            "type": "text",
+                            "default_value": "Nous faisons les recherches pour que vous puissiez vous concentrer sur la décision.",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_app_points",
+                            "label": "Étapes d'approche",
+                            "name": "points",
+                            "type": "repeater",
+                            "layout": "block",
+                            "button_label": "Ajouter une étape",
+                            "sub_fields": [
+                                {
+                                    "key": "field_app_point_number",
+                                    "label": "Numéro",
+                                    "name": "number",
+                                    "type": "text",
+                                    "required": 1,
+                                    "menu_order": 0,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_app_point_title",
+                                    "label": "Titre",
+                                    "name": "title",
+                                    "type": "text",
+                                    "required": 1,
+                                    "menu_order": 1,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_app_point_desc",
+                                    "label": "Description",
+                                    "name": "description",
+                                    "type": "textarea",
+                                    "required": 1,
+                                    "menu_order": 2,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                }
+                            ],
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "outcomes_section": {
+                    "key": "layout_outcomes_section",
+                    "name": "outcomes_section",
+                    "label": "[Accueil] Avis — témoignages clients",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_out_eyebrow",
+                            "label": "Sourcil",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "default_value": "Résultats clients vérifiés",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_out_title",
+                            "label": "Titre principal",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Ce que disent les équipes après avoir choisi via Agence Marketing Digital",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_out_desc",
+                            "label": "Description",
+                            "name": "description",
+                            "type": "textarea",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_out_metrics",
+                            "label": "Données clés (Compteurs)",
+                            "name": "metrics",
+                            "type": "repeater",
+                            "layout": "table",
+                            "button_label": "Ajouter une métrique",
+                            "sub_fields": [
+                                {
+                                    "key": "field_out_metric_val",
+                                    "label": "Valeur (e.g. 92%)",
+                                    "name": "value",
+                                    "type": "text",
+                                    "required": 1,
+                                    "menu_order": 0,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_out_metric_lbl",
+                                    "label": "Libellé",
+                                    "name": "label",
+                                    "type": "text",
+                                    "required": 1,
+                                    "menu_order": 1,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                }
+                            ],
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_out_reviews_cards",
+                            "label": "Cartes d'avis (contenu éditable ici)",
+                            "name": "reviews_cards",
+                            "type": "repeater",
+                            "instructions": "Ajoutez et modifiez chaque carte d'avis directement ici. Si vide, les avis sont tirés des publications « Témoignage ».",
+                            "layout": "block",
+                            "button_label": "Ajouter une carte d'avis",
+                            "sub_fields": [
+                                {
+                                    "key": "field_out_card_quote",
+                                    "label": "Témoignage (citation)",
+                                    "name": "quote",
+                                    "type": "textarea",
+                                    "rows": 3,
+                                    "required": 1,
+                                    "menu_order": 0,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_out_card_rating",
+                                    "label": "Note (1 à 5)",
+                                    "name": "rating",
+                                    "type": "number",
+                                    "default_value": 5,
+                                    "min": 1,
+                                    "max": 5,
+                                    "menu_order": 1,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_out_card_author",
+                                    "label": "Nom de l'auteur",
+                                    "name": "author",
+                                    "type": "text",
+                                    "required": 1,
+                                    "menu_order": 2,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_out_card_role",
+                                    "label": "Rôle / Entreprise",
+                                    "name": "role",
+                                    "type": "text",
+                                    "menu_order": 3,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_out_card_image",
+                                    "label": "Photo de l'auteur",
+                                    "name": "image",
+                                    "type": "image",
+                                    "return_format": "url",
+                                    "preview_size": "thumbnail",
+                                    "menu_order": 4,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_out_card_agency_name",
+                                    "label": "Agence recrutée",
+                                    "name": "agency_name",
+                                    "type": "text",
+                                    "menu_order": 5,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_out_card_agency_url",
+                                    "label": "Site web de l'agence",
+                                    "name": "agency_url",
+                                    "type": "url",
+                                    "instructions": "URL complète, e.g. \"https://exemple.com\". Le nom de l'agence devient un lien vers ce site.",
+                                    "menu_order": 6,
+                                    "aria-label": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_out_card_project",
+                                    "label": "Projet réalisé",
+                                    "name": "project",
+                                    "type": "text",
+                                    "menu_order": 7,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_out_card_result",
+                                    "label": "Résultat obtenu",
+                                    "name": "result",
+                                    "type": "text",
+                                    "menu_order": 8,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                }
+                            ],
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_out_reviews",
+                            "label": "Grille d'avis clients (publications Témoignage — optionnel)",
+                            "name": "reviews",
+                            "type": "relationship",
+                            "instructions": "Optionnel : utilisé seulement si « Cartes d'avis » ci-dessus est vide.",
+                            "post_type": [
+                                "testimonial"
+                            ],
+                            "filters": [
+                                "search"
+                            ],
+                            "elements": [
+                                "title"
+                            ],
+                            "return_format": "id",
+                            "menu_order": 5,
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "picks_section": {
+                    "key": "layout_picks_section",
+                    "name": "picks_section",
+                    "label": "[Accueil] Grille — sélection de l'éditeur",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_picks_eyebrow",
+                            "label": "Sourcil",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "default_value": "Choix de l'Éditeur",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_picks_title",
+                            "label": "Titre de la section",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Les agences les plus performantes ce mois-ci.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_picks_link_text",
+                            "label": "Texte du lien méthodologique",
+                            "name": "link_text",
+                            "type": "text",
+                            "default_value": "Comment nous évaluons",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_picks_link_url",
+                            "label": "URL du lien méthodologique",
+                            "name": "link_url",
+                            "type": "text",
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_picks_selected_agencies",
+                            "label": "Agences à afficher (Optionnel)",
+                            "name": "selected_agencies",
+                            "type": "relationship",
+                            "post_type": [
+                                "agency"
+                            ],
+                            "filters": [
+                                "search"
+                            ],
+                            "elements": [
+                                "featured_image"
+                            ],
+                            "return_format": "id",
+                            "instructions": "Sélectionnez manuellement les agences à afficher. Laissez vide pour recommander automatiquement le top 3 trié par rang.",
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "specialties_section": {
+                    "key": "layout_specialties_section",
+                    "name": "specialties_section",
+                    "label": "[Accueil] Grille — spécialités",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_spec_eyebrow",
+                            "label": "Sourcil",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "default_value": "Spécialités",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_spec_title",
+                            "label": "Titre principal",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Trouvez votre besoin exact.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_spec_desc",
+                            "label": "Description de sous-titre",
+                            "name": "description",
+                            "type": "text",
+                            "default_value": "Explorez notre annuaire par canal marketing ou par spécialité.",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_spec_cta",
+                            "label": "Texte du bouton CTA",
+                            "name": "view_all_cta_text",
+                            "type": "text",
+                            "default_value": "Voir tous les classements",
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "guides_section": {
+                    "key": "layout_guides_section",
+                    "name": "guides_section",
+                    "label": "[Blog] Liste — guides & analyses",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_guides_eyebrow",
+                            "label": "Sourcil",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "default_value": "Éditorial",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_guides_title",
+                            "label": "Titre principal",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Derniers guides & analyses.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_guides_link_text",
+                            "label": "Texte du lien de blog",
+                            "name": "link_text",
+                            "type": "text",
+                            "default_value": "Tous les articles",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_guides_link_url",
+                            "label": "Lien de blog",
+                            "name": "link_url",
+                            "type": "text",
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_guides_posts",
+                            "label": "Sélectionner des articles à afficher",
+                            "name": "posts",
+                            "type": "post_object",
+                            "post_type": [
+                                "post"
+                            ],
+                            "allow_null": 1,
+                            "multiple": 1,
+                            "return_format": "id",
+                            "ui": 1,
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "blog_posts_grid_section": {
+                    "key": "layout_blog_posts_grid_section",
+                    "name": "blog_posts_grid_section",
+                    "label": "[Blog] Grille — articles",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_blog_grid_title",
+                            "label": "Titre de la section héro",
+                            "name": "grid_title",
+                            "type": "text",
+                            "default_value": "Intelligence <span class=\"quiet\">Agences.</span>",
+                            "instructions": "Vous pouvez utiliser des balises HTML simples comme <span>.",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_blog_grid_subtitle",
+                            "label": "Sous-titre / description",
+                            "name": "grid_subtitle",
+                            "type": "textarea",
+                            "default_value": "Notes techniques sur les agences marocaines, la visibilité organique, Core Web Vitals, et les preuves qui séparent les vrais opérateurs SEO des argumentaires commerciaux polis.",
+                            "rows": 3,
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_blog_grid_show_filters",
+                            "label": "Afficher les filtres par catégorie",
+                            "name": "show_filters",
+                            "type": "true_false",
+                            "default_value": 1,
+                            "ui": 1,
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_blog_grid_display_categories",
+                            "label": "Catégories à afficher",
+                            "name": "display_categories",
+                            "type": "taxonomy",
+                            "taxonomy": "category",
+                            "field_type": "multi_select",
+                            "allow_null": 1,
+                            "add_term": 1,
+                            "save_terms": 0,
+                            "load_terms": 0,
+                            "return_format": "id",
+                            "instructions": "Laissez vide pour afficher toutes les catégories. Sélectionnez une ou plusieurs catégories pour limiter cette grille.",
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_blog_grid_show_newsletter",
+                            "label": "Afficher la section newsletter",
+                            "name": "show_newsletter",
+                            "type": "true_false",
+                            "default_value": 1,
+                            "ui": 1,
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_blog_grid_posts_per_page",
+                            "label": "Nombre d'articles affichés",
+                            "name": "posts_per_page",
+                            "type": "number",
+                            "default_value": -1,
+                            "min": -1,
+                            "max": 100,
+                            "instructions": "Utilisez -1 pour afficher tous les articles.",
+                            "menu_order": 5,
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "footer_cta_section": {
+                    "key": "layout_footer_cta_section",
+                    "name": "footer_cta_section",
+                    "label": "[Commun] CTA — bas de page (titre + boutons)",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_fcta_eyebrow",
+                            "label": "Sourcil",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "default_value": "Matchmaker",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_fcta_title",
+                            "label": "Titre de la carte",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Prêt à trouver la bonne agence digitale ?",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_fcta_desc",
+                            "label": "Description",
+                            "name": "description",
+                            "type": "textarea",
+                            "default_value": "Évitez les présentations commerciales génériques. Décrivez votre projet en 2 minutes et laissez nos audits indépendants identifier le partenaire idéal.",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_fcta_primary_btn",
+                            "label": "Bouton principal",
+                            "name": "primary_cta_text",
+                            "type": "text",
+                            "default_value": "Lancer le Matchmaker",
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_fcta_secondary_btn",
+                            "label": "Bouton secondaire",
+                            "name": "secondary_cta_text",
+                            "type": "text",
+                            "default_value": "Explorer l'annuaire",
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "common_hero_section": {
+                    "key": "layout_common_hero_section",
+                    "name": "common_hero_section",
+                    "label": "[Commun] Bannière — en-tête de page (simple)",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_chero_home_text",
+                            "label": "Texte lien d'accueil",
+                            "name": "home_text",
+                            "type": "text",
+                            "default_value": "Accueil",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_chero_current_text",
+                            "label": "Texte page active (Fil d'ariane)",
+                            "name": "current_text",
+                            "type": "text",
+                            "default_value": "Contact",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_chero_title",
+                            "label": "Titre de la section (HTML)",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Contactez-<span class=\"quiet\">nous.</span>",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_chero_description",
+                            "label": "Description lede",
+                            "name": "description",
+                            "type": "textarea",
+                            "default_value": "Des questions sur les données des agences, des corrections, des avis ou des recherches éditoriales ? Envoyez-nous les détails et notre équipe vous répondra.",
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_chero_cta_text",
+                            "label": "Texte du bouton CTA",
+                            "name": "cta_text",
+                            "type": "text",
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_chero_cta_link",
+                            "label": "Lien du bouton CTA",
+                            "name": "cta_link",
+                            "type": "text",
+                            "menu_order": 5,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "contact_form_section": {
+                    "key": "layout_contact_form_section",
+                    "name": "contact_form_section",
+                    "label": "[Contact] Formulaire — contact & infos",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_cform_title",
+                            "label": "Titre du formulaire",
+                            "name": "form_title",
+                            "type": "text",
+                            "default_value": "Envoyer un Message",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_desc",
+                            "label": "Description du formulaire",
+                            "name": "form_desc",
+                            "type": "textarea",
+                            "default_value": "Utilisez ce formulaire pour les demandes de référencement, les corrections, les questions des acheteurs ou les notes de partenariat.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_office_icon",
+                            "label": "Icône Adresse",
+                            "name": "office_icon",
+                            "type": "image",
+                            "instructions": "Téléversez une icône (SVG ou image) pour le bloc adresse. Laissez vide pour utiliser l'icône par défaut. Supprimez l'image pour masquer l'icône.",
+                            "return_format": "url",
+                            "library": "all",
+                            "mime_types": "svg,png,jpg,jpeg,webp,gif",
+                            "preview_size": "thumbnail",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_office_title",
+                            "label": "Titre Siège Social",
+                            "name": "office_title",
+                            "type": "text",
+                            "default_value": "Siège Social",
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_office_address",
+                            "label": "Adresse Siège Social",
+                            "name": "office_address",
+                            "type": "text",
+                            "default_value": "8 rue de la Paix, 75002 Paris, France",
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_office_city",
+                            "label": "Ville Siège Social",
+                            "name": "office_city",
+                            "type": "text",
+                            "default_value": "Casablanca, Maroc",
+                            "menu_order": 5,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_email_icon",
+                            "label": "Icône Email",
+                            "name": "email_icon",
+                            "type": "image",
+                            "instructions": "Téléversez une icône (SVG ou image) pour le bloc email. Laissez vide pour utiliser l'icône par défaut. Supprimez l'image pour masquer l'icône.",
+                            "return_format": "url",
+                            "library": "all",
+                            "mime_types": "svg,png,jpg,jpeg,webp,gif",
+                            "preview_size": "thumbnail",
+                            "menu_order": 6,
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_email",
+                            "label": "Adresse Email de contact",
+                            "name": "email",
+                            "type": "text",
+                            "default_value": "contact@agencemarketingdigital.com",
+                            "menu_order": 7,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_guarantee_title",
+                            "label": "Titre Bloc Garantie",
+                            "name": "guarantee_title",
+                            "type": "text",
+                            "default_value": "Garantie d'Indépendance",
+                            "menu_order": 8,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_guarantee_desc",
+                            "label": "Description Bloc Garantie",
+                            "name": "guarantee_desc",
+                            "type": "textarea",
+                            "default_value": "Nous n'acceptons pas de placements payants ni de classements sponsorisés. Les agences qui souhaitent être référencées passent par notre processus d'évaluation standard et indépendant.",
+                            "menu_order": 9,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "newsletter_cta_section": {
+                    "key": "layout_newsletter_cta_section",
+                    "name": "newsletter_cta_section",
+                    "label": "[Commun] CTA — newsletter (email)",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_nl_section_label",
+                            "label": "Surligné / Sourcil",
+                            "name": "section_label",
+                            "type": "text",
+                            "default_value": "Newsletter · Gratuite",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_nl_title",
+                            "label": "Titre principal",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Recevez nos analyses dans votre boîte mail.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_nl_description",
+                            "label": "Description / Sous-titre",
+                            "name": "description",
+                            "type": "textarea",
+                            "default_value": "Chaque quinzaine : un audit d'agence, un signal SEO à surveiller, une sélection de ressources pour les fondateurs et directeurs marketing au Maroc.",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_nl_placeholder",
+                            "label": "Texte de saisie (Placeholder)",
+                            "name": "email_placeholder",
+                            "type": "text",
+                            "default_value": "votre@email.com",
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_nl_btn_text",
+                            "label": "Texte du bouton",
+                            "name": "button_text",
+                            "type": "text",
+                            "default_value": "S'abonner",
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_nl_footer_text",
+                            "label": "Texte de bas de formulaire",
+                            "name": "footer_text",
+                            "type": "text",
+                            "default_value": "Aucun spam · Désabonnement en 1 clic",
+                            "menu_order": 5,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "methodology_process_section": {
+                    "key": "layout_methodology_process_section",
+                    "name": "methodology_process_section",
+                    "label": "[Méthodologie] Étapes — processus de validation",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_mproc_label",
+                            "label": "Surligné / Sourcil",
+                            "name": "section_label",
+                            "type": "text",
+                            "default_value": "01 / Processus de Validation",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_mproc_title",
+                            "label": "Titre principal",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Quatre étapes. Un seul standard.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_mproc_desc",
+                            "label": "Description / Sous-titre",
+                            "name": "description",
+                            "type": "textarea",
+                            "default_value": "La même séquence est appliquée à chaque agence répertoriée, qu'elle ait postulé ou été découverte par notre équipe.",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_mproc_stages",
+                            "label": "Étapes du processus",
+                            "name": "stages",
+                            "type": "repeater",
+                            "layout": "block",
+                            "button_label": "Ajouter une étape",
+                            "sub_fields": [
+                                {
+                                    "key": "field_mproc_stage_num",
+                                    "label": "Numéro (e.g. 01)",
+                                    "name": "stage_num",
+                                    "type": "text",
+                                    "menu_order": 0,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_mproc_stage_title",
+                                    "label": "Titre de l'étape",
+                                    "name": "stage_title",
+                                    "type": "text",
+                                    "menu_order": 1,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_mproc_stage_desc",
+                                    "label": "Description",
+                                    "name": "stage_description",
+                                    "type": "textarea",
+                                    "menu_order": 2,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_mproc_stage_tags",
+                                    "label": "Tags (séparés par des virgules)",
+                                    "name": "stage_tags",
+                                    "type": "text",
+                                    "menu_order": 3,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_mproc_stage_image",
+                                    "label": "Illustration personnalisée (Image/SVG)",
+                                    "name": "stage_image",
+                                    "type": "image",
+                                    "return_format": "url",
+                                    "preview_size": "medium",
+                                    "menu_order": 4,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_mproc_stage_icon",
+                                    "label": "Icône Lucide alternative (e.g. check-circle)",
+                                    "name": "stage_icon",
+                                    "type": "text",
+                                    "menu_order": 5,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                }
+                            ],
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "methodology_evidence_section": {
+                    "key": "layout_methodology_evidence_section",
+                    "name": "methodology_evidence_section",
+                    "label": "[Méthodologie] Grille — preuves & données",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_mevid_label",
+                            "label": "Surligné / Sourcil",
+                            "name": "section_label",
+                            "type": "text",
+                            "default_value": "02 / Carte des Preuves",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_mevid_title",
+                            "label": "Titre principal",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Les affirmations nécessitent des preuves.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_mevid_rows",
+                            "label": "Lignes de preuves",
+                            "name": "evidence_rows",
+                            "type": "repeater",
+                            "layout": "block",
+                            "button_label": "Ajouter une ligne",
+                            "sub_fields": [
+                                {
+                                    "key": "field_mevid_row_title",
+                                    "label": "Titre de la ligne",
+                                    "name": "row_title",
+                                    "type": "text",
+                                    "menu_order": 0,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_mevid_row_desc",
+                                    "label": "Description",
+                                    "name": "row_description",
+                                    "type": "textarea",
+                                    "menu_order": 1,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                }
+                            ],
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "methodology_monitor_section": {
+                    "key": "layout_methodology_monitor_section",
+                    "name": "methodology_monitor_section",
+                    "label": "[Méthodologie] Bloc — suivi continu",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_mmon_label",
+                            "label": "Surligné / Sourcil",
+                            "name": "section_label",
+                            "type": "text",
+                            "default_value": "03 / Suivi Continu",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_mmon_title",
+                            "label": "Titre principal",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Nous contrôlons régulièrement les agences.",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_mmon_desc",
+                            "label": "Description / Sous-titre",
+                            "name": "description",
+                            "type": "textarea",
+                            "default_value": "Une agence classée peut monter, descendre ou être retirée si de nouvelles analyses indiquent une modification de sa qualité.",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_mmon_steps",
+                            "label": "Étapes de suivi",
+                            "name": "steps",
+                            "type": "repeater",
+                            "layout": "block",
+                            "button_label": "Ajouter une étape",
+                            "sub_fields": [
+                                {
+                                    "key": "field_mmon_step_icon",
+                                    "label": "Nom de l'icône Lucide (e.g. calendar-sync)",
+                                    "name": "step_icon",
+                                    "type": "text",
+                                    "menu_order": 0,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_mmon_step_title",
+                                    "label": "Titre",
+                                    "name": "step_title",
+                                    "type": "text",
+                                    "menu_order": 1,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_mmon_step_desc",
+                                    "label": "Description",
+                                    "name": "step_description",
+                                    "type": "textarea",
+                                    "menu_order": 2,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                }
+                            ],
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "about_grid_section": {
+                    "key": "layout_about_grid_section",
+                    "name": "about_grid_section",
+                    "label": "[À Propos] Grille — présentation",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_agrid_cards",
+                            "label": "Cartes de présentation",
+                            "name": "cards",
+                            "type": "repeater",
+                            "layout": "block",
+                            "button_label": "Ajouter une carte",
+                            "sub_fields": [
+                                {
+                                    "key": "field_agrid_card_icon",
+                                    "label": "Icône Lucide (e.g. search-check, shield-check, users)",
+                                    "name": "card_icon",
+                                    "type": "text",
+                                    "menu_order": 0,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_agrid_card_title",
+                                    "label": "Titre de la carte",
+                                    "name": "card_title",
+                                    "type": "text",
+                                    "menu_order": 1,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                },
+                                {
+                                    "key": "field_agrid_card_desc",
+                                    "label": "Description",
+                                    "name": "card_description",
+                                    "type": "textarea",
+                                    "menu_order": 2,
+                                    "aria-label": "",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    }
+                                }
+                            ],
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
+                "about_cta_section": {
+                    "key": "layout_about_cta_section",
+                    "name": "about_cta_section",
+                    "label": "[À Propos] CTA — bas de page (titre + boutons)",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_acta_eyebrow",
+                            "label": "Surligné / Sourcil",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "default_value": "Processus & Inscription",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_acta_title",
+                            "label": "Titre principal",
+                            "name": "title",
+                            "type": "text",
+                            "default_value": "Vous voulez comprendre notre processus ?",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_acta_desc",
+                            "label": "Description / Paragraphe",
+                            "name": "description",
+                            "type": "textarea",
+                            "default_value": "Consultez la méthodologie pour voir les critères de recherche, ou contactez l'équipe éditoriale pour une correction ou une demande d'ajout.",
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_acta_primary_text",
+                            "label": "Texte Bouton Principal",
+                            "name": "primary_text",
+                            "type": "text",
+                            "default_value": "Lire la méthodologie",
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_acta_primary_link",
+                            "label": "Lien Bouton Principal",
+                            "name": "primary_link",
+                            "type": "text",
+                            "default_value": "/methodologie/",
+                            "menu_order": 4,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_acta_secondary_text",
+                            "label": "Texte Bouton Secondaire",
+                            "name": "secondary_text",
+                            "type": "text",
+                            "default_value": "Nous contacter",
+                            "menu_order": 5,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_acta_secondary_link",
+                            "label": "Lien Bouton Secondaire",
+                            "name": "secondary_link",
+                            "type": "text",
+                            "default_value": "/contact/",
+                            "menu_order": 6,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                }
+            },
+            "menu_order": 0,
+            "aria-label": "",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "page"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1782654416
+}

@@ -1,0 +1,110 @@
+{
+    "key": "group_blog_meta",
+    "title": "Métadonnées de l'Article",
+    "fields": [
+        {
+            "key": "field_blog_badge",
+            "label": "Badge / Catégorie",
+            "name": "badge",
+            "type": "text",
+            "required": 1,
+            "default_value": "Guide",
+            "instructions": "Exemples : Classement, Guide, Audit SEO, Comparatif",
+            "menu_order": 0,
+            "aria-label": "",
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_blog_read_time",
+            "label": "Temps de lecture",
+            "name": "read_time",
+            "type": "text",
+            "required": 1,
+            "default_value": "5 min de lecture",
+            "instructions": "Exemple : 8 min de lecture, 6 min read",
+            "menu_order": 1,
+            "aria-label": "",
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_blog_author_name",
+            "label": "Nom de l'auteur",
+            "name": "author_name",
+            "type": "text",
+            "required": 0,
+            "instructions": "Nom de l'auteur affiché. Si vide, affichera l'auteur WordPress de l'article.",
+            "menu_order": 2,
+            "aria-label": "",
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_blog_cover_image_url",
+            "label": "Image de couverture (URL externe)",
+            "name": "cover_image_url",
+            "type": "text",
+            "required": 0,
+            "instructions": "Optionnel. URL d'une image externe (ex. Unsplash).",
+            "menu_order": 3,
+            "aria-label": "",
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_blog_cover_image_media",
+            "label": "Image de couverture (Médiathèque)",
+            "name": "cover_image_media",
+            "type": "image",
+            "return_format": "url",
+            "preview_size": "medium",
+            "library": "all",
+            "required": 0,
+            "instructions": "Optionnel. Image sélectionnée depuis la médiathèque locale. Prioritaire sur l'URL externe.",
+            "menu_order": 4,
+            "aria-label": "",
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "post"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1782654416
+}

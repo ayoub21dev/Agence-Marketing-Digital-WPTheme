@@ -49,6 +49,11 @@
     <?php wp_head(); ?>
 </head>
 <body <?php body_class('text-slate-800 antialiased min-h-screen flex flex-col justify-between'); ?>>
+<?php
+if (function_exists('wp_body_open')) {
+    wp_body_open();
+}
+?>
 
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-200">
         <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -83,14 +88,18 @@
                     ?>
                 </nav>
                 
-                <!-- Nav Actions: Matchmaker, Translation, Mobile Menu Toggle -->
+                <!-- Nav Actions: Matchmaker, optional language switcher, Mobile Menu Toggle -->
                 <div class="flex items-center gap-3">
                     <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="hidden sm:flex bg-brand-600 hover:bg-brand-700 text-white font-semibold px-3.5 py-1.5 rounded-lg text-[12px] transition-all items-center gap-1 cursor-pointer">
                         <i data-lucide="sparkles" class="w-3.5 h-3.5 fill-white/20"></i>
                         <span><?php echo esc_html(v5_t('Trouver une agence')); ?></span>
                     </a>
 
-                    <?php v5_digital_language_switcher(); ?>
+                    <?php
+                    if (v5_digital_primary_menu_has_language_switcher()) {
+                        v5_digital_language_switcher();
+                    }
+                    ?>
 
                     <button onclick="toggleMobileMenu()" aria-label="<?php echo esc_attr(v5_t('Ouvrir le menu')); ?>" aria-expanded="false" class="md:hidden p-1.5 text-slate-600 hover:text-brand-600 cursor-pointer">
                         <i data-lucide="menu" class="w-5 h-5" aria-hidden="true"></i>

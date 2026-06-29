@@ -1,0 +1,60 @@
+{
+    "key": "group_partner_logo_fields",
+    "title": "Détails du Logo Partenaire",
+    "fields": [
+        {
+            "key": "field_partner_logo_image_media",
+            "label": "Image du Logo (Médiathèque)",
+            "name": "logo_image_media",
+            "type": "image",
+            "return_format": "url",
+            "preview_size": "thumbnail",
+            "library": "all",
+            "required": 0,
+            "menu_order": 0,
+            "aria-label": "",
+            "instructions": "",
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_partner_logo_image_url",
+            "label": "Image du Logo (Lien URL externe)",
+            "name": "logo_image_url",
+            "type": "text",
+            "required": 0,
+            "menu_order": 1,
+            "aria-label": "",
+            "instructions": "",
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "partner_logo"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1782654416
+}

@@ -22,8 +22,8 @@ if (!$stat_query->have_posts()) {
     <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-3xl mx-auto">
             <?php while ($stat_query->have_posts()) : $stat_query->the_post();
-                $number = get_field('stat_number');
-                $label  = get_field('stat_label');
+                $number = v5_digital_get_field('stat_number');
+                $label  = v5_digital_get_field('stat_label');
                 ?>
                 <div class="text-center">
                     <div class="text-[1rem] md:text-[1.15rem] font-extrabold text-slate-900 tracking-tight font-display"><?php echo esc_html($number); ?></div>

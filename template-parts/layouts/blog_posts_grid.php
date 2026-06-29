@@ -7,15 +7,17 @@
  * Sub-fields (from page_layouts flexible content):
  *   grid_title        — hero heading (HTML allowed)
  *   grid_subtitle     — hero lede text
-  *   show_filters      — boolean: show category pills
+ *   show_filters      — boolean: show category pills
+ *   display_categories — optional WP categories to include
  *   posts_per_page    — how many posts to fetch (-1 = all)
  */
 
 // ── Pull sub-fields ───────────────────────────────────────────────────────────
-$grid_title       = get_sub_field('grid_title');
-$grid_subtitle    = get_sub_field('grid_subtitle');
-$show_filters     = get_sub_field('show_filters');
-$posts_per_page   = get_sub_field('posts_per_page');
+$grid_title       = v5_digital_get_sub_field('grid_title');
+$grid_subtitle    = v5_digital_get_sub_field('grid_subtitle');
+$show_filters     = v5_digital_get_sub_field('show_filters');
+$display_categories = v5_digital_get_sub_field('display_categories');
+$posts_per_page   = v5_digital_get_sub_field('posts_per_page');
 
 // Sensible defaults
 if (!$grid_title)     $grid_title     = 'Intelligence <span class="quiet">Agences.</span>';
@@ -23,8 +25,37 @@ if (!$grid_subtitle)  $grid_subtitle  = 'Notes techniques sur les agences maroca
 if ($show_filters    === null || $show_filters    === '') $show_filters    = true;
 if (!$posts_per_page || $posts_per_page == 0) $posts_per_page = -1;
 
+$normalize_blog_category_ids = function ($categories) {
+    if (empty($categories)) {
+        return array();
+    }
+
+    if (!is_array($categories)) {
+        $categories = array($categories);
+    }
+
+    $category_ids = array();
+    foreach ($categories as $category) {
+        if (is_object($category) && isset($category->term_id)) {
+            $term_id = (int) $category->term_id;
+        } elseif (is_array($category) && isset($category['term_id'])) {
+            $term_id = (int) $category['term_id'];
+        } else {
+            $term_id = (int) $category;
+        }
+
+        if ($term_id > 0) {
+            $category_ids[$term_id] = $term_id;
+        }
+    }
+
+    return array_values($category_ids);
+};
+
+$display_category_ids = $normalize_blog_category_ids($display_categories);
+
 $blog_page = get_page_by_path('blog');
-$layouts = $blog_page ? get_field('page_layouts', $blog_page->ID) : get_field('page_layouts');
+$layouts = $blog_page ? v5_digital_get_field('page_layouts', $blog_page->ID) : v5_digital_get_field('page_layouts');
 $has_common_hero = false;
 if (is_array($layouts)) {
     foreach ($layouts as $l) {
@@ -36,14 +67,85 @@ if (is_array($layouts)) {
 }
 
 // ── Query blog posts ──────────────────────────────────────────────────────────
-$blog_query = new WP_Query(array(
+$blog_query_args = array(
     'post_type'      => 'post',
     'posts_per_page' => (int) $posts_per_page,
     'post_status'    => 'publish',
     'orderby'        => 'date',
     'order'          => 'DESC',
-));
+);
+if (!empty($display_category_ids)) {
+    $blog_query_args['category__in'] = $display_category_ids;
+}
+$blog_query = new WP_Query($blog_query_args);
 $post_count = $blog_query->found_posts;
+
+$is_default_blog_category = function ($category) {
+    if (!$category || is_wp_error($category)) {
+        return true;
+    }
+
+    $default_category_id = (int) get_option('default_category');
+
+    return ($default_category_id && (int) $category->term_id === $default_category_id)
+        || $category->slug === 'uncategorized'
+        || strtolower($category->name) === 'uncategorized'
+        || strtolower($category->name) === 'non classé';
+};
+
+$get_post_blog_categories = function ($post_id) use ($is_default_blog_category) {
+    $categories = get_the_category($post_id);
+    $valid_categories = array();
+
+    if (!empty($categories) && !is_wp_error($categories)) {
+        foreach ($categories as $category) {
+            if (!$is_default_blog_category($category)) {
+                $valid_categories[$category->term_id] = $category;
+            }
+        }
+    }
+
+    if (!empty($valid_categories)) {
+        return array_values($valid_categories);
+    }
+
+    $badge = v5_digital_get_post_badge($post_id, '');
+    if (!empty($badge)) {
+        $fallback = new stdClass();
+        $fallback->term_id = 'badge-' . sanitize_title($badge);
+        $fallback->name = $badge;
+        $fallback->slug = sanitize_title($badge);
+        return array($fallback);
+    }
+
+    return array();
+};
+
+$blog_categories = array();
+if (!empty($display_category_ids)) {
+    $selected_terms = get_terms(array(
+        'taxonomy'   => 'category',
+        'include'    => $display_category_ids,
+        'hide_empty' => false,
+        'orderby'    => 'include',
+    ));
+    if (!is_wp_error($selected_terms) && !empty($selected_terms)) {
+        foreach ($selected_terms as $category) {
+            if (!$is_default_blog_category($category)) {
+                $blog_categories[$category->slug] = $category;
+            }
+        }
+    }
+} else {
+    foreach ($blog_query->posts as $blog_post) {
+        foreach ($get_post_blog_categories($blog_post->ID) as $category) {
+            $blog_categories[$category->slug] = $category;
+        }
+    }
+}
+uasort($blog_categories, function ($a, $b) {
+    return strcasecmp($a->name, $b->name);
+});
 ?>
 
 <style>
@@ -222,10 +324,9 @@ $post_count = $blog_query->found_posts;
         <div class="blog-grid-wrap">
             <div style="display:flex;align-items:center;gap:8px;padding:12px 0;overflow-x:auto;" id="blg-topic-pills">
                 <button class="blg-topic-pill active flex-shrink-0" onclick="blgFilterTopic(this,'all')">Tout voir</button>
-                <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'Classement')">Classements</button>
-                <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'Guide')">Guides</button>
-                <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'Audit SEO')">Audits SEO</button>
-                <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'Comparatif')">Comparatifs</button>
+                <?php foreach ($blog_categories as $category) : ?>
+                    <button class="blg-topic-pill flex-shrink-0" onclick="blgFilterTopic(this,'<?php echo esc_js($category->slug); ?>')"><?php echo esc_html($category->name); ?></button>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
@@ -251,12 +352,12 @@ $post_count = $blog_query->found_posts;
                     while ($blog_query->have_posts()) : $blog_query->the_post();
 
                         $badge      = v5_digital_get_post_badge(get_the_ID(), 'Guide');
-                        $read_time  = get_field('read_time') ?: '5 min de lecture';
-                        $author     = get_the_author() ?: get_field('author_name');
+                        $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
+                        $author     = get_the_author() ?: v5_digital_get_field('author_name');
 
                         // Cover image priority: media field → URL field → post thumbnail → placeholder
-                        $cover_image = get_field('cover_image_media');
-                        if (!$cover_image) $cover_image = get_field('cover_image_url');
+                        $cover_image = v5_digital_get_field('cover_image_media');
+                        if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
                         if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'large');
                         if (!$cover_image) $cover_image = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
 
@@ -273,11 +374,18 @@ $post_count = $blog_query->found_posts;
                             $badge_cls = 'blg-badge-comparison';
                         }
 
+                        $post_categories = $get_post_blog_categories(get_the_ID());
+                        $category_slugs = array();
+                        foreach ($post_categories as $category) {
+                            $category_slugs[] = $category->slug;
+                        }
+
                         $excerpt = get_the_excerpt();
                         if (strlen($excerpt) > 115) $excerpt = substr($excerpt, 0, 115) . '…';
                         ?>
                         <article class="blg-article-card blg-post-item"
                                  data-badge="<?php echo esc_attr($badge); ?>"
+                                 data-categories="<?php echo esc_attr(implode(' ', $category_slugs)); ?>"
                                  onclick="window.location.href='<?php the_permalink(); ?>'">
                             <div class="blg-card-img" style="height:210px;">
                                 <img src="<?php echo esc_url($cover_image); ?>"
@@ -351,8 +459,8 @@ $post_count = $blog_query->found_posts;
         var visibleCount = 0;
 
         cards.forEach(function (card) {
-            var badge = (card.getAttribute('data-badge') || '').toLowerCase();
-            var match = (topic === 'all' || badge.indexOf(topic.toLowerCase()) !== -1);
+            var categories = (card.getAttribute('data-categories') || '').split(/\s+/);
+            var match = (topic === 'all' || categories.indexOf(topic) !== -1);
             card.style.display = match ? '' : 'none';
             if (match) visibleCount++;
         });

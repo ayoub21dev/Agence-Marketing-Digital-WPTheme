@@ -71,12 +71,12 @@
     }
 </style>
 
-<?php if (have_rows('cards')) : ?>
+<?php if (v5_digital_have_rows('cards')) : ?>
     <section class="about-wrap about-grid">
-        <?php while (have_rows('cards')) : the_row();
-            $card_icon        = get_sub_field('card_icon');
-            $card_title       = get_sub_field('card_title');
-            $card_description = get_sub_field('card_description');
+        <?php while (v5_digital_have_rows('cards')) : v5_digital_the_row();
+            $card_icon        = v5_digital_get_sub_field('card_icon');
+            $card_title       = v5_digital_get_sub_field('card_title');
+            $card_description = v5_digital_get_sub_field('card_description');
             ?>
             <article class="about-card">
                 <?php if (!empty($card_icon)) : ?>

@@ -37,8 +37,8 @@ if (!$hubs_query->have_posts()) {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <?php while ($hubs_query->have_posts()) : $hubs_query->the_post();
                 $post_id = get_the_ID();
-                $icon    = get_field('icon_svg', $post_id);
-                $param   = get_field('direct_link_parameter', $post_id);
+                $icon    = v5_digital_get_field('icon_svg', $post_id);
+                $param   = v5_digital_get_field('direct_link_parameter', $post_id);
                 ?>
                 <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm transition-all">
                     <div class="flex items-center gap-4 mb-6">
@@ -54,11 +54,11 @@ if (!$hubs_query->have_posts()) {
                         <h3 class="font-display text-[1.35rem] leading-tight font-bold text-slate-950"><?php the_title(); ?></h3>
                     </div>
                     
-                    <?php if (have_rows('sub_services', $post_id)) : ?>
+                    <?php if (v5_digital_have_rows('sub_services', $post_id)) : ?>
                         <div class="space-y-3 text-[14px]">
-                            <?php while (have_rows('sub_services', $post_id)) : the_row(); ?>
+                            <?php while (v5_digital_have_rows('sub_services', $post_id)) : v5_digital_the_row(); ?>
                                 <div class="w-full flex items-center justify-between gap-3 text-left text-slate-600">
-                                    <span><?php echo esc_html(get_sub_field('service_name')); ?></span>
+                                    <span><?php echo esc_html(v5_digital_get_sub_field('service_name')); ?></span>
                                 </div>
                             <?php endwhile; ?>
                         </div>

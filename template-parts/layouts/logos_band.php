@@ -20,8 +20,8 @@ if ($logo_query->have_posts()) :
   while ($logo_query->have_posts()) :
     $logo_query->the_post();
     $logo_id    = get_the_ID();
-    $logo_media = get_field('logo_image_media', $logo_id);
-    $logo_url   = get_field('logo_image_url', $logo_id);
+    $logo_media = v5_digital_get_field('logo_image_media', $logo_id);
+    $logo_url   = v5_digital_get_field('logo_image_url', $logo_id);
     $items[] = array(
       'src'  => !empty($logo_media) ? $logo_media : $logo_url,
       'name' => get_the_title(),
@@ -107,7 +107,7 @@ if (empty($items)) {
 <section class="py-12 bg-slate-50 border-t border-b border-slate-200 overflow-hidden">
   <?php if ($title) : ?>
     <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-      <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-6"><?php echo esc_html($title); ?></span>
+      <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-10"><?php echo esc_html($title); ?></span>
     </div>
   <?php endif; ?>
 

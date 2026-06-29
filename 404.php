@@ -117,10 +117,10 @@ $suggested = new WP_Query(array(
                 <?php
                 while ($suggested->have_posts()) : $suggested->the_post();
                     $badge      = v5_digital_get_post_badge(get_the_ID(), 'Guide');
-                    $read_time  = get_field('read_time') ?: '5 min de lecture';
+                    $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
 
-                    $cover_image = get_field('cover_image_media');
-                    if (!$cover_image) $cover_image = get_field('cover_image_url');
+                    $cover_image = v5_digital_get_field('cover_image_media');
+                    if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
                     if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'large');
                     if (!$cover_image) $cover_image = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
                     ?>
@@ -141,7 +141,7 @@ $suggested = new WP_Query(array(
                             <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-auto">
                                 <span class="text-[12px] text-slate-500 flex items-center gap-1 font-mono">
                                     <i data-lucide="user" class="w-3.5 h-3.5"></i>
-                                    <?php echo esc_html(get_field('author_name') ?: get_the_author()); ?>
+                                    <?php echo esc_html(v5_digital_get_field('author_name') ?: get_the_author()); ?>
                                 </span>
                                 <span class="text-[12.5px] font-bold text-brand-600 hover:text-brand-700 transition-colors font-mono flex items-center gap-1">
                                     <span>Lire</span>
