@@ -109,9 +109,13 @@ get_header();
                         <img src="<?php echo esc_url($cover_image); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover">
                     </div>
 
-                    <!-- Main prose content via Flexible Content -->
+                    <!-- Native editor content plus optional Flexible Content blocks -->
                     <div class="article-prose">
                         <?php
+                        if (trim(get_the_content()) !== '') :
+                            the_content();
+                        endif;
+
                         if (have_rows('blog_layouts')) :
                             while (have_rows('blog_layouts')) : the_row();
                                 $layout = get_row_layout();
@@ -121,8 +125,9 @@ get_header();
                                     
                                 elseif ($layout === 'heading_block') :
                                     $tag = get_sub_field('heading_level');
+                                    $tag = in_array($tag, array('h2', 'h3'), true) ? $tag : 'h2';
                                     $text = get_sub_field('heading_text');
-                                    echo '<' . esc_attr($tag) . '>' . esc_html($text) . '</' . esc_attr($tag) . '>';
+                                    echo '<' . $tag . '>' . esc_html($text) . '</' . $tag . '>';
                                     
                                 elseif ($layout === 'agency_reviews_block') :
                                     $reviews = get_sub_field('reviews_list');
@@ -193,9 +198,6 @@ get_header();
                                     endif;
 
                             endwhile;
-                        else :
-                            // Fallback if no flexible layouts are set
-                            the_content();
                         endif;
                         ?>
                     </div>
