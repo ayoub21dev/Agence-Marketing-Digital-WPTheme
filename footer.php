@@ -77,10 +77,10 @@ if (empty($matchmaker_services)) {
     );
 }
 ?>
-    <footer class="bg-white border-t border-slate-200">
+    <footer class="site-footer bg-white border-t border-slate-200">
         <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-10">
-            <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-start gap-10 md:gap-16 mb-10">
-                <div class="md:w-72 shrink-0">
+            <div class="site-footer-main max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-start gap-10 md:gap-16 mb-10">
+                <div class="site-footer-brand md:w-72 shrink-0">
                     <div class="flex items-center gap-2 mb-3 cursor-pointer" onclick="window.location.href='<?php echo esc_url(home_url('/')); ?>'">
                         <div class="flex items-center gap-1 font-display">
                             <span class="font-extrabold text-[16px] text-slate-900 tracking-tight">Agence</span>
@@ -95,7 +95,7 @@ if (empty($matchmaker_services)) {
                         ?>
                     </p>
                 </div>
-                <div class="flex-1 flex flex-wrap justify-between gap-8 md:gap-12 w-full">
+                <div class="site-footer-nav flex-1 flex flex-wrap justify-between gap-8 md:gap-12 w-full">
                     <?php 
                     v5_digital_render_footer_column(
                         'footer_explore', 
@@ -142,7 +142,7 @@ if (empty($matchmaker_services)) {
                     ?>
                 </div>
             </div>
-            <div class="max-w-4xl mx-auto border-t border-slate-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="site-footer-bottom max-w-4xl mx-auto border-t border-slate-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-[12px] text-slate-500 font-mono">&copy; <?php echo esc_html(date('Y')); ?> Agence Marketing Digital. <?php echo esc_html(v5_t('Recherche indépendante')); ?>.</p>
                 <div class="flex items-center gap-4 text-slate-500">
                     <a href="#" aria-label="Twitter" class="hover:text-slate-700 transition-colors"><i data-lucide="twitter" class="w-4 h-4" aria-hidden="true"></i></a>
