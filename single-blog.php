@@ -67,9 +67,6 @@ get_header();
             if (!$cover_image && has_post_thumbnail()) {
                 $cover_image = get_the_post_thumbnail_url(null, 'large');
             }
-            if (!$cover_image) {
-                $cover_image = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
-            }
             ?>
             <!-- ==================== ARTICLE DETAIL PAGE ==================== -->
             <div class="page" id="page-article">
@@ -106,10 +103,12 @@ get_header();
                 </div>
 
                 <div class="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8">
-                    <!-- Cover Image -->
-                    <div class="h-64 sm:h-80 overflow-hidden rounded-2xl mb-8 bg-slate-100 border border-slate-200">
-                        <img src="<?php echo esc_url($cover_image); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover">
-                    </div>
+                    <?php if ($cover_image) : ?>
+                        <!-- Cover Image -->
+                        <div class="h-64 sm:h-80 overflow-hidden rounded-2xl mb-8 bg-slate-100 border border-slate-200">
+                            <img src="<?php echo esc_url($cover_image); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover">
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Native editor content plus optional Flexible Content blocks -->
                     <div class="article-prose">
@@ -123,17 +122,7 @@ get_header();
                         if (v5_digital_have_rows('blog_layouts')) :
                             while (v5_digital_have_rows('blog_layouts')) : v5_digital_the_row();
                                 $layout = v5_digital_get_row_layout();
-                                
-                                if ($layout === 'wysiwyg_block') :
-                                    echo wp_kses_post(v5_digital_get_sub_field('content'));
-                                    
-                                elseif ($layout === 'heading_block') :
-                                    $tag = v5_digital_get_sub_field('heading_level');
-                                    $tag = in_array($tag, array('h2', 'h3'), true) ? $tag : 'h2';
-                                    $text = v5_digital_get_sub_field('heading_text');
-                                    echo '<' . $tag . '>' . esc_html($text) . '</' . $tag . '>';
-                                    
-                                elseif ($layout === 'agency_reviews_block') :
+                                if ($layout === 'agency_reviews_block') :
                                     $reviews = v5_digital_get_sub_field('reviews_list');
                                     if (!empty($reviews) && is_array($reviews)) :
                                         foreach ($reviews as $review) {

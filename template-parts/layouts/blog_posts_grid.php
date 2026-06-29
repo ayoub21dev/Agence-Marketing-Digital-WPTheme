@@ -355,11 +355,10 @@ uasort($blog_categories, function ($a, $b) {
                         $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
                         $author     = get_the_author() ?: v5_digital_get_field('author_name');
 
-                        // Cover image priority: media field → URL field → post thumbnail → placeholder
+                        // Cover image priority: media field -> URL field -> post thumbnail. Empty means no image.
                         $cover_image = v5_digital_get_field('cover_image_media');
                         if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
                         if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'large');
-                        if (!$cover_image) $cover_image = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
 
                         // Badge CSS class
                         $badge_lower = strtolower($badge);
@@ -387,12 +386,14 @@ uasort($blog_categories, function ($a, $b) {
                                  data-badge="<?php echo esc_attr($badge); ?>"
                                  data-categories="<?php echo esc_attr(implode(' ', $category_slugs)); ?>"
                                  onclick="window.location.href='<?php the_permalink(); ?>'">
-                            <div class="blg-card-img" style="height:210px;">
-                                <img src="<?php echo esc_url($cover_image); ?>"
-                                     alt="<?php the_title_attribute(); ?>"
-                                     loading="lazy"
-                                     style="width:100%;height:100%;object-fit:cover;">
-                            </div>
+                            <?php if ($cover_image) : ?>
+                                <div class="blg-card-img" style="height:210px;">
+                                    <img src="<?php echo esc_url($cover_image); ?>"
+                                         alt="<?php the_title_attribute(); ?>"
+                                         loading="lazy"
+                                         style="width:100%;height:100%;object-fit:cover;">
+                                </div>
+                            <?php endif; ?>
                             <div style="display:flex;flex-direction:column;flex:1;padding:20px;">
                                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
                                     <span style="font-size:11px;font-weight:700;font-family:monospace;text-transform:uppercase;letter-spacing:0.05em;padding:3px 10px;border-radius:4px;"
