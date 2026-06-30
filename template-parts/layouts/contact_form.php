@@ -107,7 +107,7 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                     </div>
                 </form>
 
-                <div id="contact-success-msg" class="hidden bg-emerald-50 border border-emerald-100 rounded-xl p-5 font-sans flex items-start gap-3.5">
+                <div id="contact-success-msg" class="hidden bg-emerald-50 border border-emerald-100 rounded-xl p-5 font-sans flex items-start" style="gap:1.15rem">
                     <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
                         <i data-lucide="check" class="w-5 h-5"></i>
                     </div>
