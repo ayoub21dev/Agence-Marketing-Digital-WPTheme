@@ -95,7 +95,7 @@ if (empty($matchmaker_services)) {
                         ?>
                     </p>
                 </div>
-                <div class="site-footer-nav flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 w-full">
+                <div class="site-footer-nav">
                     <?php 
                     v5_digital_render_footer_column(
                         'footer_explore', 

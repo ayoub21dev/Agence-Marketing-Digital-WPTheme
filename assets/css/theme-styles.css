@@ -274,8 +274,10 @@ dialog:focus-visible {
 }
 @media (min-width: 768px) {
     .site-footer-nav {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 3rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 3.5rem;
     }
 }
 
