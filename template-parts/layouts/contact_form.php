@@ -66,6 +66,11 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                     <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
                         <label>Ne pas remplir<input type="text" name="amd_hp" tabindex="-1" autocomplete="off"></label>
                     </div>
+                    <?php // Tag submissions with which form + page they came from (for the AMD Contact Forms plugin dashboard). ?>
+                    <input type="hidden" name="form_id" value="contact-page">
+                    <input type="hidden" name="form_name" value="Formulaire (page contact)">
+                    <input type="hidden" name="page_url" value="<?php echo esc_url(get_permalink()); ?>">
+                    <input type="hidden" name="page_title" value="<?php echo esc_attr(get_the_title()); ?>">
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
