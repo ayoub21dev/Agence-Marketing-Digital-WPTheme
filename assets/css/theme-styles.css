@@ -267,15 +267,17 @@ dialog:focus-visible {
 
 .site-footer-nav {
     flex: 1 1 0%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2rem;
     width: 100%;
 }
 @media (min-width: 768px) {
     .site-footer-nav {
-        gap: 3rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 3.5rem;
     }
 }
 
