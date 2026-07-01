@@ -10,6 +10,72 @@
             "type": "flexible_content",
             "button_label": "Ajouter une Section",
             "layouts": {
+                "form_section": {
+                    "key": "layout_form_section",
+                    "name": "form_section",
+                    "label": "[Formulaire] Afficher un formulaire de contact",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_amd_form_id",
+                            "label": "Formulaire à afficher",
+                            "name": "amd_form_id",
+                            "type": "select",
+                            "instructions": "Choisissez un formulaire créé dans « Submissions → Formulaires ».",
+                            "choices": {},
+                            "default_value": "",
+                            "allow_null": 0,
+                            "multiple": 0,
+                            "ui": 1,
+                            "ajax": 0,
+                            "return_format": "value",
+                            "menu_order": 0,
+                            "aria-label": "",
+                            "required": 1,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_amd_form_title",
+                            "label": "Titre de la section (optionnel)",
+                            "name": "section_title",
+                            "type": "text",
+                            "default_value": "",
+                            "menu_order": 1,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_amd_form_desc",
+                            "label": "Description (optionnel)",
+                            "name": "section_desc",
+                            "type": "textarea",
+                            "default_value": "",
+                            "rows": 3,
+                            "menu_order": 2,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        }
+                    ]
+                },
                 "hero_section": {
                     "key": "layout_hero_section",
                     "name": "hero_section",
@@ -2559,5 +2625,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1782654416
+    "modified": 1782925617
 }

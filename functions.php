@@ -297,6 +297,27 @@ function v5_digital_acf_json_load_paths($paths) {
 }
 add_filter('acf/settings/load_json', 'v5_digital_acf_json_load_paths');
 
+/**
+ * Populate the "Formulaire à afficher" dropdown (page builder → Formulaire section)
+ * with the forms registered in the AMD Contact Forms plugin, so an editor can pick
+ * which form a section displays. No-op if the plugin is inactive.
+ */
+function v5_digital_acf_load_amd_forms($field) {
+    $field['choices'] = array();
+    if (class_exists('AMD_CF_Forms')) {
+        foreach (AMD_CF_Forms::all() as $f) {
+            if (isset($f['id'], $f['name'])) {
+                $field['choices'][$f['id']] = $f['name'];
+            }
+        }
+    }
+    if (empty($field['choices'])) {
+        $field['choices'][''] = 'Aucun formulaire — créez-en un dans « Submissions → Formulaires »';
+    }
+    return $field;
+}
+add_filter('acf/load_field/key=field_amd_form_id', 'v5_digital_acf_load_amd_forms');
+
 function v5_digital_acf_has_json_field_groups() {
     $files = glob(v5_digital_acf_json_path() . '/group_*.json');
     return !empty($files);
