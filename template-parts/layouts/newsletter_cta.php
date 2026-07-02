@@ -52,20 +52,25 @@ $footer_text       = v5_get_field_default('footer_text', 'Aucun spam · Désabon
             <p style="font-size:15px;color:var(--blg-muted);line-height:1.65;margin-top:8px;margin-bottom:20px;">
                 <?php echo esc_html($description); ?>
             </p>
-            <form style="display:flex;flex-direction:column;gap:12px;max-width:420px;"
-                  onsubmit="blgSubmitNewsletter(event)">
+            <form class="blg-nl-form" style="display:flex;flex-direction:column;gap:12px;max-width:420px;"
+                  data-source="newsletter-band" onsubmit="v5SubmitNewsletter(event)">
                 <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                    <input type="email" required placeholder="<?php echo esc_attr($email_placeholder); ?>" id="blg-nl-email"
+                    <input type="email" required placeholder="<?php echo esc_attr($email_placeholder); ?>" class="blg-nl-email"
                            style="flex:1;border:1.5px solid rgba(16,20,24,0.12);border-radius:10px;padding:10px 16px;font-size:14px;color:var(--blg-ink);background:white;outline:none;min-width:180px;transition:border-color 0.2s,box-shadow 0.2s;"
                            onfocus="this.style.borderColor='#2463eb';this.style.boxShadow='0 0 0 3px rgba(36,99,235,0.10)'"
                            onblur="this.style.borderColor='rgba(16,20,24,0.12)';this.style.boxShadow='none'">
-                    <button type="submit" id="blg-nl-submit"
+                    <button type="submit" class="blg-nl-submit"
                             style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:10px;background:var(--blg-ink);color:white;font-weight:700;font-size:13px;padding:0 20px;border:none;cursor:pointer;transition:background 0.15s;white-space:nowrap;"
                             onmouseover="this.style.background='#000'" onmouseout="this.style.background='var(--blg-ink)'">
                         <i data-lucide="send" class="w-3.5 h-3.5"></i>
                         <span><?php echo esc_html($button_text); ?></span>
                     </button>
                 </div>
+                <?php /* Honeypot: hidden from humans, tempting to bots. */ ?>
+                <input type="text" name="website" class="blg-nl-hp" tabindex="-1" autocomplete="off"
+                       aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
+                <p class="blg-nl-msg" role="status" aria-live="polite"
+                   style="font-size:12px;font-weight:600;margin:0;min-height:1em;"></p>
             </form>
             <?php if ($footer_text) : ?>
                 <p style="font-size:11px;color:#94a3b8;font-family:monospace;margin-top:12px;">
@@ -75,21 +80,3 @@ $footer_text       = v5_get_field_default('footer_text', 'Aucun spam · Désabon
         </div>
     </div>
 </section>
-
-<script>
-(function () {
-    'use strict';
-    
-    if (!window.blgSubmitNewsletter) {
-        window.blgSubmitNewsletter = function (e) {
-            e.preventDefault();
-            var btn = document.getElementById('blg-nl-submit');
-            if (!btn) return;
-            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Abonné !';
-            btn.style.background = '#16a34a';
-            btn.disabled = true;
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        };
-    }
-}());
-</script>

@@ -14,7 +14,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 4. Initialise Search / Command Palette and Matchmaker bindings
     initModalBindings();
+
+    // 5. Article reading aids: progress bar + auto table of contents
+    initArticleEnhancements();
 });
+
+/* ----------------------------------------------------
+ * Article reading aids
+ * - Reading-progress bar tracking scroll through the article body
+ * - Auto table of contents generated from the article's h2/h3 headings
+ * Both no-op cleanly when their target elements are absent.
+ * ---------------------------------------------------- */
+function initArticleEnhancements() {
+    var prose = document.querySelector('.article-prose');
+
+    // ── Table of contents ──────────────────────────────────────────────
+    var tocNav = document.getElementById('article-toc');
+    if (prose && tocNav) {
+        var list     = tocNav.querySelector('ul');
+        var headings = prose.querySelectorAll('h2, h3');
+        var slugged  = {};
+
+        headings.forEach(function (h, i) {
+            var text = (h.textContent || '').trim();
+            if (!text) return;
+            if (!h.id) {
+                var base = text.toLowerCase()
+                    .replace(/[^\wÀ-ſ\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '') || ('section-' + i);
+                var id = base;
+                var n = 2;
+                while (slugged[id] || document.getElementById(id)) { id = base + '-' + n++; }
+                slugged[id] = true;
+                h.id = id;
+            }
+            var li = document.createElement('li');
+            li.className = (h.tagName === 'H3') ? 'toc-h3' : 'toc-h2';
+            var a = document.createElement('a');
+            a.href = '#' + h.id;
+            a.textContent = text;
+            a.addEventListener('click', function (e) {
+                e.preventDefault();
+                h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (history.replaceState) { history.replaceState(null, '', '#' + h.id); }
+            });
+            li.appendChild(a);
+            list.appendChild(li);
+        });
+
+        // Only reveal the TOC if it actually has 2+ entries worth navigating.
+        if (list.children.length >= 2) {
+            tocNav.hidden = false;
+        }
+    }
+
+    // ── Reading progress bar ───────────────────────────────────────────
+    var bar = document.getElementById('reading-progress');
+    if (bar && prose) {
+        var ticking = false;
+        var update = function () {
+            var rect      = prose.getBoundingClientRect();
+            var vh        = window.innerHeight || document.documentElement.clientHeight;
+            var total     = rect.height - vh;
+            var scrolled  = -rect.top;
+            var pct       = total > 0 ? (scrolled / total) : (rect.top <= 0 ? 1 : 0);
+            pct = Math.max(0, Math.min(1, pct));
+            bar.style.width = (pct * 100).toFixed(2) + '%';
+            ticking = false;
+        };
+        var onScroll = function () {
+            if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
+        update();
+    }
+}
 
 const motionState = {
     initialized: false,
@@ -818,6 +895,72 @@ function toggleFaq(button) {
         }
     }
 }
+
+/* ----------------------------------------------------
+ * Newsletter — real AJAX subscribe handler
+ * Shared by the newsletter band and the in-article inline capture.
+ * Any <form class="blg-nl-form"> with .blg-nl-email / .blg-nl-submit /
+ * .blg-nl-hp / .blg-nl-msg and onsubmit="v5SubmitNewsletter(event)" works.
+ * ---------------------------------------------------- */
+window.v5SubmitNewsletter = function (e) {
+    e.preventDefault();
+    var form = e.target.closest ? e.target.closest('form') : e.target;
+    if (!form) return;
+    var email = form.querySelector('.blg-nl-email');
+    var btn   = form.querySelector('.blg-nl-submit');
+    var hp    = form.querySelector('.blg-nl-hp');
+    var msg   = form.querySelector('.blg-nl-msg');
+    var cfg   = window.v5Newsletter || {};
+
+    if (!email || !btn || !cfg.ajaxUrl) return;
+
+    var setMsg = function (text, color) {
+        if (msg) { msg.textContent = text || ''; msg.style.color = color || '#94a3b8'; }
+    };
+
+    btn.disabled = true;
+    setMsg('…', '#94a3b8');
+
+    var data = new URLSearchParams();
+    data.append('action', 'v5_newsletter_subscribe');
+    data.append('nonce', cfg.nonce || '');
+    data.append('email', email.value || '');
+    data.append('source', form.getAttribute('data-source') || 'site');
+    data.append('website', hp ? hp.value : '');
+
+    fetch(cfg.ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: data.toString(),
+        credentials: 'same-origin'
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+        var status = res && res.status;
+        if (status === 'ok') {
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> ' + (cfg.msgOk || 'Abonné !');
+            btn.style.background = '#16a34a';
+            setMsg('', '');
+            email.setAttribute('disabled', 'disabled');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        } else if (status === 'duplicate') {
+            btn.disabled = false;
+            setMsg(cfg.msgDup || 'Déjà inscrit', '#2463eb');
+        } else if (status === 'invalid') {
+            btn.disabled = false;
+            setMsg('Email invalide', '#dc2626');
+        } else {
+            btn.disabled = false;
+            setMsg(cfg.msgErr || 'Erreur, réessayez', '#dc2626');
+        }
+    })
+    .catch(function () {
+        btn.disabled = false;
+        setMsg(cfg.msgErr || 'Erreur, réessayez', '#dc2626');
+    });
+};
+// Back-compat alias for any cached markup calling the old function name.
+window.blgSubmitNewsletter = window.v5SubmitNewsletter;
 
 // Compatibility redirect trigger
 function triggerHomeSearch() {

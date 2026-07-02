@@ -2039,8 +2039,270 @@ function v5_digital_enqueue_assets() {
         $js_ver,
         true
     );
+
+    // Expose AJAX endpoint + nonce so the newsletter (and future front-end
+    // actions) can talk to admin-ajax.php securely. Attached to the always-on
+    // theme script so it is available on every template, including standalone
+    // newsletter renders.
+    wp_localize_script(
+        'agence-marketing-digital-scripts',
+        'v5Newsletter',
+        array(
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce'   => wp_create_nonce('v5_newsletter'),
+            'msgOk'   => v5_t('Abonné !'),
+            'msgDup'  => v5_t('Déjà inscrit'),
+            'msgErr'  => v5_t('Erreur, réessayez'),
+        )
+    );
 }
 add_action('wp_enqueue_scripts', 'v5_digital_enqueue_assets');
+
+// ----------------------------------------------------
+// 3b. NEWSLETTER — SELF-HOSTED SUBSCRIBER CAPTURE
+// ----------------------------------------------------
+// A dependency-free double-opt-out newsletter list stored in a custom table.
+// Front-end forms POST to admin-ajax.php (action=v5_newsletter_subscribe);
+// admins view/export subscribers under Tools → Abonnés. No third-party ESP.
+
+/** Fully-qualified subscribers table name. */
+function v5_digital_newsletter_table() {
+    global $wpdb;
+    return $wpdb->prefix . 'v5_subscribers';
+}
+
+/** Create/upgrade the subscribers table. Cheap + idempotent (dbDelta). */
+function v5_digital_newsletter_install_table() {
+    global $wpdb;
+    $table   = v5_digital_newsletter_table();
+    $charset = $wpdb->get_charset_collate();
+
+    // email capped at 191 chars so the UNIQUE index fits utf8mb4 (767-byte limit).
+    $sql = "CREATE TABLE {$table} (
+        id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        email varchar(191) NOT NULL,
+        status varchar(20) NOT NULL DEFAULT 'active',
+        source varchar(120) NOT NULL DEFAULT '',
+        ip varchar(100) NOT NULL DEFAULT '',
+        created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+        PRIMARY KEY  (id),
+        UNIQUE KEY email (email),
+        KEY status (status)
+    ) {$charset};";
+
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    dbDelta($sql);
+    update_option('v5_newsletter_db_version', 1);
+}
+
+/**
+ * Ensure the table exists. Runs on theme switch AND lazily on admin_init so an
+ * already-active theme (this one is) still gets the table without a re-switch.
+ */
+function v5_digital_newsletter_maybe_install() {
+    if ((int) get_option('v5_newsletter_db_version') < 1) {
+        v5_digital_newsletter_install_table();
+    }
+}
+add_action('after_switch_theme', 'v5_digital_newsletter_install_table');
+add_action('admin_init', 'v5_digital_newsletter_maybe_install');
+
+/**
+ * AJAX: store a subscriber. Handles logged-in + anonymous visitors.
+ * Returns JSON {status: ok|duplicate|invalid|error}.
+ */
+function v5_digital_newsletter_subscribe() {
+    check_ajax_referer('v5_newsletter', 'nonce');
+
+    // Honeypot: real users leave the hidden "website" field empty. Bots fill it.
+    if (!empty($_POST['website'])) {
+        wp_send_json(array('status' => 'ok')); // silently accept, store nothing
+    }
+
+    $email = isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : '';
+    if (!$email || !is_email($email)) {
+        wp_send_json(array('status' => 'invalid'), 200);
+    }
+
+    $source = isset($_POST['source']) ? sanitize_text_field(wp_unslash($_POST['source'])) : 'site';
+    $source = substr($source, 0, 120);
+
+    // Ensure the table exists even if no admin page has loaded since deploy.
+    v5_digital_newsletter_maybe_install();
+
+    global $wpdb;
+    $table = v5_digital_newsletter_table();
+
+    $exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$table} WHERE email = %s", $email));
+    if ($exists) {
+        wp_send_json(array('status' => 'duplicate'), 200);
+    }
+
+    $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
+
+    $inserted = $wpdb->insert(
+        $table,
+        array(
+            'email'      => $email,
+            'status'     => 'active',
+            'source'     => $source,
+            'ip'         => $ip,
+            'created_at' => current_time('mysql'),
+        ),
+        array('%s', '%s', '%s', '%s', '%s')
+    );
+
+    wp_send_json(array('status' => $inserted ? 'ok' : 'error'), 200);
+}
+add_action('wp_ajax_v5_newsletter_subscribe', 'v5_digital_newsletter_subscribe');
+add_action('wp_ajax_nopriv_v5_newsletter_subscribe', 'v5_digital_newsletter_subscribe');
+
+/** Admin screen: Tools → Abonnés. */
+function v5_digital_newsletter_admin_menu() {
+    add_management_page(
+        'Abonnés Newsletter',
+        'Abonnés',
+        'manage_options',
+        'v5-subscribers',
+        'v5_digital_newsletter_admin_page'
+    );
+}
+add_action('admin_menu', 'v5_digital_newsletter_admin_menu');
+
+function v5_digital_newsletter_admin_page() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+    global $wpdb;
+    $table = v5_digital_newsletter_table();
+
+    $total  = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$table} WHERE status = 'active'");
+    $export_url = wp_nonce_url(admin_url('admin-post.php?action=v5_export_subscribers'), 'v5_export_subscribers');
+    $rows = $wpdb->get_results("SELECT email, source, created_at FROM {$table} WHERE status = 'active' ORDER BY id DESC LIMIT 500");
+    ?>
+    <div class="wrap">
+        <h1 style="display:flex;align-items:center;gap:16px;">
+            Abonnés Newsletter
+            <span class="title-count"><?php echo esc_html($total); ?></span>
+        </h1>
+        <p>
+            <a href="<?php echo esc_url($export_url); ?>" class="button button-primary">Exporter en CSV</a>
+        </p>
+        <table class="wp-list-table widefat fixed striped">
+            <thead><tr><th>Email</th><th>Source</th><th>Date</th></tr></thead>
+            <tbody>
+            <?php if ($rows) : foreach ($rows as $r) : ?>
+                <tr>
+                    <td><?php echo esc_html($r->email); ?></td>
+                    <td><?php echo esc_html($r->source); ?></td>
+                    <td><?php echo esc_html($r->created_at); ?></td>
+                </tr>
+            <?php endforeach; else : ?>
+                <tr><td colspan="3">Aucun abonné pour l'instant.</td></tr>
+            <?php endif; ?>
+            </tbody>
+        </table>
+        <?php if ($total > 500) : ?>
+            <p><em>Affichage des 500 plus récents. Utilisez l'export CSV pour la liste complète.</em></p>
+        <?php endif; ?>
+    </div>
+    <?php
+}
+
+/** Stream the full subscriber list as a CSV download. */
+function v5_digital_newsletter_export_csv() {
+    if (!current_user_can('manage_options')) {
+        wp_die('Accès refusé');
+    }
+    check_admin_referer('v5_export_subscribers');
+
+    global $wpdb;
+    $table = v5_digital_newsletter_table();
+    $rows  = $wpdb->get_results("SELECT email, source, ip, created_at FROM {$table} WHERE status = 'active' ORDER BY id DESC", ARRAY_A);
+
+    nocache_headers();
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=abonnes-' . gmdate('Y-m-d') . '.csv');
+
+    $out = fopen('php://output', 'w');
+    fputcsv($out, array('email', 'source', 'ip', 'created_at'));
+    foreach ($rows as $row) {
+        fputcsv($out, $row);
+    }
+    fclose($out);
+    exit;
+}
+add_action('admin_post_v5_export_subscribers', 'v5_digital_newsletter_export_csv');
+
+// ----------------------------------------------------
+// 3c. STRUCTURED DATA — ARTICLE + BREADCRUMB JSON-LD
+// ----------------------------------------------------
+// Emits schema.org Article + BreadcrumbList on single blog posts so Google can
+// surface rich results (headline, date, author, image) — lifting SERP CTR.
+
+function v5_digital_article_schema() {
+    if (!is_singular('post')) {
+        return;
+    }
+
+    $post_id = get_the_ID();
+    if (!$post_id) {
+        return;
+    }
+
+    // Image: ACF media → ACF URL → featured image.
+    $image = v5_digital_get_field('cover_image_media', $post_id);
+    if (!$image) $image = v5_digital_get_field('cover_image_url', $post_id);
+    if (!$image && has_post_thumbnail($post_id)) $image = get_the_post_thumbnail_url($post_id, 'large');
+
+    $author = get_the_author_meta('display_name', get_post_field('post_author', $post_id));
+    if (!$author) $author = v5_digital_get_field('author_name', $post_id);
+    if (!$author) $author = 'Rédaction';
+
+    $article = array(
+        '@context'         => 'https://schema.org',
+        '@type'            => 'Article',
+        'mainEntityOfPage' => array(
+            '@type' => 'WebPage',
+            '@id'   => get_permalink($post_id),
+        ),
+        'headline'         => wp_strip_all_tags(get_the_title($post_id)),
+        'datePublished'    => get_the_date('c', $post_id),
+        'dateModified'     => get_the_modified_date('c', $post_id),
+        'author'           => array('@type' => 'Person', 'name' => $author),
+        'publisher'        => array(
+            '@type' => 'Organization',
+            'name'  => get_bloginfo('name'),
+        ),
+    );
+
+    $excerpt = wp_strip_all_tags(get_the_excerpt($post_id));
+    if ($excerpt) {
+        $article['description'] = $excerpt;
+    }
+    if ($image) {
+        $article['image'] = array($image);
+    }
+
+    // Breadcrumb: Accueil › Blog › Article
+    $blog_page = get_page_by_path('blog');
+    $blog_url  = $blog_page ? get_permalink($blog_page->ID) : home_url('/blog/');
+
+    $breadcrumb = array(
+        '@context'        => 'https://schema.org',
+        '@type'           => 'BreadcrumbList',
+        'itemListElement' => array(
+            array('@type' => 'ListItem', 'position' => 1, 'name' => 'Accueil', 'item' => home_url('/')),
+            array('@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => $blog_url),
+            array('@type' => 'ListItem', 'position' => 3, 'name' => wp_strip_all_tags(get_the_title($post_id)), 'item' => get_permalink($post_id)),
+        ),
+    );
+
+    $flags = defined('JSON_UNESCAPED_UNICODE') ? (JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : 0;
+    echo "\n" . '<script type="application/ld+json">' . wp_json_encode($article, $flags) . '</script>' . "\n";
+    echo '<script type="application/ld+json">' . wp_json_encode($breadcrumb, $flags) . '</script>' . "\n";
+}
+add_action('wp_head', 'v5_digital_article_schema');
 
 // ----------------------------------------------------
 // 4. THEME SWITCH AUTOMATION (INITIALIZE PAGES & SITE DATA)
