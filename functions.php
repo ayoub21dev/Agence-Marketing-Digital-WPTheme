@@ -312,7 +312,7 @@ function v5_digital_acf_load_amd_forms($field) {
         }
     }
     if (empty($field['choices'])) {
-        $field['choices'][''] = 'Aucun formulaire — créez-en un dans « Submissions → Formulaires »';
+        $field['choices'][''] = 'No form yet — create one in "Submissions → Forms"';
     }
     return $field;
 }
