@@ -1,0 +1,162 @@
+diff --git a/functions.php b/functions.php
+index 8770e01..0c4d5d1 100644
+--- a/functions.php
++++ b/functions.php
+@@ -3697,62 +3697,108 @@ add_filter('redirect_canonical', function($redirect_url, $requested_url) {
+     return $redirect_url;
+ }, 10, 2);
+ 
++// The custom /sitemap.xml replaces WordPress core's /wp-sitemap.xml — disable
++// the core one so search engines don't see two competing sitemaps.
++add_filter('wp_sitemaps_enabled', '__return_false');
++
++// Advertise the sitemap in robots.txt (uses the site URL, so it stays correct
++// on local, staging and production without hardcoding the domain).
++add_filter('robots_txt', function ($output) {
++    return rtrim($output) . "\nSitemap: " . home_url('/sitemap.xml') . "\n";
++});
++
+ add_action('template_redirect', function() {
+-    if (get_query_var('custom_sitemap')) {
+-        header('Content-Type: application/xml; charset=utf-8');
+-        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+-        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+-
+-        // 1. Static/Core pages
+-        $urls = array(
+-            home_url('/'),
+-            home_url('/blog/'),
+-            home_url('/about/'),
+-            home_url('/methodologie/'),
+-            home_url('/contact/'),
+-        );
+-        foreach ($urls as $url) {
+-            echo '  <url>' . "\n";
+-            echo '    <loc>' . esc_url($url) . '</loc>' . "\n";
+-            echo '    <changefreq>daily</changefreq>' . "\n";
+-            echo '    <priority>1.0</priority>' . "\n";
+-            echo '  </url>' . "\n";
+-        }
++    if (!get_query_var('custom_sitemap')) {
++        return;
++    }
+ 
+-        // 2. Query dynamic posts and CPT content
+-        $posts_query = new WP_Query(array(
+-            'post_type'      => array('post', 'agency', 'specialty_hub'),
+-            'posts_per_page' => -1,
+-            'post_status'    => 'publish',
+-        ));
++    status_header(200);
++    header('Content-Type: application/xml; charset=utf-8');
+ 
+-        if ($posts_query->have_posts()) {
+-            while ($posts_query->have_posts()) {
+-                $posts_query->the_post();
+-                $post_id  = get_the_ID();
+-                $type     = get_post_type();
+-                $priority = '0.8';
+-
+-                if ($type === 'agency') {
+-                    $priority = '0.9';
+-                    $loc = home_url('/annuaire/?id=' . get_post_field('post_name', $post_id));
+-                } else {
+-                    $loc = get_permalink();
+-                }
++    // Each entry: [loc, lastmod (ISO 8601 or null), changefreq, priority]
++    $entries = array();
+ 
+-                echo '  <url>' . "\n";
+-                echo '    <loc>' . esc_url($loc) . '</loc>' . "\n";
+-                echo '    <lastmod>' . get_the_modified_date('c') . '</lastmod>' . "\n";
+-                echo '    <changefreq>weekly</changefreq>' . "\n";
+-                echo '    <priority>' . $priority . '</priority>' . "\n";
+-                echo '  </url>' . "\n";
+-            }
+-            wp_reset_postdata();
++    // 1. Homepage — lastmod mirrors the most recently modified content.
++    $site_lastmod = get_lastpostmodified('blog');
++    $entries[] = array(
++        home_url('/'),
++        $site_lastmod ? mysql2date('c', $site_lastmod, false) : null,
++        'daily',
++        '1.0',
++    );
++
++    // 2. All published pages, discovered dynamically (no hardcoded slugs).
++    //    Listing pages that surface fresh content rank higher than static ones.
++    //    The annuaire (and its ?id=/?service= deep links) is deliberately kept
++    //    out of the sitemap.
++    $front_id       = (int) get_option('page_on_front');
++    $listing_slugs  = array('blog');
++    $excluded_slugs = array('annuaire');
++    $pages = get_posts(array(
++        'post_type'      => 'page',
++        'post_status'    => 'publish',
++        'posts_per_page' => -1,
++        'orderby'        => 'menu_order',
++        'order'          => 'ASC',
++        'lang'           => '', // include every language when Polylang is active
++    ));
++    foreach ($pages as $page) {
++        if ($page->ID === $front_id || !empty($page->post_password)) {
++            continue; // homepage already listed; skip protected pages
++        }
++        if (in_array($page->post_name, $excluded_slugs, true)) {
++            continue;
+         }
++        $is_listing = in_array($page->post_name, $listing_slugs, true);
++        $entries[] = array(
++            get_permalink($page),
++            get_post_modified_time('c', false, $page),
++            $is_listing ? 'daily' : 'monthly',
++            $is_listing ? '0.9' : '0.7',
++        );
++    }
++
++    // 3. Blog posts.
++    $posts = get_posts(array(
++        'post_type'      => 'post',
++        'post_status'    => 'publish',
++        'posts_per_page' => -1,
++        'lang'           => '',
++    ));
++    foreach ($posts as $post) {
++        $entries[] = array(
++            get_permalink($post),
++            get_post_modified_time('c', false, $post),
++            'weekly',
++            '0.8',
++        );
++    }
+ 
+-        echo '</urlset>' . "\n";
+-        exit;
++    // (Category archives are deliberately excluded: the theme has no
++    // category/archive template — they'd render the bare index.php fallback —
++    // and the blog page filters categories client-side without ever linking
++    // /category/ URLs.)
++
++    // (Agency profiles and specialty_hub permalinks are deliberately excluded:
++    // agencies only exist as /annuaire/?id= deep links and the annuaire is kept
++    // out of the sitemap; specialty singles are orphan pages the front-end
++    // never links to.)
++
++    echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
++    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
++    foreach ($entries as $entry) {
++        list($loc, $lastmod, $changefreq, $priority) = $entry;
++        echo "  <url>\n";
++        echo '    <loc>' . esc_url($loc) . "</loc>\n";
++        if ($lastmod) {
++            echo '    <lastmod>' . esc_html($lastmod) . "</lastmod>\n";
++        }
++        echo '    <changefreq>' . $changefreq . "</changefreq>\n";
++        echo '    <priority>' . $priority . "</priority>\n";
++        echo "  </url>\n";
+     }
++    echo '</urlset>' . "\n";
++    exit;
+ });
+ 
+ /**

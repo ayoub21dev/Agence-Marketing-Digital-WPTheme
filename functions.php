@@ -3697,62 +3697,108 @@ add_filter('redirect_canonical', function($redirect_url, $requested_url) {
     return $redirect_url;
 }, 10, 2);
 
+// The custom /sitemap.xml replaces WordPress core's /wp-sitemap.xml — disable
+// the core one so search engines don't see two competing sitemaps.
+add_filter('wp_sitemaps_enabled', '__return_false');
+
+// Advertise the sitemap in robots.txt (uses the site URL, so it stays correct
+// on local, staging and production without hardcoding the domain).
+add_filter('robots_txt', function ($output) {
+    return rtrim($output) . "\nSitemap: " . home_url('/sitemap.xml') . "\n";
+});
+
 add_action('template_redirect', function() {
-    if (get_query_var('custom_sitemap')) {
-        header('Content-Type: application/xml; charset=utf-8');
-        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-
-        // 1. Static/Core pages
-        $urls = array(
-            home_url('/'),
-            home_url('/blog/'),
-            home_url('/about/'),
-            home_url('/methodologie/'),
-            home_url('/contact/'),
-        );
-        foreach ($urls as $url) {
-            echo '  <url>' . "\n";
-            echo '    <loc>' . esc_url($url) . '</loc>' . "\n";
-            echo '    <changefreq>daily</changefreq>' . "\n";
-            echo '    <priority>1.0</priority>' . "\n";
-            echo '  </url>' . "\n";
-        }
-
-        // 2. Query dynamic posts and CPT content
-        $posts_query = new WP_Query(array(
-            'post_type'      => array('post', 'agency', 'specialty_hub'),
-            'posts_per_page' => -1,
-            'post_status'    => 'publish',
-        ));
-
-        if ($posts_query->have_posts()) {
-            while ($posts_query->have_posts()) {
-                $posts_query->the_post();
-                $post_id  = get_the_ID();
-                $type     = get_post_type();
-                $priority = '0.8';
-
-                if ($type === 'agency') {
-                    $priority = '0.9';
-                    $loc = home_url('/annuaire/?id=' . get_post_field('post_name', $post_id));
-                } else {
-                    $loc = get_permalink();
-                }
-
-                echo '  <url>' . "\n";
-                echo '    <loc>' . esc_url($loc) . '</loc>' . "\n";
-                echo '    <lastmod>' . get_the_modified_date('c') . '</lastmod>' . "\n";
-                echo '    <changefreq>weekly</changefreq>' . "\n";
-                echo '    <priority>' . $priority . '</priority>' . "\n";
-                echo '  </url>' . "\n";
-            }
-            wp_reset_postdata();
-        }
-
-        echo '</urlset>' . "\n";
-        exit;
+    if (!get_query_var('custom_sitemap')) {
+        return;
     }
+
+    status_header(200);
+    header('Content-Type: application/xml; charset=utf-8');
+
+    // Each entry: [loc, lastmod (ISO 8601 or null), changefreq, priority]
+    $entries = array();
+
+    // 1. Homepage — lastmod mirrors the most recently modified content.
+    $site_lastmod = get_lastpostmodified('blog');
+    $entries[] = array(
+        home_url('/'),
+        $site_lastmod ? mysql2date('c', $site_lastmod, false) : null,
+        'daily',
+        '1.0',
+    );
+
+    // 2. All published pages, discovered dynamically (no hardcoded slugs).
+    //    Listing pages that surface fresh content rank higher than static ones.
+    //    The annuaire (and its ?id=/?service= deep links) is deliberately kept
+    //    out of the sitemap.
+    $front_id       = (int) get_option('page_on_front');
+    $listing_slugs  = array('blog');
+    $excluded_slugs = array('annuaire');
+    $pages = get_posts(array(
+        'post_type'      => 'page',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'orderby'        => 'menu_order',
+        'order'          => 'ASC',
+        'lang'           => '', // include every language when Polylang is active
+    ));
+    foreach ($pages as $page) {
+        if ($page->ID === $front_id || !empty($page->post_password)) {
+            continue; // homepage already listed; skip protected pages
+        }
+        if (in_array($page->post_name, $excluded_slugs, true)) {
+            continue;
+        }
+        $is_listing = in_array($page->post_name, $listing_slugs, true);
+        $entries[] = array(
+            get_permalink($page),
+            get_post_modified_time('c', false, $page),
+            $is_listing ? 'daily' : 'monthly',
+            $is_listing ? '0.9' : '0.7',
+        );
+    }
+
+    // 3. Blog posts.
+    $posts = get_posts(array(
+        'post_type'      => 'post',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'lang'           => '',
+    ));
+    foreach ($posts as $post) {
+        $entries[] = array(
+            get_permalink($post),
+            get_post_modified_time('c', false, $post),
+            'weekly',
+            '0.8',
+        );
+    }
+
+    // (Category archives are deliberately excluded: the theme has no
+    // category/archive template — they'd render the bare index.php fallback —
+    // and the blog page filters categories client-side without ever linking
+    // /category/ URLs.)
+
+    // (Agency profiles and specialty_hub permalinks are deliberately excluded:
+    // agencies only exist as /annuaire/?id= deep links and the annuaire is kept
+    // out of the sitemap; specialty singles are orphan pages the front-end
+    // never links to.)
+
+    echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    foreach ($entries as $entry) {
+        list($loc, $lastmod, $changefreq, $priority) = $entry;
+        echo "  <url>\n";
+        echo '    <loc>' . esc_url($loc) . "</loc>\n";
+        if ($lastmod) {
+            echo '    <lastmod>' . esc_html($lastmod) . "</lastmod>\n";
+        }
+        echo '    <changefreq>' . $changefreq . "</changefreq>\n";
+        echo '    <priority>' . $priority . "</priority>\n";
+        echo "  </url>\n";
+    }
+    echo '</urlset>' . "\n";
+    exit;
 });
 
 /**
@@ -4310,6 +4356,60 @@ function v5_digital_run_data_migrations() {
     update_option('v5_digital_migration_version', V5_DIGITAL_MIGRATION_VERSION);
 }
 add_action('admin_init', 'v5_digital_run_data_migrations');
+
+/**
+ * One-time switch of the permalink structure to /blog/%postname%/ so blog
+ * posts live under the blog section (pages keep their root URLs). Runs once
+ * per site on the next admin visit, then never again — the setting stays
+ * editable in Settings → Permalinks afterwards.
+ */
+function v5_digital_set_blog_permalink_structure_once() {
+    if (get_option('v5_blog_permalinks_v1_done')) {
+        return;
+    }
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    global $wp_rewrite;
+    $wp_rewrite->set_permalink_structure('/blog/%postname%/');
+    flush_rewrite_rules();
+
+    update_option('v5_blog_permalinks_v1_done', 1);
+}
+add_action('admin_init', 'v5_digital_set_blog_permalink_structure_once');
+
+/**
+ * 301 the old root-level article URLs (/top-agencies/) to their new
+ * /blog/top-agencies/ home. WordPress's 404 permalink guesser usually
+ * covers this, but an explicit redirect is guaranteed — important while
+ * search engines still hold the old URLs.
+ */
+add_action('template_redirect', function () {
+    if (!is_404()) {
+        return;
+    }
+
+    $request = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+    $path    = trim((string) parse_url($request, PHP_URL_PATH), '/');
+
+    // Account for WordPress living in a subdirectory.
+    $home_path = trim((string) parse_url(home_url('/'), PHP_URL_PATH), '/');
+    if ($home_path && strpos($path, $home_path) === 0) {
+        $path = trim(substr($path, strlen($home_path)), '/');
+    }
+
+    // Old article URLs were a single root-level segment.
+    if ($path === '' || strpos($path, '/') !== false) {
+        return;
+    }
+
+    $post = get_page_by_path($path, OBJECT, 'post');
+    if ($post instanceof WP_Post && $post->post_status === 'publish') {
+        wp_safe_redirect(get_permalink($post), 301);
+        exit;
+    }
+});
 
 /**
  * One-time setup: create missing footer menus and assign empty locations.
