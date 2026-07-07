@@ -1,0 +1,184 @@
+diff --git a/single-blog.php b/single-blog.php
+index 9b1aa8e..e87902f 100644
+--- a/single-blog.php
++++ b/single-blog.php
+@@ -16,32 +16,78 @@ get_header();
+     }
+ 
+     .article-prose p {
+-        margin-bottom: 1.25rem;
+-        font-size: 14.5px;
+-        line-height: 1.7;
++        margin-bottom: 1.5rem;
++        font-size: 16px;
++        line-height: 1.8;
+         color: #475569;
+     }
+     .article-prose h2 {
+         font-family: 'Space Grotesk', system-ui, sans-serif;
+-        font-size: 18px;
++        font-size: 22px;
+         font-weight: 700;
+         color: #0f172a;
+-        margin-top: 1.75rem;
+-        margin-bottom: 0.75rem;
++        margin-top: 2.25rem;
++        margin-bottom: 0.85rem;
+         text-transform: uppercase;
+         letter-spacing: -0.01em;
+     }
+     .article-prose h3 {
+         font-family: 'Space Grotesk', system-ui, sans-serif;
+-        font-size: 16px;
++        font-size: 18px;
+         font-weight: 700;
+         color: #0f172a;
+-        margin-top: 1.5rem;
+-        margin-bottom: 0.5rem;
++        margin-top: 1.75rem;
++        margin-bottom: 0.6rem;
+         text-transform: uppercase;
+         letter-spacing: -0.01em;
+     }
+     .article-prose strong { font-weight: 600; color: #0f172a; }
++
++    /* Tailwind utilities used on this page that are missing from the committed
++       assets/css/tailwind.css build (Node.js unavailable to rebuild). Identical
++       to what `npm run build` generates — safe to delete after a rebuild. */
++    .pt-10 { padding-top: 2.5rem; }
++    .text-\[2rem\] { font-size: 2rem; }
++    .leading-\[1\.15\] { line-height: 1.15; }
++    @media (min-width: 768px) {
++        .md\:pt-8 { padding-top: 2rem; }
++        .md\:p-10 { padding: 2.5rem; }
++        .md\:text-\[2\.75rem\] { font-size: 2.75rem; }
++    }
++
++    /* Image hero: the cover image is the hero backdrop; text sits on a slate
++       gradient scrim so the white title stays readable on any photo. */
++    .article-hero-media {
++        position: absolute;
++        inset: 0;
++        width: 100%;
++        height: 100%;
++        object-fit: cover;
++    }
++    .article-hero-overlay {
++        position: absolute;
++        inset: 0;
++        background: linear-gradient(to top,
++            rgba(2, 6, 23, 0.92) 0%,
++            rgba(2, 6, 23, 0.55) 45%,
++            rgba(2, 6, 23, 0.28) 100%);
++    }
++    .article-hero-tall { min-height: 420px; }
++    @media (min-width: 768px) {
++        .article-hero-tall { min-height: 520px; }
++    }
++    .article-hero-title { text-shadow: 0 2px 24px rgba(2, 6, 23, 0.45); }
++    .article-hero-dim { color: rgba(255, 255, 255, 0.78); }
++    .article-hero-dim a:hover { color: #fff; }
++    /* Frosted chips (badge + back button) on top of the image */
++    .article-hero-chip {
++        background: rgba(255, 255, 255, 0.12);
++        border-color: rgba(255, 255, 255, 0.25);
++        color: #fff;
++        backdrop-filter: blur(6px);
++        -webkit-backdrop-filter: blur(6px);
++    }
++    a.article-hero-chip:hover { background: rgba(255, 255, 255, 0.22); }
+ </style>
+ 
+ <main class="flex-grow">
+@@ -58,32 +104,59 @@ get_header();
+ 
+             $blog_page = get_page_by_path('blog');
+             $blog_url  = $blog_page ? get_permalink($blog_page->ID) : home_url('/blog/');
++
++            // Cover image priority: media field -> URL field -> post thumbnail. Empty means no image.
++            $cover_image = v5_digital_get_field('cover_image_media');
++            if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
++            if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'full');
+             ?>
+             <!-- ==================== ARTICLE DETAIL PAGE ==================== -->
++            <?php $on_image = (bool) $cover_image; // cover image becomes a contained hero card ?>
+             <div class="page" id="page-article">
+-                <div class="bg-white/80 border-b border-slate-200 backdrop-blur-sm">
+-                    <div class="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8">
+-                        
+-                        <!-- Breadcrumbs & Back -->
+-                        <div class="flex items-center justify-between mb-6">
+-                            <div class="flex items-center gap-1.5 text-[12px] text-slate-500 font-mono">
+-                                <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url(home_url('/')); ?>">Accueil</a>
+-                                <i data-lucide="chevron-right" class="w-3 h-3"></i>
+-                                <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url($blog_url); ?>">Blog</a>
+-                                <i data-lucide="chevron-right" class="w-3 h-3"></i>
+-                                <span class="text-slate-900 font-semibold truncate max-w-[150px] sm:max-w-xs"><?php the_title(); ?></span>
+-                            </div>
+-                            <a href="<?php echo esc_url($blog_url); ?>" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] text-slate-600 flex items-center gap-1 transition-all no-underline">
+-                                <i data-lucide="arrow-left" class="w-3 h-3"></i> <span>retour aux articles</span>
+-                            </a>
++                <div class="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 pt-6 md:pt-8">
++
++                    <!-- Breadcrumbs & Back -->
++                    <div class="flex items-center justify-between mb-5">
++                        <div class="flex items-center gap-1.5 text-[12px] text-slate-500 font-mono">
++                            <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url(home_url('/')); ?>">Accueil</a>
++                            <i data-lucide="chevron-right" class="w-3 h-3"></i>
++                            <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url($blog_url); ?>">Blog</a>
++                            <i data-lucide="chevron-right" class="w-3 h-3"></i>
++                            <span class="text-slate-900 font-semibold truncate max-w-[150px] sm:max-w-xs"><?php the_title(); ?></span>
+                         </div>
++                        <a href="<?php echo esc_url($blog_url); ?>" class="bg-white hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] text-slate-600 flex items-center gap-1 transition-all no-underline">
++                            <i data-lucide="arrow-left" class="w-3 h-3"></i> <span>retour aux articles</span>
++                        </a>
++                    </div>
++
++                    <?php if ($on_image) : ?>
++                    <!-- Hero card: cover image as backdrop, title pinned to its bottom -->
++                    <div class="relative overflow-hidden rounded-2xl border border-slate-200 shadow-lg bg-slate-900 flex flex-col article-hero-tall">
++                        <img src="<?php echo esc_url($cover_image); ?>" alt="" aria-hidden="true" class="article-hero-media">
++                        <div class="article-hero-overlay" aria-hidden="true"></div>
++
++                        <div class="relative z-10 mt-auto p-6 md:p-10">
++                            <span class="inline-block border text-[10px] font-mono font-bold px-2.5 py-1 rounded mb-3 uppercase tracking-wider article-hero-chip"><?php echo esc_html($badge); ?></span>
+ 
+-                        <!-- Category Badge -->
++                            <h1 class="text-[2rem] md:text-[2.75rem] font-extrabold tracking-tight leading-[1.15] mb-5 font-display text-white article-hero-title"><?php the_title(); ?></h1>
++
++                            <div class="flex flex-wrap items-center gap-3 text-[12px] font-mono article-hero-dim">
++                                <span class="flex items-center gap-1"><i data-lucide="user" class="w-3.5 h-3.5"></i> <span><?php echo esc_html(v5_t('Par')); ?> <?php echo esc_html($author); ?></span></span>
++                                <span>&middot;</span>
++                                <span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span><?php echo get_the_date('d M Y'); ?></span></span>
++                                <span>&middot;</span>
++                                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> <span><?php echo esc_html($read_time); ?></span></span>
++                            </div>
++                        </div>
++                    </div>
++                    <?php else : ?>
++                    <!-- No cover image: plain heading block -->
++                    <div class="pt-2 pb-2 border-b border-slate-200">
+                         <span class="inline-block bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-mono font-bold px-2.5 py-1 rounded mb-3 uppercase tracking-wider"><?php echo esc_html($badge); ?></span>
+-                        
+-                        <h1 class="text-[1.75rem] md:text-[2.25rem] font-extrabold text-slate-900 tracking-tight leading-tight mb-4 font-display"><?php the_title(); ?></h1>
+-                        
+-                        <div class="flex flex-wrap items-center gap-3 text-[12px] text-slate-500 font-mono">
++
++                        <h1 class="text-[2rem] md:text-[2.75rem] font-extrabold text-slate-900 tracking-tight leading-[1.15] mb-5 font-display"><?php the_title(); ?></h1>
++
++                        <div class="flex flex-wrap items-center gap-3 text-[12px] text-slate-500 font-mono mb-6">
+                             <span class="flex items-center gap-1"><i data-lucide="user" class="w-3.5 h-3.5"></i> <span><?php echo esc_html(v5_t('Par')); ?> <?php echo esc_html($author); ?></span></span>
+                             <span>&middot;</span>
+                             <span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span><?php echo get_the_date('d M Y'); ?></span></span>
+@@ -91,9 +164,10 @@ get_header();
+                             <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> <span><?php echo esc_html($read_time); ?></span></span>
+                         </div>
+                     </div>
++                    <?php endif; ?>
+                 </div>
+ 
+-                <div class="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8">
++                <div class="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 pt-10 pb-12">
+ 
+                     <!-- Native editor content plus optional Flexible Content blocks -->
+                     <div class="article-prose">
