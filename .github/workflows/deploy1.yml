@@ -27,7 +27,7 @@ jobs:
           port: 21
           timeout: 600000
           local-dir: ./
-          server-dir: /public_html/wp-content/themes/agence-marketing-digital/
+          server-dir: /wp-content/themes/agence-marketing-digital/
 
       - name: Wait before retry 2
         if: steps.deploy1.outcome == 'failure'
@@ -46,7 +46,7 @@ jobs:
           port: 21
           timeout: 600000
           local-dir: ./
-          server-dir: /public_html/wp-content/themes/agence-marketing-digital/
+          server-dir: /wp-content/themes/agence-marketing-digital/
 
       - name: Wait before retry 3
         if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
@@ -65,7 +65,7 @@ jobs:
           port: 21
           timeout: 600000
           local-dir: ./
-          server-dir: /public_html/wp-content/themes/agence-marketing-digital/
+          server-dir: /wp-content/themes/agence-marketing-digital/
 
       - name: Fail job if all attempts failed
         if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure' && steps.deploy3.outcome == 'failure'
