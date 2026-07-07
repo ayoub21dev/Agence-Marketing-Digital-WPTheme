@@ -105,10 +105,10 @@ get_header();
             $blog_page = get_page_by_path('blog');
             $blog_url  = $blog_page ? get_permalink($blog_page->ID) : home_url('/blog/');
 
-            // Cover image priority: media field -> URL field -> post thumbnail. Empty means no image.
-            $cover_image = v5_digital_get_field('cover_image_media');
+            // Cover image priority: featured image -> legacy ACF media/URL fields. Empty means no image.
+            $cover_image = has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'full') : '';
+            if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_media');
             if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
-            if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'full');
             ?>
             <!-- ==================== ARTICLE DETAIL PAGE ==================== -->
             <?php $on_image = (bool) $cover_image; // cover image becomes a contained hero card ?>
@@ -194,6 +194,41 @@ get_header();
                         endif;
 
                         if (!empty($agency_reviews)) :
+                            // ItemList JSON-LD mirroring the ranked agency list below —
+                            // this is the schema Google reads for "Top X" ranking articles.
+                            $schema_items = array();
+                            foreach ($agency_reviews as $schema_rev) {
+                                if (empty($schema_rev['agency'])) continue;
+                                $schema_agency = get_post($schema_rev['agency']);
+                                if (!$schema_agency) continue;
+
+                                $item = array(
+                                    '@type'    => 'ListItem',
+                                    'position' => intval($schema_rev['rank']) ?: count($schema_items) + 1,
+                                    'name'     => $schema_agency->post_title,
+                                );
+                                $schema_site = get_post_meta($schema_agency->ID, 'website', true);
+                                if ($schema_site) {
+                                    $item['url'] = strpos($schema_site, 'http') === 0 ? $schema_site : 'https://' . $schema_site;
+                                }
+                                $schema_items[] = $item;
+                            }
+                            if (!empty($schema_items)) {
+                                usort($schema_items, function ($a, $b) {
+                                    return $a['position'] - $b['position'];
+                                });
+                                $item_list = array(
+                                    '@context'        => 'https://schema.org',
+                                    '@type'           => 'ItemList',
+                                    'name'            => get_the_title(),
+                                    'url'             => get_permalink(),
+                                    'numberOfItems'   => count($schema_items),
+                                    'itemListElement' => $schema_items,
+                                );
+                                echo '<script type="application/ld+json">'
+                                    . wp_json_encode($item_list, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                                    . '</script>' . "\n";
+                            }
                                         ?>
                                         <div class="mt-10 pt-8 border-t border-slate-200">
                                             <h3 class="font-extrabold text-[16px] text-slate-900 uppercase font-display tracking-wide mb-6">Analyses Éditoriales</h3>

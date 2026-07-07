@@ -69,7 +69,7 @@
             "name": "cover_image_url",
             "type": "text",
             "required": 0,
-            "instructions": "Optionnel. URL d'une image externe (ex. Unsplash).",
+            "instructions": "Hérité. Utilisez plutôt l'« Image mise en avant » (panneau latéral). Ce champ ne sert que de repli : URL d'une image externe (ex. Unsplash).",
             "menu_order": 3,
             "aria-label": "",
             "conditional_logic": 0,
@@ -88,7 +88,7 @@
             "preview_size": "medium",
             "library": "all",
             "required": 0,
-            "instructions": "Optionnel. Image sélectionnée depuis la médiathèque locale. Prioritaire sur l'URL externe.",
+            "instructions": "Hérité. Utilisez plutôt l'« Image mise en avant » (panneau latéral), qui est prioritaire. Ce champ ne sert que de repli pour les anciens articles.",
             "menu_order": 4,
             "aria-label": "",
             "conditional_logic": 0,
@@ -117,5 +117,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1782654416
+    "modified": 1783434010
 }

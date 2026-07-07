@@ -3375,6 +3375,10 @@ function v5_digital_theme_setup() {
     // Support standard dynamic title tag
     add_theme_support('title-tag');
 
+    // Native featured images ("Image mise en avant" panel in the editor).
+    // Templates prefer this over the legacy ACF cover-image fields.
+    add_theme_support('post-thumbnails');
+
     // Load translations for the theme's own __() strings.
     load_theme_textdomain('agence-marketing-digital', get_template_directory() . '/languages');
 }
@@ -3696,6 +3700,40 @@ add_filter('redirect_canonical', function($redirect_url, $requested_url) {
     }
     return $redirect_url;
 }, 10, 2);
+
+/**
+ * Organization JSON-LD on every page — tells search engines who publishes
+ * the site (name, URL, contact). Complements the ItemList schema emitted on
+ * ranked-list articles (see single-blog.php).
+ */
+function v5_digital_organization_schema() {
+    $schema = array(
+        '@context' => 'https://schema.org',
+        '@type'    => 'Organization',
+        '@id'      => home_url('/#organization'),
+        'name'     => get_bloginfo('name'),
+        'url'      => home_url('/'),
+        'email'    => v5_digital_get_dynamic_email(),
+    );
+
+    $tagline = get_bloginfo('description');
+    if ($tagline) {
+        $schema['description'] = $tagline;
+    }
+
+    $logo_id = get_theme_mod('custom_logo');
+    if ($logo_id) {
+        $logo_url = wp_get_attachment_image_url($logo_id, 'full');
+        if ($logo_url) {
+            $schema['logo'] = $logo_url;
+        }
+    }
+
+    echo '<script type="application/ld+json">'
+        . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        . '</script>' . "\n";
+}
+add_action('wp_head', 'v5_digital_organization_schema');
 
 // The custom /sitemap.xml replaces WordPress core's /wp-sitemap.xml — disable
 // the core one so search engines don't see two competing sitemaps.

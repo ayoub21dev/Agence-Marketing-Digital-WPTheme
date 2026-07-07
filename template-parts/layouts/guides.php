@@ -60,12 +60,12 @@ $guides_query = new WP_Query($query_args);
             if ($guides_query->have_posts()) : 
                 while ($guides_query->have_posts()) : $guides_query->the_post(); 
                     $post_id = get_the_ID();
-                    $thumbnail_url = v5_digital_get_field('cover_image_media', $post_id);
+                    $thumbnail_url = has_post_thumbnail($post_id) ? get_the_post_thumbnail_url($post_id, 'medium') : '';
+                    if (!$thumbnail_url) {
+                        $thumbnail_url = v5_digital_get_field('cover_image_media', $post_id);
+                    }
                     if (!$thumbnail_url) {
                         $thumbnail_url = v5_digital_get_field('cover_image_url', $post_id);
-                    }
-                    if (!$thumbnail_url && has_post_thumbnail($post_id)) {
-                        $thumbnail_url = get_the_post_thumbnail_url($post_id, 'medium');
                     }
                     
                     // Retrieve category/tag name or fallback (skips "Uncategorized")

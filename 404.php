@@ -119,9 +119,9 @@ $suggested = new WP_Query(array(
                     $badge      = v5_digital_get_post_badge(get_the_ID(), 'Guide');
                     $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
 
-                    $cover_image = v5_digital_get_field('cover_image_media');
+                    $cover_image = has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'large') : '';
+                    if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_media');
                     if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
-                    if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'large');
                     if (!$cover_image) $cover_image = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
                     ?>
                     <div class="card-hover bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col cursor-pointer"

@@ -1,0 +1,103 @@
+diff --git a/404.php b/404.php
+index 2da78ce..b68f416 100644
+--- a/404.php
++++ b/404.php
+@@ -119,9 +119,9 @@ $suggested = new WP_Query(array(
+                     $badge      = v5_digital_get_post_badge(get_the_ID(), 'Guide');
+                     $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
+ 
+-                    $cover_image = v5_digital_get_field('cover_image_media');
++                    $cover_image = has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'large') : '';
++                    if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_media');
+                     if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
+-                    if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'large');
+                     if (!$cover_image) $cover_image = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
+                     ?>
+                     <div class="card-hover bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col cursor-pointer"
+diff --git a/acf-json/group_blog_meta.json b/acf-json/group_blog_meta.json
+index 273e149..7259e93 100644
+--- a/acf-json/group_blog_meta.json
++++ b/acf-json/group_blog_meta.json
+@@ -69,7 +69,7 @@
+             "name": "cover_image_url",
+             "type": "text",
+             "required": 0,
+-            "instructions": "Optionnel. URL d'une image externe (ex. Unsplash).",
++            "instructions": "Hérité. Utilisez plutôt l'« Image mise en avant » (panneau latéral). Ce champ ne sert que de repli : URL d'une image externe (ex. Unsplash).",
+             "menu_order": 3,
+             "aria-label": "",
+             "conditional_logic": 0,
+@@ -88,7 +88,7 @@
+             "preview_size": "medium",
+             "library": "all",
+             "required": 0,
+-            "instructions": "Optionnel. Image sélectionnée depuis la médiathèque locale. Prioritaire sur l'URL externe.",
++            "instructions": "Hérité. Utilisez plutôt l'« Image mise en avant » (panneau latéral), qui est prioritaire. Ce champ ne sert que de repli pour les anciens articles.",
+             "menu_order": 4,
+             "aria-label": "",
+             "conditional_logic": 0,
+@@ -117,5 +117,5 @@
+     "active": true,
+     "description": "",
+     "show_in_rest": 0,
+-    "modified": 1782654416
++    "modified": 1783434010
+ }
+\ No newline at end of file
+diff --git a/single-blog.php b/single-blog.php
+index e87902f..177ef92 100644
+--- a/single-blog.php
++++ b/single-blog.php
+@@ -105,10 +105,10 @@ get_header();
+             $blog_page = get_page_by_path('blog');
+             $blog_url  = $blog_page ? get_permalink($blog_page->ID) : home_url('/blog/');
+ 
+-            // Cover image priority: media field -> URL field -> post thumbnail. Empty means no image.
+-            $cover_image = v5_digital_get_field('cover_image_media');
++            // Cover image priority: featured image -> legacy ACF media/URL fields. Empty means no image.
++            $cover_image = has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'full') : '';
++            if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_media');
+             if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
+-            if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'full');
+             ?>
+             <!-- ==================== ARTICLE DETAIL PAGE ==================== -->
+             <?php $on_image = (bool) $cover_image; // cover image becomes a contained hero card ?>
+diff --git a/template-parts/layouts/blog_posts_grid.php b/template-parts/layouts/blog_posts_grid.php
+index 11a47db..c6003a0 100644
+--- a/template-parts/layouts/blog_posts_grid.php
++++ b/template-parts/layouts/blog_posts_grid.php
+@@ -355,10 +355,10 @@ uasort($blog_categories, function ($a, $b) {
+                         $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
+                         $author     = get_the_author() ?: v5_digital_get_field('author_name');
+ 
+-                        // Cover image priority: media field -> URL field -> post thumbnail. Empty means no image.
+-                        $cover_image = v5_digital_get_field('cover_image_media');
++                        // Cover image priority: featured image -> legacy ACF media/URL fields. Empty means no image.
++                        $cover_image = has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'large') : '';
++                        if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_media');
+                         if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
+-                        if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'large');
+ 
+                         // Badge CSS class
+                         $badge_lower = strtolower($badge);
+diff --git a/template-parts/layouts/guides.php b/template-parts/layouts/guides.php
+index ea84f2e..e2fa757 100644
+--- a/template-parts/layouts/guides.php
++++ b/template-parts/layouts/guides.php
+@@ -60,12 +60,12 @@ $guides_query = new WP_Query($query_args);
+             if ($guides_query->have_posts()) : 
+                 while ($guides_query->have_posts()) : $guides_query->the_post(); 
+                     $post_id = get_the_ID();
+-                    $thumbnail_url = v5_digital_get_field('cover_image_media', $post_id);
++                    $thumbnail_url = has_post_thumbnail($post_id) ? get_the_post_thumbnail_url($post_id, 'medium') : '';
+                     if (!$thumbnail_url) {
+-                        $thumbnail_url = v5_digital_get_field('cover_image_url', $post_id);
++                        $thumbnail_url = v5_digital_get_field('cover_image_media', $post_id);
+                     }
+-                    if (!$thumbnail_url && has_post_thumbnail($post_id)) {
+-                        $thumbnail_url = get_the_post_thumbnail_url($post_id, 'medium');
++                    if (!$thumbnail_url) {
++                        $thumbnail_url = v5_digital_get_field('cover_image_url', $post_id);
+                     }
+                     
+                     // Retrieve category/tag name or fallback (skips "Uncategorized")

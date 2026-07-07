@@ -355,10 +355,10 @@ uasort($blog_categories, function ($a, $b) {
                         $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
                         $author     = get_the_author() ?: v5_digital_get_field('author_name');
 
-                        // Cover image priority: media field -> URL field -> post thumbnail. Empty means no image.
-                        $cover_image = v5_digital_get_field('cover_image_media');
+                        // Cover image priority: featured image -> legacy ACF media/URL fields. Empty means no image.
+                        $cover_image = has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'large') : '';
+                        if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_media');
                         if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_url');
-                        if (!$cover_image && has_post_thumbnail()) $cover_image = get_the_post_thumbnail_url(null, 'large');
 
                         // Badge CSS class
                         $badge_lower = strtolower($badge);
