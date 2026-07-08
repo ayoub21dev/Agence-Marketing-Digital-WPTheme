@@ -372,6 +372,73 @@ function v5_digital_blog_grid_filter_switch_notice() {
 }
 add_action('acf/input/admin_footer', 'v5_digital_blog_grid_filter_switch_notice');
 
+/**
+ * Editor feedback (page builder): warn when the same section is added more than
+ * once on a page. The flexible-content field (`page_layouts`) happily allows
+ * duplicates, and an editor who accidentally adds two Hero / two Blog-grid
+ * blocks gets a broken-looking page with no clue why. This flags every repeat
+ * occurrence with a dismissible amber note inside that row — non-blocking
+ * ("you can continue anyway"). Admin-only; no front-end impact.
+ */
+function v5_digital_page_builder_duplicate_notice() {
+    ?>
+    <script>
+    (function ($) {
+        if (typeof acf === 'undefined') return;
+
+        function scan(field) {
+            var $rows = field.$el.find('.acf-flexible-content .values > .layout')
+                .not('[data-id="acfcloneindex"]').not('.acf-clone');
+
+            // Rebuild from scratch each pass so removed duplicates clear cleanly.
+            field.$el.find('.amd-dup-note').remove();
+
+            var seen = {};
+            $rows.each(function () {
+                var $row  = $(this);
+                var name  = $row.attr('data-layout');
+                if (!name) return;
+
+                if (!seen[name]) {           // first occurrence is fine
+                    seen[name] = true;
+                    return;
+                }
+                if ($row.attr('data-amd-dup-dismissed') === '1') return; // editor dismissed it
+
+                var label = $row.attr('data-label') || name;
+                var $note = $('<div class="amd-dup-note" style="display:flex;align-items:flex-start;gap:10px;margin:8px 12px;padding:9px 12px;border-radius:6px;background:#fef3c7;border:1px solid #fde68a;color:#92400e;font-size:12.5px;font-weight:600;line-height:1.5;">' +
+                    '<span style="flex:1;">⚠ La section « ' + label + ' » est déjà utilisée sur cette page. Vous pouvez continuer, mais vérifiez que c\'est intentionnel.</span>' +
+                    '<button type="button" class="amd-dup-dismiss" aria-label="Ignorer" style="border:0;background:none;color:#92400e;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;">×</button>' +
+                    '</div>');
+
+                $note.find('.amd-dup-dismiss').on('click', function () {
+                    $row.attr('data-amd-dup-dismissed', '1');
+                    $note.remove();
+                });
+
+                var $handle = $row.children('.acf-fc-layout-handle');
+                if ($handle.length) {
+                    $handle.after($note);
+                } else {
+                    $row.prepend($note);
+                }
+            });
+        }
+
+        function bind(field) {
+            // The flex field's input fires a change on every add / duplicate / remove.
+            field.on('change', function () { scan(field); });
+            scan(field);
+        }
+
+        acf.addAction('ready_field/key=field_page_layouts', bind);
+        acf.addAction('append_field/key=field_page_layouts', bind);
+    })(jQuery);
+    </script>
+    <?php
+}
+add_action('acf/input/admin_footer', 'v5_digital_page_builder_duplicate_notice');
+
 function v5_digital_acf_has_json_field_groups() {
     $files = glob(v5_digital_acf_json_path() . '/group_*.json');
     return !empty($files);
