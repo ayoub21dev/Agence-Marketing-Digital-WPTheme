@@ -39,42 +39,6 @@
             }
         },
         {
-            "key": "field_site_phone",
-            "label": "Phone",
-            "name": "phone",
-            "type": "text",
-            "instructions": "Shown on the contact page and in Google structured data. Leave empty to hide.",
-            "menu_order": 2,
-            "aria-label": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "default_value": "",
-            "placeholder": "+212 5 22 00 00 00",
-            "wrapper": {
-                "width": "50",
-                "class": "",
-                "id": ""
-            }
-        },
-        {
-            "key": "field_site_whatsapp_number",
-            "label": "WhatsApp number",
-            "name": "whatsapp_number",
-            "type": "text",
-            "instructions": "International format, e.g. +212612345678. Shown as a click-to-chat link. Leave empty to hide.",
-            "menu_order": 3,
-            "aria-label": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "default_value": "",
-            "placeholder": "+212612345678",
-            "wrapper": {
-                "width": "50",
-                "class": "",
-                "id": ""
-            }
-        },
-        {
             "key": "field_site_office_title",
             "label": "Office title",
             "name": "office_title",
@@ -275,5 +239,5 @@
     "active": true,
     "description": "Site-wide content: contact details, social links, footer description.",
     "show_in_rest": 0,
-    "modified": 1783510000
+    "modified": 1783620000
 }

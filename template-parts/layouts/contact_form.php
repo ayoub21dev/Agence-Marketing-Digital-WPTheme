@@ -13,9 +13,6 @@ $office_address  = v5_digital_get_field('office_address', 'option') ?: v5_get_fi
 $office_city     = v5_digital_get_field('office_city', 'option')    ?: v5_get_field_default('office_city', '')    ?: 'Casablanca, Maroc';
 $email_icon      = v5_get_field_default('email_icon', '');
 $email           = v5_digital_get_field('contact_email', 'option') ?: v5_get_field_default('email', v5_digital_get_dynamic_email());
-// Phone + WhatsApp exist only in Site Settings (no per-page sub-fields).
-$contact_phone    = v5_digital_get_field('phone', 'option');
-$contact_whatsapp = v5_digital_get_field('whatsapp_number', 'option');
 
 // Normalize icon fields (ACF image may return an array depending on config).
 if (is_array($office_icon)) { $office_icon = isset($office_icon['url']) ? $office_icon['url'] : ''; }
@@ -140,16 +137,13 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                 <?php
                 $has_address  = !empty($office_title) || !empty($office_address) || !empty($office_city);
                 $has_email    = !empty($email);
-                $has_phone    = !empty($contact_phone);
-                $has_whatsapp = !empty($contact_whatsapp);
-                $has_reach    = $has_email || $has_phone || $has_whatsapp; // anything below the address block
-                if ($has_address || $has_reach) :
+                if ($has_address || $has_email) :
                 ?>
                 <div>
                     <span class="block font-mono text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-4">Informations de contact</span>
                     <div class="space-y-6 text-[13.5px] text-slate-500 leading-relaxed font-sans">
                         <?php if ($has_address) : ?>
-                        <div class="flex items-start gap-3 <?php echo $has_reach ? 'border-b border-slate-200/60 pb-5' : 'pb-2'; ?>">
+                        <div class="flex items-start gap-3 <?php echo $has_email ? 'border-b border-slate-200/60 pb-5' : 'pb-2'; ?>">
                             <?php if (!empty($office_icon)) : ?>
                                 <img src="<?php echo esc_url($office_icon); ?>" alt="" class="w-4 h-4 mt-0.5 flex-shrink-0 object-contain">
                             <?php endif; ?>
@@ -168,33 +162,13 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                         <?php endif; ?>
                         
                         <?php if ($has_email) : ?>
-                        <div class="flex items-start gap-3 <?php echo ($has_phone || $has_whatsapp) ? 'border-b border-slate-200/60 pb-5' : 'pb-2'; ?>">
+                        <div class="flex items-start gap-3 pb-2">
                             <?php if (!empty($email_icon)) : ?>
                                 <img src="<?php echo esc_url($email_icon); ?>" alt="" class="w-4 h-4 mt-0.5 flex-shrink-0 object-contain">
                             <?php endif; ?>
                             <div>
                                 <h4 class="font-semibold text-slate-800 text-[13px] mb-0.5 font-display">Email</h4>
                                 <a href="mailto:<?php echo esc_attr($email); ?>" class="text-brand-600 font-medium break-all hover:text-brand-700 transition-colors"><?php echo esc_html($email); ?></a>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-
-                        <?php if ($has_phone) : ?>
-                        <div class="flex items-start gap-3 <?php echo $has_whatsapp ? 'border-b border-slate-200/60 pb-5' : 'pb-2'; ?>">
-                            <i data-lucide="phone" class="w-4 h-4 mt-0.5 flex-shrink-0 text-slate-400" aria-hidden="true"></i>
-                            <div>
-                                <h4 class="font-semibold text-slate-800 text-[13px] mb-0.5 font-display"><?php echo esc_html(v5_t('Téléphone')); ?></h4>
-                                <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $contact_phone)); ?>" class="text-brand-600 font-medium break-all hover:text-brand-700 transition-colors"><?php echo esc_html($contact_phone); ?></a>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-
-                        <?php if ($has_whatsapp) : ?>
-                        <div class="flex items-start gap-3 pb-2">
-                            <i data-lucide="message-circle" class="w-4 h-4 mt-0.5 flex-shrink-0 text-slate-400" aria-hidden="true"></i>
-                            <div>
-                                <h4 class="font-semibold text-slate-800 text-[13px] mb-0.5 font-display">WhatsApp</h4>
-                                <a href="https://wa.me/<?php echo rawurlencode(preg_replace('/[^0-9]/', '', $contact_whatsapp)); ?>" target="_blank" rel="noopener noreferrer" class="text-brand-600 font-medium break-all hover:text-brand-700 transition-colors"><?php echo esc_html($contact_whatsapp); ?></a>
                             </div>
                         </div>
                         <?php endif; ?>

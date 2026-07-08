@@ -157,14 +157,6 @@ if (empty($matchmaker_services)) {
                     array('url' => v5_digital_get_field('instagram_url', 'option'), 'label' => 'Instagram', 'icon' => 'instagram'),
                     array('url' => v5_digital_get_field('facebook_url', 'option'),  'label' => 'Facebook',  'icon' => 'facebook'),
                 );
-                $footer_whatsapp = v5_digital_get_field('whatsapp_number', 'option');
-                if (!empty($footer_whatsapp)) {
-                    $footer_socials[] = array(
-                        'url'   => 'https://wa.me/' . preg_replace('/[^0-9]/', '', $footer_whatsapp),
-                        'label' => 'WhatsApp',
-                        'icon'  => 'message-circle',
-                    );
-                }
                 $footer_socials = array_filter($footer_socials, function ($s) { return !empty($s['url']); });
                 if (!empty($footer_socials)) : ?>
                 <div class="flex items-center gap-4 text-slate-500">

@@ -2207,20 +2207,6 @@ if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_fie
                 'instructions' => 'Used on the contact page, mailto links and Google structured data. Leave empty to auto-use contact@<domain>.',
             ),
             array(
-                'key'          => 'field_site_phone',
-                'label'        => 'Phone',
-                'name'         => 'phone',
-                'type'         => 'text',
-                'instructions' => 'Shown on the contact page and in Google structured data. Leave empty to hide.',
-            ),
-            array(
-                'key'          => 'field_site_whatsapp_number',
-                'label'        => 'WhatsApp number',
-                'name'         => 'whatsapp_number',
-                'type'         => 'text',
-                'instructions' => 'International format, e.g. +212612345678. Shown as a click-to-chat link. Leave empty to hide.',
-            ),
-            array(
                 'key'           => 'field_site_office_title',
                 'label'         => 'Office title',
                 'name'          => 'office_title',
@@ -3719,8 +3705,6 @@ function v5_digital_ui_strings() {
         // Recent-posts rail (article sidebar + blog listing)
         'Articles récents',
         'Tout le blog',
-        // Contact info block (phone row heading)
-        'Téléphone',
     );
 }
 
@@ -4033,12 +4017,7 @@ function v5_digital_organization_schema() {
         }
     }
 
-    // Site Settings (options page): phone + social profiles, when filled.
-    $phone = v5_digital_get_field('phone', 'option');
-    if (!empty($phone)) {
-        $schema['telephone'] = $phone;
-    }
-
+    // Site Settings (options page): social profiles, when filled.
     $same_as = array_values(array_filter(array(
         v5_digital_get_field('twitter_url', 'option'),
         v5_digital_get_field('linkedin_url', 'option'),
