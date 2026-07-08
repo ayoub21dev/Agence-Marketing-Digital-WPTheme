@@ -48,11 +48,26 @@ Replace the flat header nav with a mega menu.
   a mega menu means a richer markup layer on top of the WP menu, plus mobile
   behaviour. Touches `header.php` + `theme-scripts.js`.
 
+### 4. Exit-intent pop-up modal
+Show a modal when a visitor is about to leave the page.
+
+- **Trigger:** cursor exits toward the browser chrome (desktop `mouseout` at
+  `clientY <= 0`), or a back-gesture / rapid scroll-up on mobile. Fire once per
+  session (`sessionStorage` flag), never on the same page twice.
+- **Content:** last-chance CTA — e.g. "Trouvez votre agence en 2 min"
+  (matchmaker wizard), newsletter capture, or a link to the guides.
+- **Rules:** don't fire on form pages or if the visitor already converted;
+  respect a global on/off switch (ACF option or theme option).
+- **Notes:** must be dismissible (Escape, backdrop click, close button),
+  focus-trapped, `aria-modal`, and respect reduced-motion — same constraints
+  as item 5. Lives in `theme-scripts.js` + a small markup partial in
+  `footer.php`.
+
 ---
 
 ## Research / exploration
 
-### 4. Engagement & accessibility patterns
+### 5. Engagement & accessibility patterns
 Investigate UI patterns that raise on-page engagement and improve
 accessibility, then recommend which to implement and how.
 

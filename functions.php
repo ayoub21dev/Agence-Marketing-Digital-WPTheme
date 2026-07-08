@@ -2110,6 +2110,53 @@ function v5_digital_layout_preview_data() {
 }
 
 /**
+ * Render an existing `page_layouts` row with its SAVED values.
+ *
+ * Walks the flexible-content rows to $row_index and renders the template part
+ * inside that row's context, so the layout's get_sub_field() calls resolve.
+ *
+ * Returns '' when the row cannot be resolved — a row added but not yet saved,
+ * an index past the end, or a layout mismatch (rows reordered without saving).
+ * The caller then shows the "nothing to display" notice rather than lying about
+ * which section is on screen.
+ */
+function v5_digital_render_saved_row($post_id, $row_index, $layout, $slug) {
+    if (!$post_id || !v5_digital_acf_is_active()) {
+        return '';
+    }
+    if (!function_exists('have_rows') || !function_exists('the_row') || !function_exists('get_row_layout')) {
+        return '';
+    }
+
+    $html  = '';
+    $index = 0;
+
+    if (have_rows('page_layouts', $post_id)) {
+        while (have_rows('page_layouts', $post_id)) {
+            the_row();
+
+            if ($index === $row_index) {
+                // Guard against drift between the DOM order and saved order.
+                if (get_row_layout() === $layout) {
+                    ob_start();
+                    get_template_part('template-parts/layouts/' . $slug);
+                    $html = trim(ob_get_clean());
+                }
+                break;
+            }
+            $index++;
+        }
+    }
+
+    // Leave ACF's row stack clean for anything that runs after us.
+    if (function_exists('reset_rows')) {
+        reset_rows();
+    }
+
+    return $html;
+}
+
+/**
  * AJAX (logged-in only): output a standalone HTML document rendering one
  * section, for the preview iframe.
  */
@@ -2118,6 +2165,9 @@ function v5_digital_render_section_preview() {
 
     $layout  = isset($_GET['layout']) ? sanitize_key(wp_unslash($_GET['layout'])) : '';
     $post_id = isset($_GET['post_id']) ? absint($_GET['post_id']) : 0;
+    // Row index of an existing `page_layouts` row: render it with its saved
+    // values. -1 (or absent) = generic demo for the "Add Row" popup.
+    $row_index = isset($_GET['row']) && $_GET['row'] !== '' ? (int) $_GET['row'] : -1;
 
     // Capability: tied to the post being edited when we know it.
     $allowed_user = $post_id ? current_user_can('edit_post', $post_id) : current_user_can('edit_posts');
@@ -2145,9 +2195,17 @@ function v5_digital_render_section_preview() {
         }
     }
 
-    ob_start();
-    get_template_part('template-parts/layouts/' . $slug);
-    $section_html = trim(ob_get_clean());
+    if ($row_index >= 0) {
+        // Existing row: render it inside its ACF row context so the layout's
+        // get_sub_field() calls return that row's saved values.
+        $section_html = v5_digital_render_saved_row($post_id, $row_index, $layout, $slug);
+    } else {
+        // "Add Row" popup: no row exists yet — layouts fall back to their
+        // v5_get_field_default() copy, CPT-driven ones query the database.
+        ob_start();
+        get_template_part('template-parts/layouts/' . $slug);
+        $section_html = trim(ob_get_clean());
+    }
 
     wp_reset_postdata();
 
@@ -2184,6 +2242,13 @@ function v5_digital_render_section_preview() {
         /* Mirrors header.php's inline rule (tailwind only emits used utilities). */
         .hidden { display: none; }
         html, body { margin: 0; padding: 0; background: #fff; }
+        /* Some sections (e.g. the stats band) use a NEGATIVE top margin to tuck
+           up under the section above them. Previewed in isolation there is
+           nothing above, so that margin pulls the content off the top of the
+           frame and it looks blank. Cancel a leading negative top margin on the
+           first rendered element, and give the frame a little breathing room. */
+        body > *:first-child { margin-top: 0 !important; }
+        body { padding-top: 1px; }
         /* No GSAP here: `motion-enhanced` on <body> keeps hero titles visible
            instead of stuck at the opacity:0 that header.php sets. */
         .v5-preview-empty {
@@ -2202,6 +2267,11 @@ function v5_digital_render_section_preview() {
 <body class="motion-enhanced text-slate-800 antialiased">
 <?php if ($has_visible_content) : ?>
     <?php echo $section_html; // phpcs:ignore WordPress.Security.EscapeOutput — theme template output ?>
+<?php elseif ($row_index >= 0) : ?>
+    <div class="v5-preview-empty">
+        <strong><?php echo esc_html__('Section non encore enregistrée', 'agence-marketing-digital'); ?></strong>
+        <?php echo esc_html__('L\'aperçu affiche le contenu enregistré. Cliquez sur « Mettre à jour » puis rouvrez l\'aperçu.', 'agence-marketing-digital'); ?>
+    </div>
 <?php else : ?>
     <div class="v5-preview-empty">
         <strong><?php echo esc_html__('Rien à afficher pour le moment', 'agence-marketing-digital'); ?></strong>
@@ -2267,6 +2337,10 @@ function v5_digital_admin_section_preview_assets($hook) {
             'loading'      => __('Chargement de l\'aperçu…', 'agence-marketing-digital'),
             'error'        => __('Impossible de charger l\'aperçu.', 'agence-marketing-digital'),
             'demoNotice'   => __('Aperçu de démonstration — le contenu réel dépendra de vos réglages.', 'agence-marketing-digital'),
+            'rowPreview'   => __('Aperçu de cette section avec son contenu enregistré.', 'agence-marketing-digital'),
+            'dirtyHint'    => __('Modifications non enregistrées : l\'aperçu montre la dernière version enregistrée. Cliquez sur « Mettre à jour » pour les voir.', 'agence-marketing-digital'),
+            'newRowHint'   => __('Cette section n\'a jamais été enregistrée. Cliquez sur « Mettre à jour » puis rouvrez l\'aperçu.', 'agence-marketing-digital'),
+            'refresh'      => __('Rafraîchir', 'agence-marketing-digital'),
         ),
     ));
 }
@@ -4079,6 +4153,9 @@ add_action('template_redirect', function() {
         'lang'           => '',
     ));
     foreach ($posts as $post) {
+        if (!empty($post->post_password)) {
+            continue; // don't advertise password-protected posts (parity with pages loop)
+        }
         $entries[] = array(
             get_permalink($post),
             get_post_modified_time('c', false, $post),
