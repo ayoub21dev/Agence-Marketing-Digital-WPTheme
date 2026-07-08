@@ -13,6 +13,13 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v4
 
+      # Stamp the deploy number onto the theme version (deployed copy only —
+      # the repo keeps the clean semantic version). Appearance → Themes will
+      # show e.g. "1.0.0.53" so you can tell which deploy is live.
+      - name: Stamp build number on theme version
+        run: |
+          sed -i "s/^Version: \([0-9.]*\)/Version: \1.${{ github.run_number }}/" style.css
+
       # Self-heal: Hostinger sometimes refuses a GitHub runner IP, so we retry
       # the proven action up to 3 times, each attempt landing on a fresh IP.
       - name: Deploy theme via FTP (attempt 1)
