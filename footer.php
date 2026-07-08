@@ -90,8 +90,12 @@ if (empty($matchmaker_services)) {
                     </div>
                     <p class="text-[13px] text-slate-500 leading-relaxed">
                         <?php
-                        $tagline = get_bloginfo('description');
-                        echo !empty($tagline) ? esc_html($tagline) : esc_html(v5_t('Analyses indépendantes des agences de marketing digital au Maroc. Évaluations objectives, guides de sélection pratiques et absence d\'influence publicitaire.'));
+                        // Precedence: Site Settings option → site tagline → translated fallback.
+                        $footer_desc = v5_digital_get_field('footer_description', 'option');
+                        if (empty($footer_desc)) {
+                            $footer_desc = get_bloginfo('description');
+                        }
+                        echo !empty($footer_desc) ? esc_html($footer_desc) : esc_html(v5_t('Analyses indépendantes des agences de marketing digital au Maroc. Évaluations objectives, guides de sélection pratiques et absence d\'influence publicitaire.'));
                         ?>
                     </p>
                 </div>
@@ -144,10 +148,31 @@ if (empty($matchmaker_services)) {
             </div>
             <div class="site-footer-bottom max-w-4xl mx-auto border-t border-slate-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-[12px] text-slate-500 font-mono">&copy; <?php echo esc_html(date('Y')); ?> Agence Marketing Digital. <?php echo esc_html(v5_t('Recherche indépendante')); ?>.</p>
+                <?php
+                // Social links from Site Settings — only filled ones render; the whole
+                // block disappears when none are set (no dead "#" links).
+                $footer_socials = array(
+                    array('url' => v5_digital_get_field('twitter_url', 'option'),   'label' => 'Twitter',   'icon' => 'twitter'),
+                    array('url' => v5_digital_get_field('linkedin_url', 'option'),  'label' => 'LinkedIn',  'icon' => 'linkedin'),
+                    array('url' => v5_digital_get_field('instagram_url', 'option'), 'label' => 'Instagram', 'icon' => 'instagram'),
+                    array('url' => v5_digital_get_field('facebook_url', 'option'),  'label' => 'Facebook',  'icon' => 'facebook'),
+                );
+                $footer_whatsapp = v5_digital_get_field('whatsapp_number', 'option');
+                if (!empty($footer_whatsapp)) {
+                    $footer_socials[] = array(
+                        'url'   => 'https://wa.me/' . preg_replace('/[^0-9]/', '', $footer_whatsapp),
+                        'label' => 'WhatsApp',
+                        'icon'  => 'message-circle',
+                    );
+                }
+                $footer_socials = array_filter($footer_socials, function ($s) { return !empty($s['url']); });
+                if (!empty($footer_socials)) : ?>
                 <div class="flex items-center gap-4 text-slate-500">
-                    <a href="#" aria-label="Twitter" class="hover:text-slate-700 transition-colors"><i data-lucide="twitter" class="w-4 h-4" aria-hidden="true"></i></a>
-                    <a href="#" aria-label="LinkedIn" class="hover:text-slate-700 transition-colors"><i data-lucide="linkedin" class="w-4 h-4" aria-hidden="true"></i></a>
+                    <?php foreach ($footer_socials as $social) : ?>
+                        <a href="<?php echo esc_url($social['url']); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr($social['label']); ?>" class="hover:text-slate-700 transition-colors"><i data-lucide="<?php echo esc_attr($social['icon']); ?>" class="w-4 h-4" aria-hidden="true"></i></a>
+                    <?php endforeach; ?>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
     </footer>

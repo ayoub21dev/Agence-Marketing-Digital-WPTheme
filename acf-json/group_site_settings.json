@@ -1,0 +1,279 @@
+{
+    "key": "group_site_settings",
+    "title": "Site Settings",
+    "fields": [
+        {
+            "key": "field_site_tab_contact",
+            "label": "Contact details",
+            "name": "",
+            "type": "tab",
+            "placement": "top",
+            "endpoint": 0,
+            "menu_order": 0,
+            "aria-label": "",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_contact_email",
+            "label": "Contact email",
+            "name": "contact_email",
+            "type": "email",
+            "instructions": "Used on the contact page, mailto links and Google structured data. Leave empty to auto-use contact@<domain>.",
+            "menu_order": 1,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "contact@agencemarketingdigital.com",
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_phone",
+            "label": "Phone",
+            "name": "phone",
+            "type": "text",
+            "instructions": "Shown on the contact page and in Google structured data. Leave empty to hide.",
+            "menu_order": 2,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "+212 5 22 00 00 00",
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_whatsapp_number",
+            "label": "WhatsApp number",
+            "name": "whatsapp_number",
+            "type": "text",
+            "instructions": "International format, e.g. +212612345678. Shown as a click-to-chat link. Leave empty to hide.",
+            "menu_order": 3,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "+212612345678",
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_office_title",
+            "label": "Office title",
+            "name": "office_title",
+            "type": "text",
+            "instructions": "Heading of the address block on the contact page (front-end content, keep it in French).",
+            "menu_order": 4,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "Siège Social",
+            "placeholder": "",
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_office_address",
+            "label": "Office address",
+            "name": "office_address",
+            "type": "text",
+            "instructions": "",
+            "menu_order": 5,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "12 Boulevard Zerktouni, Casablanca",
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_office_city",
+            "label": "City / Country",
+            "name": "office_city",
+            "type": "text",
+            "instructions": "",
+            "menu_order": 6,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "Casablanca, Maroc",
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_tab_social",
+            "label": "Social links",
+            "name": "",
+            "type": "tab",
+            "placement": "top",
+            "endpoint": 0,
+            "menu_order": 7,
+            "aria-label": "",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_twitter_url",
+            "label": "Twitter \/ X URL",
+            "name": "twitter_url",
+            "type": "url",
+            "instructions": "Only filled links appear in the footer. Leave empty to hide.",
+            "menu_order": 8,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "https:\/\/x.com\/youraccount",
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_linkedin_url",
+            "label": "LinkedIn URL",
+            "name": "linkedin_url",
+            "type": "url",
+            "instructions": "",
+            "menu_order": 9,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "https:\/\/www.linkedin.com\/company\/yourpage",
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_instagram_url",
+            "label": "Instagram URL",
+            "name": "instagram_url",
+            "type": "url",
+            "instructions": "",
+            "menu_order": 10,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "https:\/\/www.instagram.com\/youraccount",
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_facebook_url",
+            "label": "Facebook URL",
+            "name": "facebook_url",
+            "type": "url",
+            "instructions": "",
+            "menu_order": 11,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "https:\/\/www.facebook.com\/yourpage",
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_tab_footer",
+            "label": "Footer",
+            "name": "",
+            "type": "tab",
+            "placement": "top",
+            "endpoint": 0,
+            "menu_order": 12,
+            "aria-label": "",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        },
+        {
+            "key": "field_site_footer_description",
+            "label": "Footer description",
+            "name": "footer_description",
+            "type": "textarea",
+            "instructions": "Short paragraph under the footer logo. Overrides the site tagline; leave empty to use the tagline. Front-end content — write it in French.",
+            "menu_order": 13,
+            "aria-label": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "",
+            "rows": 3,
+            "new_lines": "",
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            }
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "site-settings"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Site-wide content: contact details, social links, footer description.",
+    "show_in_rest": 0,
+    "modified": 1783510000
+}

@@ -54,6 +54,13 @@ add_action('admin_notices', 'v5_digital_acf_missing_admin_notice');
 
 // Helper to get dynamic domain-based contact email
 function v5_digital_get_dynamic_email() {
+    // Site Settings (options page) wins when filled — a real, verified mailbox
+    // beats the guessed contact@<domain> below.
+    $option_email = v5_digital_get_field('contact_email', 'option');
+    if (is_string($option_email) && $option_email !== '') {
+        return $option_email;
+    }
+
     $host = parse_url(home_url(), PHP_URL_HOST);
     if ($host) {
         $host = preg_replace('/^www\./i', '', $host);
@@ -296,6 +303,31 @@ function v5_digital_acf_json_load_paths($paths) {
     return $paths;
 }
 add_filter('acf/settings/load_json', 'v5_digital_acf_json_load_paths');
+
+/**
+ * "Site Settings" options page (ACF Pro): site-wide content that belongs to no
+ * single page — contact details, social links, footer description. Fields are
+ * defined in acf-json/group_site_settings.json (+ PHP fallback) and read with
+ * v5_digital_get_field('<name>', 'option'). ACF-Pro-only; no-op otherwise.
+ */
+function v5_digital_register_options_page() {
+    if (!function_exists('acf_add_options_page')) {
+        return;
+    }
+    acf_add_options_page(array(
+        'page_title'      => 'Site Settings',
+        'menu_title'      => 'Site Settings',
+        'menu_slug'       => 'site-settings',
+        'capability'      => 'manage_options',
+        'position'        => 61,
+        'icon_url'        => 'dashicons-admin-settings',
+        'redirect'        => false,
+        'autoload'        => true, // options ride the autoloaded cache: reads are free
+        'update_button'   => 'Save settings',
+        'updated_message' => 'Settings saved.',
+    ));
+}
+add_action('acf/init', 'v5_digital_register_options_page');
 
 /**
  * Populate the "Formulaire à afficher" dropdown (page builder → Formulaire section)
@@ -2153,6 +2185,118 @@ if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_fie
             ),
         ),
     ));
+
+    // Site Settings (options page) — global content: contact details, social
+    // links, footer description. Canonical definition: acf-json/group_site_settings.json.
+    acf_add_local_field_group(array(
+        'key'    => 'group_site_settings',
+        'title'  => 'Site Settings',
+        'fields' => array(
+            array(
+                'key'       => 'field_site_tab_contact',
+                'label'     => 'Contact details',
+                'name'      => '',
+                'type'      => 'tab',
+                'placement' => 'top',
+            ),
+            array(
+                'key'          => 'field_site_contact_email',
+                'label'        => 'Contact email',
+                'name'         => 'contact_email',
+                'type'         => 'email',
+                'instructions' => 'Used on the contact page, mailto links and Google structured data. Leave empty to auto-use contact@<domain>.',
+            ),
+            array(
+                'key'          => 'field_site_phone',
+                'label'        => 'Phone',
+                'name'         => 'phone',
+                'type'         => 'text',
+                'instructions' => 'Shown on the contact page and in Google structured data. Leave empty to hide.',
+            ),
+            array(
+                'key'          => 'field_site_whatsapp_number',
+                'label'        => 'WhatsApp number',
+                'name'         => 'whatsapp_number',
+                'type'         => 'text',
+                'instructions' => 'International format, e.g. +212612345678. Shown as a click-to-chat link. Leave empty to hide.',
+            ),
+            array(
+                'key'           => 'field_site_office_title',
+                'label'         => 'Office title',
+                'name'          => 'office_title',
+                'type'          => 'text',
+                'default_value' => 'Siège Social',
+            ),
+            array(
+                'key'   => 'field_site_office_address',
+                'label' => 'Office address',
+                'name'  => 'office_address',
+                'type'  => 'text',
+            ),
+            array(
+                'key'   => 'field_site_office_city',
+                'label' => 'City / Country',
+                'name'  => 'office_city',
+                'type'  => 'text',
+            ),
+            array(
+                'key'       => 'field_site_tab_social',
+                'label'     => 'Social links',
+                'name'      => '',
+                'type'      => 'tab',
+                'placement' => 'top',
+            ),
+            array(
+                'key'          => 'field_site_twitter_url',
+                'label'        => 'Twitter / X URL',
+                'name'         => 'twitter_url',
+                'type'         => 'url',
+                'instructions' => 'Only filled links appear in the footer. Leave empty to hide.',
+            ),
+            array(
+                'key'   => 'field_site_linkedin_url',
+                'label' => 'LinkedIn URL',
+                'name'  => 'linkedin_url',
+                'type'  => 'url',
+            ),
+            array(
+                'key'   => 'field_site_instagram_url',
+                'label' => 'Instagram URL',
+                'name'  => 'instagram_url',
+                'type'  => 'url',
+            ),
+            array(
+                'key'   => 'field_site_facebook_url',
+                'label' => 'Facebook URL',
+                'name'  => 'facebook_url',
+                'type'  => 'url',
+            ),
+            array(
+                'key'       => 'field_site_tab_footer',
+                'label'     => 'Footer',
+                'name'      => '',
+                'type'      => 'tab',
+                'placement' => 'top',
+            ),
+            array(
+                'key'          => 'field_site_footer_description',
+                'label'        => 'Footer description',
+                'name'         => 'footer_description',
+                'type'         => 'textarea',
+                'rows'         => 3,
+                'instructions' => 'Short paragraph under the footer logo. Overrides the site tagline; leave empty to use the tagline. Front-end content — write it in French.',
+            ),
+        ),
+        'location' => array(
+            array(
+                array(
+                    'param'    => 'options_page',
+                    'operator' => '==',
+                    'value'    => 'site-settings',
+                ),
+            ),
+        ),
+    ));
 }
 
 // ----------------------------------------------------
@@ -3575,6 +3719,8 @@ function v5_digital_ui_strings() {
         // Recent-posts rail (article sidebar + blog listing)
         'Articles récents',
         'Tout le blog',
+        // Contact info block (phone row heading)
+        'Téléphone',
     );
 }
 
@@ -3885,6 +4031,22 @@ function v5_digital_organization_schema() {
         if ($logo_url) {
             $schema['logo'] = $logo_url;
         }
+    }
+
+    // Site Settings (options page): phone + social profiles, when filled.
+    $phone = v5_digital_get_field('phone', 'option');
+    if (!empty($phone)) {
+        $schema['telephone'] = $phone;
+    }
+
+    $same_as = array_values(array_filter(array(
+        v5_digital_get_field('twitter_url', 'option'),
+        v5_digital_get_field('linkedin_url', 'option'),
+        v5_digital_get_field('instagram_url', 'option'),
+        v5_digital_get_field('facebook_url', 'option'),
+    )));
+    if (!empty($same_as)) {
+        $schema['sameAs'] = $same_as;
     }
 
     echo '<script type="application/ld+json">'
