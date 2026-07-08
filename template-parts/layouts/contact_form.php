@@ -5,13 +5,14 @@
 $form_title      = v5_get_field_default('form_title', 'Envoyer un Message');
 $form_desc       = v5_get_field_default('form_desc', 'Utilisez ce formulaire pour les demandes de référencement, les corrections, les questions des acheteurs ou les notes de partenariat.');
 $office_icon     = v5_get_field_default('office_icon', '');
-// Precedence: page sub-field → Site Settings option → hardcoded default.
-$office_title    = v5_get_field_default('office_title', '')   ?: v5_digital_get_field('office_title', 'option')   ?: 'Siège Social';
-$office_address  = v5_get_field_default('office_address', '') ?: v5_digital_get_field('office_address', 'option') ?: '8 rue de la Paix, 75002 Paris, France';
-$office_city     = v5_get_field_default('office_city', '')    ?: v5_digital_get_field('office_city', 'option')    ?: 'Casablanca, Maroc';
+// Global contact info: Site Settings (options page) is the source of truth and
+// WINS over any per-page value — otherwise old seeded page values silently block
+// the editor's Site Settings edits. Precedence: option → page sub-field → default.
+$office_title    = v5_digital_get_field('office_title', 'option')   ?: v5_get_field_default('office_title', '')   ?: 'Siège Social';
+$office_address  = v5_digital_get_field('office_address', 'option') ?: v5_get_field_default('office_address', '') ?: '8 rue de la Paix, 75002 Paris, France';
+$office_city     = v5_digital_get_field('office_city', 'option')    ?: v5_get_field_default('office_city', '')    ?: 'Casablanca, Maroc';
 $email_icon      = v5_get_field_default('email_icon', '');
-// v5_digital_get_dynamic_email() already prefers the Site Settings contact_email.
-$email           = v5_get_field_default('email', v5_digital_get_dynamic_email());
+$email           = v5_digital_get_field('contact_email', 'option') ?: v5_get_field_default('email', v5_digital_get_dynamic_email());
 // Phone + WhatsApp exist only in Site Settings (no per-page sub-fields).
 $contact_phone    = v5_digital_get_field('phone', 'option');
 $contact_whatsapp = v5_digital_get_field('whatsapp_number', 'option');
