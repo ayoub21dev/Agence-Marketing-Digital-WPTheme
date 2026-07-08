@@ -1,0 +1,223 @@
+/**
+ * Page builder — live section preview (eye button + modal iframe).
+ * Styled for ACF's light "Add Row" popup and the WP admin.
+ */
+
+/* ── Eye button inside each popup entry ─────────────────────────────────── */
+/* Keep the popup from growing unbounded with long section labels. */
+.acf-fc-popup ul {
+    max-width: 380px;
+}
+
+.acf-fc-popup a.v5-sp-has-eye {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Long labels ellipsis instead of pushing the eye out of view.
+   min-width:0 is required for a flex child to be allowed to shrink. */
+.v5-sp-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.v5-sp-eye {
+    flex: 0 0 auto;          /* never shrinks, never scrolls out of view */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: -2px -2px -2px 0;
+    background: transparent;
+    border: 0;
+    border-radius: 3px;
+    cursor: pointer;
+    color: #64748b;          /* light popup: slate icon, not white */
+    opacity: 1;              /* always visible, not hover-only */
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.v5-sp-eye:hover,
+.v5-sp-eye:focus {
+    background: rgba(37, 99, 235, 0.12);
+    color: #2563eb;          /* brand-600 */
+    outline: none;
+}
+
+.v5-sp-eye .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+
+/* While the modal is open, get ACF's popup out of the way. `visibility` (not
+   `display`) keeps its anchors in the layout so insertion still works. */
+body.v5-sp-modal-open .acf-fc-popup,
+body.v5-sp-modal-open .acf-tooltip {
+    visibility: hidden !important;
+}
+
+/* ── Modal ──────────────────────────────────────────────────────────────── */
+.v5-sp-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999999; /* above ACF's popup (which sits very high) and the admin bar */
+    display: none;
+}
+
+.v5-sp-modal.is-open {
+    display: block;
+}
+
+.v5-sp-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.68);
+}
+
+.v5-sp-dialog {
+    position: relative;
+    width: min(1240px, calc(100vw - 40px));
+    max-height: calc(100vh - 48px);
+    margin: 24px auto;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+    overflow: hidden;
+    animation: v5-sp-in 0.14s ease-out;
+}
+
+@keyframes v5-sp-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.v5-sp-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 13px 18px;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.v5-sp-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.v5-sp-close {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    font-size: 22px;
+    line-height: 1;
+    color: #646970;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.v5-sp-close:hover,
+.v5-sp-close:focus {
+    background: #f0f0f1;
+    color: #1d2327;
+}
+
+/* The stage scrolls vertically; never horizontally. */
+.v5-sp-stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 220px;
+    max-height: calc(100vh - 280px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #f6f7f7;
+}
+
+/* transform:scale() shrinks the render visually but the scaler keeps its
+   1280px layout box — the clip absorbs that overflow and carries the real
+   (scaled) height, so no phantom space or horizontal scrollbar appears. */
+.v5-sp-clip {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #fff;
+}
+
+.v5-sp-scaler {
+    transform-origin: top left;
+    background: #fff;
+}
+
+.v5-sp-scaler iframe {
+    display: block;
+    width: 1280px;   /* layouts are designed around this width */
+    height: 400px;   /* replaced once the content height is measured */
+    border: 0;
+    background: #fff;
+}
+
+.v5-sp-status {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #646970;
+    background: #f6f7f7;
+    z-index: 1;
+}
+
+.v5-sp-status.is-error {
+    color: #b32d2e;
+}
+
+.v5-sp-body {
+    flex: 0 0 auto;
+    padding: 12px 18px;
+    border-top: 1px solid #dcdcde;
+}
+
+.v5-sp-desc {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #50575e;
+}
+
+.v5-sp-note {
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-style: italic;
+    color: #787c82;
+}
+
+.v5-sp-foot {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 18px;
+    background: #f6f7f7;
+    border-top: 1px solid #dcdcde;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .v5-sp-dialog { animation: none; }
+    .v5-sp-eye { transition: none; }
+}
