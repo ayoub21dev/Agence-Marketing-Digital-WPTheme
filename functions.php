@@ -1596,11 +1596,16 @@ if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_fie
                         ),
                     ),
                     // Layout 13: Contact Form & Info
+                    // NOTE: office/email text lives in Site Settings (options page)
+                    // only — this layout keeps presentation fields (icons, titles,
+                    // success message). max 1: duplicate copies would emit duplicate
+                    // HTML ids and break the form JS feedback.
                     'contact_form_section' => array(
                         'key' => 'layout_contact_form_section',
                         'name' => 'contact_form_section',
                         'label' => '[Contact] Formulaire — contact & infos',
                         'display' => 'block',
+                        'max' => 1,
                         'sub_fields' => array(
                             array(
                                 'key' => 'field_cform_title',
@@ -1621,50 +1626,37 @@ if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_fie
                                 'label' => 'Icône Adresse',
                                 'name' => 'office_icon',
                                 'type' => 'image',
-                                'instructions' => 'Téléversez une icône (SVG ou image) pour le bloc adresse. Laissez vide pour utiliser l\'icône par défaut. Supprimez l\'image pour masquer l\'icône.',
+                                'instructions' => 'Laissez vide pour l\'icône par défaut (épingle). Le texte de l\'adresse se gère dans Site Settings → Contact details.',
                                 'return_format' => 'url',
                                 'library' => 'all',
                                 'mime_types' => 'svg,png,jpg,jpeg,webp,gif',
                                 'preview_size' => 'thumbnail',
-                            ),
-                            array(
-                                'key' => 'field_cform_office_title',
-                                'label' => 'Titre Siège Social',
-                                'name' => 'office_title',
-                                'type' => 'text',
-                                'default_value' => 'Siège Social',
-                            ),
-                            array(
-                                'key' => 'field_cform_office_address',
-                                'label' => 'Adresse Siège Social',
-                                'name' => 'office_address',
-                                'type' => 'text',
-                                'default_value' => '8 rue de la Paix, 75002 Paris, France',
-                            ),
-                            array(
-                                'key' => 'field_cform_office_city',
-                                'label' => 'Ville Siège Social',
-                                'name' => 'office_city',
-                                'type' => 'text',
-                                'default_value' => 'Casablanca, Maroc',
                             ),
                             array(
                                 'key' => 'field_cform_email_icon',
                                 'label' => 'Icône Email',
                                 'name' => 'email_icon',
                                 'type' => 'image',
-                                'instructions' => 'Téléversez une icône (SVG ou image) pour le bloc email. Laissez vide pour utiliser l\'icône par défaut. Supprimez l\'image pour masquer l\'icône.',
+                                'instructions' => 'Laissez vide pour l\'icône par défaut (enveloppe). L\'adresse email se gère dans Site Settings → Contact details.',
                                 'return_format' => 'url',
                                 'library' => 'all',
                                 'mime_types' => 'svg,png,jpg,jpeg,webp,gif',
                                 'preview_size' => 'thumbnail',
                             ),
                             array(
-                                'key' => 'field_cform_email',
-                                'label' => 'Adresse Email de contact',
-                                'name' => 'email',
+                                'key' => 'field_cform_success_title',
+                                'label' => 'Titre du message de confirmation',
+                                'name' => 'success_title',
                                 'type' => 'text',
-                                'default_value' => v5_digital_get_dynamic_email(),
+                                'instructions' => 'Affiché après l\'envoi réussi du formulaire. Si les deux champs de confirmation sont vides, le message par défaut est utilisé.',
+                                'default_value' => 'Message envoyé !',
+                            ),
+                            array(
+                                'key' => 'field_cform_success_desc',
+                                'label' => 'Texte du message de confirmation',
+                                'name' => 'success_desc',
+                                'type' => 'textarea',
+                                'default_value' => 'Merci ! Notre équipe éditoriale vous contactera sous 24 heures.',
                             ),
                             array(
                                 'key' => 'field_cform_guarantee_title',
@@ -2588,13 +2580,11 @@ function v5_digital_setup_theme_content($destructive = false) {
                                 'description'   => 'Des questions sur les données des agences, des corrections, des avis ou des recherches éditoriales ? Envoyez-nous les détails et notre équipe vous répondra.',
                             ),
                             array(
+                                // Office address/city/email are NOT seeded: they live in
+                                // Site Settings (options page), the single source of truth.
                                 'acf_fc_layout'   => 'contact_form_section',
                                 'form_title'      => 'Envoyer un Message',
                                 'form_desc'       => 'Utilisez ce formulaire pour les demandes de référencement, les corrections, les questions des acheteurs ou les notes de partenariat.',
-                                'office_title'    => 'Siège Social',
-                                'office_address'  => '8 rue de la Paix, 75002 Paris, France',
-                                'office_city'     => 'Casablanca, Maroc',
-                                'email'           => v5_digital_get_dynamic_email(),
                                 'guarantee_title' => 'Garantie d\'Indépendance',
                                 'guarantee_desc'  => 'Nous n\'acceptons pas de placements payants ni de classements sponsorisés. Les agences qui souhaitent être référencées passent par notre processus d\'évaluation standard et indépendant.',
                             ),
@@ -3705,6 +3695,28 @@ function v5_digital_ui_strings() {
         // Recent-posts rail (article sidebar + blog listing)
         'Articles récents',
         'Tout le blog',
+        // Contact form (layout contact_form_section)
+        'Prénom',
+        'Votre prénom',
+        'Nom',
+        'Votre nom de famille',
+        'Email',
+        'adresse@entreprise.com',
+        'Sujet',
+        'Message',
+        'Comment pouvons-nous vous aider ?',
+        'Envoyer le Message',
+        'Ne pas remplir',
+        'Informations de contact',
+        // Subject labels — MUST mirror AMD_CF_Handler::subject_labels() in the
+        // AMD Contact Forms plugin (the select is rendered from that map).
+        'Demande Générale',
+        'Référencer mon Agence',
+        'Signaler un Problème',
+        'Opportunité de Partenariat',
+        // Fallback shown when the AMD Contact Forms plugin is inactive
+        'Le formulaire est momentanément indisponible. Écrivez-nous directement par email :',
+        'Envoyer un email',
     );
 }
 

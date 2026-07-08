@@ -1757,6 +1757,7 @@
                     "name": "contact_form_section",
                     "label": "[Contact] Formulaire — contact & infos",
                     "display": "block",
+                    "max": 1,
                     "sub_fields": [
                         {
                             "key": "field_cform_title",
@@ -1797,7 +1798,7 @@
                             "label": "Icône Adresse",
                             "name": "office_icon",
                             "type": "image",
-                            "instructions": "Téléversez une icône (SVG ou image) pour le bloc adresse. Laissez vide pour utiliser l'icône par défaut. Supprimez l'image pour masquer l'icône.",
+                            "instructions": "Laissez vide pour l'icône par défaut (épingle). Le texte de l'adresse se gère dans Site Settings → Contact details.",
                             "return_format": "url",
                             "library": "all",
                             "mime_types": "svg,png,jpg,jpeg,webp,gif",
@@ -1807,58 +1808,7 @@
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            }
-                        },
-                        {
-                            "key": "field_cform_office_title",
-                            "label": "Titre Siège Social",
-                            "name": "office_title",
-                            "type": "text",
-                            "default_value": "Siège Social",
-                            "menu_order": 3,
-                            "aria-label": "",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            }
-                        },
-                        {
-                            "key": "field_cform_office_address",
-                            "label": "Adresse Siège Social",
-                            "name": "office_address",
-                            "type": "text",
-                            "default_value": "8 rue de la Paix, 75002 Paris, France",
-                            "menu_order": 4,
-                            "aria-label": "",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            }
-                        },
-                        {
-                            "key": "field_cform_office_city",
-                            "label": "Ville Siège Social",
-                            "name": "office_city",
-                            "type": "text",
-                            "default_value": "Casablanca, Maroc",
-                            "menu_order": 5,
-                            "aria-label": "",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
+                                "width": "50",
                                 "class": "",
                                 "id": ""
                             }
@@ -1868,12 +1818,29 @@
                             "label": "Icône Email",
                             "name": "email_icon",
                             "type": "image",
-                            "instructions": "Téléversez une icône (SVG ou image) pour le bloc email. Laissez vide pour utiliser l'icône par défaut. Supprimez l'image pour masquer l'icône.",
+                            "instructions": "Laissez vide pour l'icône par défaut (enveloppe). L'adresse email se gère dans Site Settings → Contact details.",
                             "return_format": "url",
                             "library": "all",
                             "mime_types": "svg,png,jpg,jpeg,webp,gif",
                             "preview_size": "thumbnail",
-                            "menu_order": 6,
+                            "menu_order": 3,
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_cform_success_title",
+                            "label": "Titre du message de confirmation",
+                            "name": "success_title",
+                            "type": "text",
+                            "instructions": "Affiché après l'envoi réussi du formulaire. Si les deux champs de confirmation sont vides, le message par défaut est utilisé.",
+                            "default_value": "Message envoyé !",
+                            "menu_order": 4,
                             "aria-label": "",
                             "required": 0,
                             "conditional_logic": 0,
@@ -1884,14 +1851,16 @@
                             }
                         },
                         {
-                            "key": "field_cform_email",
-                            "label": "Adresse Email de contact",
-                            "name": "email",
-                            "type": "text",
-                            "default_value": "contact@agencemarketingdigital.com",
-                            "menu_order": 7,
-                            "aria-label": "",
+                            "key": "field_cform_success_desc",
+                            "label": "Texte du message de confirmation",
+                            "name": "success_desc",
+                            "type": "textarea",
                             "instructions": "",
+                            "default_value": "Merci ! Notre équipe éditoriale vous contactera sous 24 heures.",
+                            "rows": 2,
+                            "new_lines": "",
+                            "menu_order": 5,
+                            "aria-label": "",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -1906,7 +1875,7 @@
                             "name": "guarantee_title",
                             "type": "text",
                             "default_value": "Garantie d'Indépendance",
-                            "menu_order": 8,
+                            "menu_order": 6,
                             "aria-label": "",
                             "instructions": "",
                             "required": 0,
@@ -1923,7 +1892,7 @@
                             "name": "guarantee_desc",
                             "type": "textarea",
                             "default_value": "Nous n'acceptons pas de placements payants ni de classements sponsorisés. Les agences qui souhaitent être référencées passent par notre processus d'évaluation standard et indépendant.",
-                            "menu_order": 9,
+                            "menu_order": 7,
                             "aria-label": "",
                             "instructions": "",
                             "required": 0,
@@ -2677,5 +2646,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1783508060
+    "modified": 1783620100
 }

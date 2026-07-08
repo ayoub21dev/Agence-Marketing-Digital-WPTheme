@@ -5,20 +5,44 @@
 $form_title      = v5_get_field_default('form_title', 'Envoyer un Message');
 $form_desc       = v5_get_field_default('form_desc', 'Utilisez ce formulaire pour les demandes de référencement, les corrections, les questions des acheteurs ou les notes de partenariat.');
 $office_icon     = v5_get_field_default('office_icon', '');
-// Global contact info: Site Settings (options page) is the source of truth and
-// WINS over any per-page value — otherwise old seeded page values silently block
-// the editor's Site Settings edits. Precedence: option → page sub-field → default.
-$office_title    = v5_digital_get_field('office_title', 'option')   ?: v5_get_field_default('office_title', '')   ?: 'Siège Social';
-$office_address  = v5_digital_get_field('office_address', 'option') ?: v5_get_field_default('office_address', '') ?: '8 rue de la Paix, 75002 Paris, France';
-$office_city     = v5_digital_get_field('office_city', 'option')    ?: v5_get_field_default('office_city', '')    ?: 'Casablanca, Maroc';
+// Contact info comes from ONE place: Site Settings (options page). An empty
+// option hides its row; all three office fields empty = whole address block
+// hidden. The email always resolves (option first, else contact@<domain>) —
+// a contact page must stay reachable.
+$office_title    = (string) v5_digital_get_field('office_title', 'option');
+$office_address  = (string) v5_digital_get_field('office_address', 'option');
+$office_city     = (string) v5_digital_get_field('office_city', 'option');
 $email_icon      = v5_get_field_default('email_icon', '');
-$email           = v5_digital_get_field('contact_email', 'option') ?: v5_get_field_default('email', v5_digital_get_dynamic_email());
+$email           = v5_digital_get_dynamic_email();
 
 // Normalize icon fields (ACF image may return an array depending on config).
 if (is_array($office_icon)) { $office_icon = isset($office_icon['url']) ? $office_icon['url'] : ''; }
 if (is_array($email_icon))  { $email_icon  = isset($email_icon['url'])  ? $email_icon['url']  : ''; }
 $guarantee_title = v5_get_field_default('guarantee_title', 'Garantie d\'Indépendance');
 $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas de placements payants ni de classements sponsorisés. Les agences qui souhaitent être référencées passent par notre processus d\'évaluation standard et indépendant.');
+
+// Success message shown by the form JS after a successful submit (editable).
+// If the editor clears BOTH fields, fall back to the defaults so the green
+// confirmation box is never empty.
+$success_title = v5_get_field_default('success_title', 'Message envoyé !');
+$success_desc  = v5_get_field_default('success_desc', 'Merci ! Notre équipe éditoriale vous contactera sous 24 heures.');
+if ($success_title === '' && $success_desc === '') {
+    $success_title = 'Message envoyé !';
+    $success_desc  = 'Merci ! Notre équipe éditoriale vous contactera sous 24 heures.';
+}
+
+// Subject choices come from the plugin so the theme can never drift from the
+// value→label map the submission handler stores (unknown keys silently become
+// "Demande Générale" server-side). Static copy only as an unreachable safety
+// net — the form itself is hidden when the plugin is missing.
+$subject_choices = (class_exists('AMD_CF_Handler') && method_exists('AMD_CF_Handler', 'subject_labels'))
+    ? AMD_CF_Handler::subject_labels()
+    : array(
+        'general' => 'Demande Générale',
+        'list'    => 'Référencer mon Agence',
+        'report'  => 'Signaler un Problème',
+        'partner' => 'Opportunité de Partenariat',
+    );
 ?>
 
 <style>
@@ -63,11 +87,12 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                 <?php if ($form_desc) : ?>
                     <p class="text-[13.5px] text-slate-500 mb-6 font-sans"><?php echo esc_html($form_desc); ?></p>
                 <?php endif; ?>
-                
+
+                <?php if (class_exists('AMD_CF_Form')) : // Submission needs the AMD Contact Forms plugin — see fallback below. ?>
                 <form id="contact-form" class="space-y-4">
                     <!-- Honeypot: hidden from humans, bots tend to fill it. Submissions with this set are silently dropped. -->
                     <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
-                        <label>Ne pas remplir<input type="text" name="amd_hp" tabindex="-1" autocomplete="off"></label>
+                        <label><?php echo esc_html(v5_t('Ne pas remplir')); ?><input type="text" name="amd_hp" tabindex="-1" autocomplete="off"></label>
                     </div>
                     <?php // Tag submissions with which form + page they came from (for the AMD Contact Forms plugin dashboard).
                     // Uses the plugin's default registered form ("Formulaire de contact") so it shows up as that form.
@@ -81,39 +106,38 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="firstName" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold">Prénom</label>
-                            <input type="text" id="firstName" name="first_name" required placeholder="Votre prénom" class="w-full bg-slate-50 hover:bg-slate-100/50 border border-slate-200 focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/10 rounded-lg px-3.5 py-2.5 text-[13px] outline-none transition-all font-sans">
+                            <label for="firstName" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold"><?php echo esc_html(v5_t('Prénom')); ?></label>
+                            <input type="text" id="firstName" name="first_name" required placeholder="<?php echo esc_attr(v5_t('Votre prénom')); ?>" class="w-full bg-slate-50 hover:bg-slate-100/50 border border-slate-200 focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/10 rounded-lg px-3.5 py-2.5 text-[13px] outline-none transition-all font-sans">
                         </div>
                         <div>
-                            <label for="lastName" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold">Nom</label>
-                            <input type="text" id="lastName" name="last_name" required placeholder="Votre nom de famille" class="w-full bg-slate-50 hover:bg-slate-100/50 border border-slate-200 focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/10 rounded-lg px-3.5 py-2.5 text-[13px] outline-none transition-all font-sans">
+                            <label for="lastName" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold"><?php echo esc_html(v5_t('Nom')); ?></label>
+                            <input type="text" id="lastName" name="last_name" required placeholder="<?php echo esc_attr(v5_t('Votre nom de famille')); ?>" class="w-full bg-slate-50 hover:bg-slate-100/50 border border-slate-200 focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/10 rounded-lg px-3.5 py-2.5 text-[13px] outline-none transition-all font-sans">
                         </div>
                     </div>
 
                     <div>
-                        <label for="email" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold">Email</label>
-                        <input type="email" id="email" name="email" required placeholder="adresse@entreprise.com" class="w-full bg-slate-50 hover:bg-slate-100/50 border border-slate-200 focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/10 rounded-lg px-3.5 py-2.5 text-[13px] outline-none transition-all font-sans">
+                        <label for="email" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold"><?php echo esc_html(v5_t('Email')); ?></label>
+                        <input type="email" id="email" name="email" required placeholder="<?php echo esc_attr(v5_t('adresse@entreprise.com')); ?>" class="w-full bg-slate-50 hover:bg-slate-100/50 border border-slate-200 focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/10 rounded-lg px-3.5 py-2.5 text-[13px] outline-none transition-all font-sans">
                     </div>
 
                     <div>
-                        <label for="subject" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold">Sujet</label>
+                        <label for="subject" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold"><?php echo esc_html(v5_t('Sujet')); ?></label>
                         <select id="subject" name="subject" class="w-full bg-slate-50 border border-slate-200 focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/10 rounded-lg px-3.5 py-2.5 text-[13px] outline-none transition-all font-sans">
-                            <option value="general">Demande Générale</option>
-                            <option value="list">Référencer mon Agence</option>
-                            <option value="report">Signaler un Problème</option>
-                            <option value="partner">Opportunité de Partenariat</option>
+                            <?php foreach ($subject_choices as $subject_value => $subject_label) : ?>
+                                <option value="<?php echo esc_attr($subject_value); ?>"><?php echo esc_html(v5_t($subject_label)); ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
                     <div>
-                        <label for="message" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold">Message</label>
-                        <textarea id="message" name="message" required rows="5" placeholder="Comment pouvons-nous vous aider ?" class="w-full bg-slate-50 hover:bg-slate-100/50 border border-slate-200 focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/10 rounded-lg px-3.5 py-2.5 text-[13px] outline-none transition-all resize-none font-sans"></textarea>
+                        <label for="message" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider font-mono font-bold"><?php echo esc_html(v5_t('Message')); ?></label>
+                        <textarea id="message" name="message" required rows="5" placeholder="<?php echo esc_attr(v5_t('Comment pouvons-nous vous aider ?')); ?>" class="w-full bg-slate-50 hover:bg-slate-100/50 border border-slate-200 focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/10 rounded-lg px-3.5 py-2.5 text-[13px] outline-none transition-all resize-none font-sans"></textarea>
                     </div>
-                    
+
                     <div class="pt-2">
                         <button type="submit" id="contact-submit-btn" class="btn-spring bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-2.5 rounded-lg text-[13px] flex items-center gap-1.5 shadow-sm font-mono cursor-pointer">
                             <span class="amd-btn-spinner" aria-hidden="true"></span>
-                            <span class="amd-btn-label">Envoyer le Message</span>
+                            <span class="amd-btn-label"><?php echo esc_html(v5_t('Envoyer le Message')); ?></span>
                             <i data-lucide="send" class="w-3.5 h-3.5 amd-send-icon"></i>
                         </button>
                     </div>
@@ -124,11 +148,26 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                         <i data-lucide="check" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <p class="font-bold text-emerald-900 text-[14px] mb-0.5 font-display">Message envoyé !</p>
-                        <p class="text-[13.5px] text-emerald-800">Merci ! Notre équipe éditoriale vous contactera sous 24 heures.</p>
+                        <?php if ($success_title !== '') : ?>
+                            <p class="font-bold text-emerald-900 text-[14px] mb-0.5 font-display"><?php echo esc_html($success_title); ?></p>
+                        <?php endif; ?>
+                        <?php if ($success_desc !== '') : ?>
+                            <p class="text-[13.5px] text-emerald-800"><?php echo esc_html($success_desc); ?></p>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div id="contact-error-msg" class="hidden mt-3 bg-red-50 border border-red-100 text-red-700 rounded-lg p-4 text-[13.5px] font-sans"></div>
+                <?php else : ?>
+                <!-- AMD Contact Forms plugin inactive: a dead form would silently
+                     lose the visitor's message, so offer a direct email instead. -->
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 font-sans">
+                    <p class="text-[13.5px] text-slate-500 mb-4"><?php echo esc_html(v5_t('Le formulaire est momentanément indisponible. Écrivez-nous directement par email :')); ?></p>
+                    <a href="mailto:<?php echo esc_attr($email); ?>" class="btn-spring bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-2.5 rounded-lg text-[13px] inline-flex items-center gap-1.5 shadow-sm font-mono">
+                        <i data-lucide="mail" class="w-3.5 h-3.5" aria-hidden="true"></i>
+                        <span><?php echo esc_html(v5_t('Envoyer un email')); ?></span>
+                    </a>
+                </div>
+                <?php endif; ?>
             </div>
             
             <!-- Right: Side block info (4 cols) -->
@@ -140,12 +179,14 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                 if ($has_address || $has_email) :
                 ?>
                 <div>
-                    <span class="block font-mono text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-4">Informations de contact</span>
+                    <span class="block font-mono text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-4"><?php echo esc_html(v5_t('Informations de contact')); ?></span>
                     <div class="space-y-6 text-[13.5px] text-slate-500 leading-relaxed font-sans">
                         <?php if ($has_address) : ?>
                         <div class="flex items-start gap-3 <?php echo $has_email ? 'border-b border-slate-200/60 pb-5' : 'pb-2'; ?>">
                             <?php if (!empty($office_icon)) : ?>
                                 <img src="<?php echo esc_url($office_icon); ?>" alt="" class="w-4 h-4 mt-0.5 flex-shrink-0 object-contain">
+                            <?php else : ?>
+                                <i data-lucide="map-pin" class="w-4 h-4 mt-0.5 flex-shrink-0 text-slate-400" aria-hidden="true"></i>
                             <?php endif; ?>
                             <div>
                                 <?php if (!empty($office_title)) : ?>
@@ -165,9 +206,11 @@ $guarantee_desc  = v5_get_field_default('guarantee_desc', 'Nous n\'acceptons pas
                         <div class="flex items-start gap-3 pb-2">
                             <?php if (!empty($email_icon)) : ?>
                                 <img src="<?php echo esc_url($email_icon); ?>" alt="" class="w-4 h-4 mt-0.5 flex-shrink-0 object-contain">
+                            <?php else : ?>
+                                <i data-lucide="mail" class="w-4 h-4 mt-0.5 flex-shrink-0 text-slate-400" aria-hidden="true"></i>
                             <?php endif; ?>
                             <div>
-                                <h4 class="font-semibold text-slate-800 text-[13px] mb-0.5 font-display">Email</h4>
+                                <h4 class="font-semibold text-slate-800 text-[13px] mb-0.5 font-display"><?php echo esc_html(v5_t('Email')); ?></h4>
                                 <a href="mailto:<?php echo esc_attr($email); ?>" class="text-brand-600 font-medium break-all hover:text-brand-700 transition-colors"><?php echo esc_html($email); ?></a>
                             </div>
                         </div>
