@@ -10,6 +10,9 @@
  *   show_filters      — boolean: show category pills
  *   display_categories — optional WP categories to include
  *   posts_per_page    — how many posts to fetch (-1 = all)
+ *   show_recent_rail  — boolean: show the "Articles récents" side rail
+ *   rail_title        — rail heading
+ *   rail_count        — how many posts the rail lists
  */
 
 // ── Pull sub-fields ───────────────────────────────────────────────────────────
@@ -18,12 +21,18 @@ $grid_subtitle    = v5_digital_get_sub_field('grid_subtitle');
 $show_filters     = v5_digital_get_sub_field('show_filters');
 $display_categories = v5_digital_get_sub_field('display_categories');
 $posts_per_page   = v5_digital_get_sub_field('posts_per_page');
+$show_recent_rail = v5_digital_get_sub_field('show_recent_rail');
+$rail_title       = v5_digital_get_sub_field('rail_title');
+$rail_count       = v5_digital_get_sub_field('rail_count');
 
 // Sensible defaults
 if (!$grid_title)     $grid_title     = 'Intelligence <span class="quiet">Agences.</span>';
 if (!$grid_subtitle)  $grid_subtitle  = 'Notes techniques sur les agences marocaines, la visibilité organique, Core Web Vitals, et les preuves qui séparent les vrais opérateurs SEO des argumentaires commerciaux polis.';
 if ($show_filters    === null || $show_filters    === '') $show_filters    = true;
 if (!$posts_per_page || $posts_per_page == 0) $posts_per_page = -1;
+if ($show_recent_rail === null || $show_recent_rail === '') $show_recent_rail = true;
+if (!$rail_title)  $rail_title = v5_t('Articles récents');
+if (!$rail_count || (int) $rail_count < 1) $rail_count = 5;
 
 $normalize_blog_category_ids = function ($categories) {
     if (empty($categories)) {
@@ -254,6 +263,19 @@ uasort($blog_categories, function ($a, $b) {
         padding: clamp(32px, 4vw, 52px) 0;
         background: #ffffff;
     }
+
+    /* Main column + "Articles récents" rail (rail stacks below on mobile) */
+    .blg-listing-rail { margin-top: 40px; }
+    @media (min-width: 1024px) {
+        .blg-listing-cols {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 40px;
+            align-items: start;
+        }
+        /* 56px sticky header + ~66px sticky filter bar */
+        .blg-listing-rail { margin-top: 0; position: sticky; top: 122px; }
+    }
     .blg-article-card {
         background: #fff;
         border-radius: 14px;
@@ -335,6 +357,8 @@ uasort($blog_categories, function ($a, $b) {
     <?php /* ── ARTICLE GRID ── */ ?>
     <section class="blg-list-section">
         <div class="blog-grid-wrap">
+            <div<?php if ($show_recent_rail) echo ' class="blg-listing-cols"'; ?>>
+            <div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
                 <p style="font-size:12.5px;color:#94a3b8;font-family:monospace;">
                     <span id="blg-showing-count"><?php echo $post_count; ?></span> articles
@@ -346,7 +370,7 @@ uasort($blog_categories, function ($a, $b) {
                 </a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="blg-grid-container">
+            <div class="grid grid-cols-1 md:grid-cols-2 <?php echo $show_recent_rail ? '' : 'lg:grid-cols-3'; ?> gap-6" id="blg-grid-container">
                 <?php
                 if ($blog_query->have_posts()) :
                     while ($blog_query->have_posts()) : $blog_query->the_post();
@@ -436,6 +460,18 @@ uasort($blog_categories, function ($a, $b) {
             <div id="blg-empty" style="display:none;padding:64px 0;text-align:center;">
                 <i data-lucide="search-x" style="width:40px;height:40px;color:#cbd5e1;margin:0 auto 12px;display:block;"></i>
                 <p style="font-size:13px;color:#94a3b8;font-family:monospace;">Aucun article dans cette catégorie.</p>
+            </div>
+            </div>
+
+            <?php if ($show_recent_rail) : ?>
+            <aside class="blg-listing-rail">
+                <?php get_template_part('template-parts/components/recent-posts-rail', null, array(
+                    'count'   => (int) $rail_count,
+                    'exclude' => 0,
+                    'title'   => $rail_title,
+                )); ?>
+            </aside>
+            <?php endif; ?>
             </div>
         </div>
     </section>

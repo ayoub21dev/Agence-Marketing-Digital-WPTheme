@@ -1312,6 +1312,48 @@ if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_fie
                                 'max'           => 100,
                                 'instructions'  => 'Utilisez -1 pour afficher tous les articles.',
                             ),
+                            array(
+                                'key'           => 'field_blog_grid_show_recent_rail',
+                                'label'         => 'Afficher la colonne « Articles récents »',
+                                'name'          => 'show_recent_rail',
+                                'type'          => 'true_false',
+                                'default_value' => 1,
+                                'ui'            => 1,
+                            ),
+                            array(
+                                'key'           => 'field_blog_grid_rail_title',
+                                'label'         => 'Titre de la colonne',
+                                'name'          => 'rail_title',
+                                'type'          => 'text',
+                                'default_value' => 'Articles récents',
+                                'conditional_logic' => array(
+                                    array(
+                                        array(
+                                            'field'    => 'field_blog_grid_show_recent_rail',
+                                            'operator' => '==',
+                                            'value'    => '1',
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            array(
+                                'key'           => 'field_blog_grid_rail_count',
+                                'label'         => 'Nombre d\'articles dans la colonne',
+                                'name'          => 'rail_count',
+                                'type'          => 'number',
+                                'default_value' => 5,
+                                'min'           => 1,
+                                'max'           => 10,
+                                'conditional_logic' => array(
+                                    array(
+                                        array(
+                                            'field'    => 'field_blog_grid_show_recent_rail',
+                                            'operator' => '==',
+                                            'value'    => '1',
+                                        ),
+                                    ),
+                                ),
+                            ),
                         ),
                     ),
                     // Layout 11: Footer CTA
@@ -3417,6 +3459,9 @@ function v5_digital_ui_strings() {
         'Fermer la recherche',
         // Blog / article meta
         'Par',
+        // Recent-posts rail (article sidebar + blog listing)
+        'Articles récents',
+        'Tout le blog',
     );
 }
 

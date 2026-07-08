@@ -1496,6 +1496,76 @@
                                 "class": "",
                                 "id": ""
                             }
+                        },
+                        {
+                            "key": "field_blog_grid_show_recent_rail",
+                            "label": "Afficher la colonne « Articles récents »",
+                            "name": "show_recent_rail",
+                            "type": "true_false",
+                            "default_value": 1,
+                            "ui": 1,
+                            "menu_order": 6,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_blog_grid_rail_title",
+                            "label": "Titre de la colonne",
+                            "name": "rail_title",
+                            "type": "text",
+                            "default_value": "Articles récents",
+                            "menu_order": 7,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": [
+                                [
+                                    {
+                                        "field": "field_blog_grid_show_recent_rail",
+                                        "operator": "==",
+                                        "value": "1"
+                                    }
+                                ]
+                            ],
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
+                        },
+                        {
+                            "key": "field_blog_grid_rail_count",
+                            "label": "Nombre d'articles dans la colonne",
+                            "name": "rail_count",
+                            "type": "number",
+                            "default_value": 5,
+                            "min": 1,
+                            "max": 10,
+                            "menu_order": 8,
+                            "aria-label": "",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": [
+                                [
+                                    {
+                                        "field": "field_blog_grid_show_recent_rail",
+                                        "operator": "==",
+                                        "value": "1"
+                                    }
+                                ]
+                            ],
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            }
                         }
                     ]
                 },

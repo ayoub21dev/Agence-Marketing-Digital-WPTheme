@@ -43,18 +43,6 @@ get_header();
     }
     .article-prose strong { font-weight: 600; color: #0f172a; }
 
-    /* Tailwind utilities used on this page that are missing from the committed
-       assets/css/tailwind.css build (Node.js unavailable to rebuild). Identical
-       to what `npm run build` generates — safe to delete after a rebuild. */
-    .pt-10 { padding-top: 2.5rem; }
-    .text-\[2rem\] { font-size: 2rem; }
-    .leading-\[1\.15\] { line-height: 1.15; }
-    @media (min-width: 768px) {
-        .md\:pt-8 { padding-top: 2rem; }
-        .md\:p-10 { padding: 2.5rem; }
-        .md\:text-\[2\.75rem\] { font-size: 2.75rem; }
-    }
-
     /* Image hero: the cover image is the hero backdrop; text sits on a slate
        gradient scrim so the white title stays readable on any photo. */
     .article-hero-media {
@@ -113,7 +101,7 @@ get_header();
             <!-- ==================== ARTICLE DETAIL PAGE ==================== -->
             <?php $on_image = (bool) $cover_image; // cover image becomes a contained hero card ?>
             <div class="page" id="page-article">
-                <div class="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 pt-6 md:pt-8">
+                <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pt-6 md:pt-8">
 
                     <!-- Breadcrumbs & Back -->
                     <div class="flex items-center justify-between mb-5">
@@ -167,8 +155,9 @@ get_header();
                     <?php endif; ?>
                 </div>
 
-                <div class="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 pt-10 pb-12">
+                <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pt-10 pb-12 lg:grid lg:grid-cols-12 lg:gap-12">
 
+                    <div class="lg:col-span-8 min-w-0">
                     <!-- Native editor content plus optional Flexible Content blocks -->
                     <div class="article-prose">
                         <?php
@@ -298,6 +287,17 @@ get_header();
                         endif;
                         ?>
                     </div>
+                    </div>
+
+                    <!-- Right rail: latest articles (stacks below the article on mobile) -->
+                    <aside class="lg:col-span-4 mt-10 lg:mt-0">
+                        <div class="lg:sticky lg:top-24">
+                            <?php get_template_part('template-parts/components/recent-posts-rail', null, array(
+                                'count'   => 4,
+                                'exclude' => get_the_ID(),
+                            )); ?>
+                        </div>
+                    </aside>
 
                 </div>
             </div>
