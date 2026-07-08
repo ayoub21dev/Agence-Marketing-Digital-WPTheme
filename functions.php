@@ -344,11 +344,14 @@ function v5_digital_blog_grid_filter_switch_notice() {
                 .find('> .acf-field[data-key="field_blog_grid_show_filters"]');
             if (!$switch.length) return;
 
-            $switch.css('opacity', single ? '0.55' : '');
+            // Dim only the toggle + its label — NOT the field container, so the
+            // warning below stays fully readable.
+            $switch.find('> .acf-label, .acf-input .acf-switch, .acf-input .acf-true-false')
+                   .css('opacity', single ? '0.5' : '');
 
             var $note = $switch.find('.amd-single-cat-note');
             if (single && !$note.length) {
-                $('<p class="amd-single-cat-note" style="margin:8px 0 0;padding:8px 10px;border-radius:6px;background:#fef3c7;border:1px solid #fde68a;color:#92400e;font-size:12px;">' +
+                $('<p class="amd-single-cat-note" style="margin:8px 0 0;padding:9px 12px;border-radius:6px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:12.5px;font-weight:600;line-height:1.5;">' +
                     'Une seule catégorie sélectionnée : les boutons de filtrage ne s\'afficheront pas sur le site (il n\'y a rien à filtrer).' +
                   '</p>').appendTo($switch.find('.acf-input'));
             } else if (!single && $note.length) {
