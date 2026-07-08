@@ -2278,6 +2278,345 @@ if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_fie
 }
 
 // ----------------------------------------------------
+// 2b. PAGE BUILDER — LIVE SECTION PREVIEW (admin only)
+//
+// Renders a single `page_layouts` section, standalone, into an iframe shown in
+// a modal from the ACF "Add Row" popup. Because no ACF row exists at that
+// point, sub-field lookups return false and the layouts fall back to their
+// v5_get_field_default() copy — CPT-driven sections (picks, specialties,
+// stats_band, logos_band, outcomes) render real content from the database.
+// ----------------------------------------------------
+
+/** Human descriptions for each `page_layouts` layout, shown under the preview. */
+function v5_digital_layout_descriptions() {
+    return array(
+        'hero_section'                 => 'Grand titre d\'accroche, boutons d\'action et preuve sociale. À placer en haut de la page d\'accueil.',
+        'common_hero_section'          => 'En-tête simple (titre + description) pour les pages internes.',
+        'stats_band_section'           => 'Bande de chiffres clés, alimentée par les « Stat Metrics ».',
+        'search_filter_section'        => 'Barre de recherche et filtres redirigeant vers l\'annuaire.',
+        'logos_band_section'           => 'Carrousel de logos partenaires (défilement automatique).',
+        'challenge_section'            => 'Bloc « problème » : cartes d\'arguments et citation client.',
+        'approach_section'             => 'Notre approche en étapes numérotées.',
+        'outcomes_section'             => 'Résultats et témoignages clients avec métriques.',
+        'picks_section'                => 'Sélection d\'agences recommandées (fiches agences).',
+        'specialties_section'          => 'Grille des spécialités / canaux marketing.',
+        'guides_section'               => 'Cartes de guides et articles mis en avant.',
+        'blog_posts_grid_section'      => 'Listing complet du blog : filtres par catégorie et grille d\'articles.',
+        'footer_cta_section'           => 'Appel à l\'action large en bas de page.',
+        'contact_form_section'         => 'Formulaire de contact intégré + informations de contact.',
+        'form_section'                 => 'Formulaire créé dans le plugin « AMD Contact Forms » (au choix).',
+        'newsletter_cta_section'       => 'Bandeau d\'inscription à la newsletter.',
+        'methodology_process_section'  => 'Méthodologie : les étapes du processus d\'évaluation.',
+        'methodology_evidence_section' => 'Méthodologie : les preuves et critères retenus.',
+        'methodology_monitor_section'  => 'Méthodologie : le suivi et la surveillance continue.',
+        'about_grid_section'           => 'À propos : grille de valeurs ou de membres d\'équipe.',
+        'about_cta_section'            => 'À propos : appel à l\'action de fin de page.',
+    );
+}
+
+/**
+ * layout name => {label, desc}. Labels are read from the real ACF field group
+ * so they never drift from the picker. Doubles as the security allowlist.
+ */
+function v5_digital_layout_preview_data() {
+    $descriptions = v5_digital_layout_descriptions();
+    $labels       = array();
+
+    if (function_exists('acf_get_field_group') && function_exists('acf_get_fields')) {
+        $group = acf_get_field_group('group_homepage_fields');
+        if ($group) {
+            foreach ((array) acf_get_fields($group) as $field) {
+                if (isset($field['name'], $field['layouts']) && $field['name'] === 'page_layouts') {
+                    foreach ((array) $field['layouts'] as $layout) {
+                        if (!empty($layout['name'])) {
+                            $labels[$layout['name']] = !empty($layout['label']) ? $layout['label'] : $layout['name'];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    $data = array();
+    foreach (array_unique(array_merge(array_keys($descriptions), array_keys($labels))) as $name) {
+        // Only expose layouts that have a real template file behind them.
+        $slug = str_replace('_section', '', $name);
+        if (!locate_template('template-parts/layouts/' . $slug . '.php')) {
+            continue;
+        }
+        $data[$name] = array(
+            'label' => isset($labels[$name]) ? $labels[$name] : ucwords(str_replace('_', ' ', $name)),
+            'desc'  => isset($descriptions[$name]) ? $descriptions[$name] : '',
+        );
+    }
+    return $data;
+}
+
+/**
+ * Render an existing `page_layouts` row with its SAVED values.
+ *
+ * Walks the flexible-content rows to $row_index and renders the template part
+ * inside that row's context, so the layout's get_sub_field() calls resolve.
+ *
+ * Returns '' when the row cannot be resolved — a row added but not yet saved,
+ * an index past the end, or a layout mismatch (rows reordered without saving).
+ * The caller then shows the "nothing to display" notice rather than lying about
+ * which section is on screen.
+ */
+function v5_digital_render_saved_row($post_id, $row_index, $layout, $slug) {
+    if (!$post_id || !v5_digital_acf_is_active()) {
+        return '';
+    }
+    if (!function_exists('have_rows') || !function_exists('the_row') || !function_exists('get_row_layout')) {
+        return '';
+    }
+
+    $html  = '';
+    $index = 0;
+
+    if (have_rows('page_layouts', $post_id)) {
+        while (have_rows('page_layouts', $post_id)) {
+            the_row();
+
+            if ($index === $row_index) {
+                // Guard against drift between the DOM order and saved order.
+                if (get_row_layout() === $layout) {
+                    ob_start();
+                    get_template_part('template-parts/layouts/' . $slug);
+                    $html = trim(ob_get_clean());
+                }
+                break;
+            }
+            $index++;
+        }
+    }
+
+    // Leave ACF's row stack clean for anything that runs after us.
+    if (function_exists('reset_rows')) {
+        reset_rows();
+    }
+
+    return $html;
+}
+
+/**
+ * AJAX (logged-in only): output a standalone HTML document rendering one
+ * section, for the preview iframe.
+ */
+function v5_digital_render_section_preview() {
+    check_ajax_referer('v5_section_preview');
+
+    $layout  = isset($_GET['layout']) ? sanitize_key(wp_unslash($_GET['layout'])) : '';
+    $post_id = isset($_GET['post_id']) ? absint($_GET['post_id']) : 0;
+    // Row index of an existing `page_layouts` row: render it with its saved
+    // values. -1 (or absent) = generic demo for the "Add Row" popup.
+    $row_index = isset($_GET['row']) && $_GET['row'] !== '' ? (int) $_GET['row'] : -1;
+
+    // Capability: tied to the post being edited when we know it.
+    $allowed_user = $post_id ? current_user_can('edit_post', $post_id) : current_user_can('edit_posts');
+    if (!$allowed_user) {
+        status_header(403);
+        wp_die(esc_html__('Accès refusé.', 'agence-marketing-digital'), '', array('response' => 403));
+    }
+
+    // Allowlist — never build a template path from raw input.
+    $layouts = v5_digital_layout_preview_data();
+    if (!isset($layouts[$layout])) {
+        status_header(400);
+        wp_die(esc_html__('Section inconnue.', 'agence-marketing-digital'), '', array('response' => 400));
+    }
+
+    $slug = str_replace('_section', '', $layout);
+
+    // Give the layout a post context: several call get_the_ID()/get_permalink().
+    if ($post_id) {
+        $preview_post = get_post($post_id);
+        if ($preview_post) {
+            global $post;
+            $post = $preview_post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+            setup_postdata($post);
+        }
+    }
+
+    if ($row_index >= 0) {
+        // Existing row: render it inside its ACF row context so the layout's
+        // get_sub_field() calls return that row's saved values.
+        $section_html = v5_digital_render_saved_row($post_id, $row_index, $layout, $slug);
+    } else {
+        // "Add Row" popup: no row exists yet — layouts fall back to their
+        // v5_get_field_default() copy, CPT-driven ones query the database.
+        ob_start();
+        get_template_part('template-parts/layouts/' . $slug);
+        $section_html = trim(ob_get_clean());
+    }
+
+    wp_reset_postdata();
+
+    // Several layouts only render inside `have_rows()` (e.g. about_grid's cards).
+    // With no ACF row they still emit their <style> block, so a non-empty string
+    // does not mean visible content. Probe for something actually renderable.
+    $probe = preg_replace('#<(style|script)\b[^>]*>.*?</\1>#is', '', $section_html);
+    $probe = preg_replace('#<!--.*?-->#s', '', (string) $probe);
+    $probe = trim(strip_tags((string) $probe, '<img><svg><iframe><input><button><video>'));
+    $has_visible_content = ($probe !== '');
+
+    $tw_path  = get_template_directory() . '/assets/css/tailwind.css';
+    $css_path = get_template_directory() . '/assets/css/theme-styles.css';
+    $js_path  = get_template_directory() . '/assets/js/theme-scripts.js';
+    $tw_ver   = file_exists($tw_path) ? filemtime($tw_path) : '1';
+    $css_ver  = file_exists($css_path) ? filemtime($css_path) : '1';
+    $js_ver   = file_exists($js_path) ? filemtime($js_path) : '1';
+
+    nocache_headers();
+    header('Content-Type: text/html; charset=utf-8');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('X-Robots-Tag: noindex, nofollow');
+    ?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+    <meta charset="<?php bloginfo('charset'); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="<?php echo esc_url(get_template_directory_uri() . '/assets/css/tailwind.css?ver=' . $tw_ver); ?>">
+    <link rel="stylesheet" href="<?php echo esc_url(get_template_directory_uri() . '/assets/css/theme-styles.css?ver=' . $css_ver); ?>">
+    <style>
+        /* Mirrors header.php's inline rule (tailwind only emits used utilities). */
+        .hidden { display: none; }
+        html, body { margin: 0; padding: 0; background: #fff; }
+        /* Some sections (e.g. the stats band) use a NEGATIVE top margin to tuck
+           up under the section above them. Previewed in isolation there is
+           nothing above, so that margin pulls the content off the top of the
+           frame and it looks blank. Cancel a leading negative top margin on the
+           first rendered element, and give the frame a little breathing room. */
+        body > *:first-child { margin-top: 0 !important; }
+        body { padding-top: 1px; }
+        /* Mirrors header.php's FOUC-prevention rules exactly, so the real GSAP
+           entrance animation (loaded below) has the same hidden starting point
+           it has on the live site instead of flashing in unstyled. */
+        .hero-title, .section-label, main h1 + p, main .hero-title + p {
+            opacity: 0;
+        }
+        .motion-enhanced .hero-title,
+        .motion-enhanced .section-label,
+        .motion-enhanced main h1 + p,
+        .motion-enhanced main .hero-title + p {
+            opacity: 1;
+        }
+        body:not(.motion-enhanced) .hero-title,
+        body:not(.motion-enhanced) .section-label,
+        body:not(.motion-enhanced) main h1 + p,
+        body:not(.motion-enhanced) main .hero-title + p {
+            opacity: 1;
+        }
+        .v5-preview-empty {
+            font-family: Inter, system-ui, sans-serif;
+            color: #64748b;
+            font-size: 14px;
+            text-align: center;
+            padding: 80px 24px;
+            line-height: 1.6;
+        }
+        .v5-preview-empty strong { display: block; color: #0f172a; margin-bottom: 6px; font-size: 15px; }
+        /* Nothing in a preview should navigate. */
+        a { pointer-events: none; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+<?php if ($has_visible_content) : ?>
+    <?php echo $section_html; // phpcs:ignore WordPress.Security.EscapeOutput — theme template output ?>
+<?php elseif ($row_index >= 0) : ?>
+    <div class="v5-preview-empty">
+        <strong><?php echo esc_html__('Section non encore enregistrée', 'agence-marketing-digital'); ?></strong>
+        <?php echo esc_html__('L\'aperçu affiche le contenu enregistré. Cliquez sur « Mettre à jour » puis rouvrez l\'aperçu.', 'agence-marketing-digital'); ?>
+    </div>
+<?php else : ?>
+    <div class="v5-preview-empty">
+        <strong><?php echo esc_html__('Rien à afficher pour le moment', 'agence-marketing-digital'); ?></strong>
+        <?php echo esc_html__('Cette section n\'affiche du contenu qu\'une fois configurée (ou quand le contenu associé existe).', 'agence-marketing-digital'); ?>
+    </div>
+<?php endif; ?>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+    }
+</script>
+<!-- Same motion system as the live site (footer.php), so the preview shows
+     the real hero/section entrance animation and a running logo marquee
+     instead of a static frame. Every GSAP call in theme-scripts.js is
+     null-guarded (if (header), if (heroTitle), ...), so it degrades cleanly
+     when a single isolated section is missing elements (nav, other sections)
+     that exist on the real page. -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="<?php echo esc_url(get_template_directory_uri() . '/assets/js/theme-scripts.js?ver=' . $js_ver); ?>"></script>
+</body>
+</html>
+    <?php
+    exit;
+}
+add_action('wp_ajax_v5_section_preview', 'v5_digital_render_section_preview');
+
+/** Load the preview modal assets on the post/page edit screens only. */
+function v5_digital_admin_section_preview_assets($hook) {
+    if ($hook !== 'post.php' && $hook !== 'post-new.php') {
+        return;
+    }
+    if (!v5_digital_acf_is_active()) {
+        return;
+    }
+
+    $css_path = get_template_directory() . '/assets/admin/section-preview.css';
+    $js_path  = get_template_directory() . '/assets/admin/section-preview.js';
+
+    wp_enqueue_style(
+        'v5-digital-section-preview',
+        get_template_directory_uri() . '/assets/admin/section-preview.css',
+        array('dashicons'),
+        file_exists($css_path) ? filemtime($css_path) : false
+    );
+
+    wp_enqueue_script(
+        'v5-digital-section-preview',
+        get_template_directory_uri() . '/assets/admin/section-preview.js',
+        array(),
+        file_exists($js_path) ? filemtime($js_path) : false,
+        true
+    );
+
+    // Post context for the preview: the page being edited. `get_the_ID()` is
+    // unreliable on post-new.php, so fall back to the ?post= query arg.
+    $preview_post_id = get_the_ID();
+    if (!$preview_post_id && isset($_GET['post'])) {
+        $preview_post_id = absint($_GET['post']);
+    }
+
+    wp_localize_script('v5-digital-section-preview', 'v5SectionPreview', array(
+        'ajaxUrl' => admin_url('admin-ajax.php'),
+        'nonce'   => wp_create_nonce('v5_section_preview'),
+        'postId'  => $preview_post_id ? (int) $preview_post_id : 0,
+        'layouts' => v5_digital_layout_preview_data(),
+        'i18n'    => array(
+            'previewTitle' => __('Aperçu de la section', 'agence-marketing-digital'),
+            'insert'       => __('Insérer cette section', 'agence-marketing-digital'),
+            'close'        => __('Fermer', 'agence-marketing-digital'),
+            'loading'      => __('Chargement de l\'aperçu…', 'agence-marketing-digital'),
+            'error'        => __('Impossible de charger l\'aperçu.', 'agence-marketing-digital'),
+            'demoNotice'   => __('Aperçu de démonstration — le contenu réel dépendra de vos réglages.', 'agence-marketing-digital'),
+            'rowPreview'   => __('Aperçu de cette section avec son contenu enregistré.', 'agence-marketing-digital'),
+            'dirtyHint'    => __('Modifications non enregistrées : l\'aperçu montre la dernière version enregistrée. Cliquez sur « Mettre à jour » pour les voir.', 'agence-marketing-digital'),
+            'newRowHint'   => __('Cette section n\'a jamais été enregistrée. Cliquez sur « Mettre à jour » puis rouvrez l\'aperçu.', 'agence-marketing-digital'),
+            'refresh'      => __('Rafraîchir', 'agence-marketing-digital'),
+        ),
+    ));
+}
+add_action('admin_enqueue_scripts', 'v5_digital_admin_section_preview_assets');
+
+// ----------------------------------------------------
 // 3. ENQUEUE THEME SCRIPTS AND STYLES
 // ----------------------------------------------------
 
@@ -4115,6 +4454,9 @@ add_action('template_redirect', function() {
         'lang'           => '',
     ));
     foreach ($posts as $post) {
+        if (!empty($post->post_password)) {
+            continue; // don't advertise password-protected posts (parity with pages loop)
+        }
         $entries[] = array(
             get_permalink($post),
             get_post_modified_time('c', false, $post),
