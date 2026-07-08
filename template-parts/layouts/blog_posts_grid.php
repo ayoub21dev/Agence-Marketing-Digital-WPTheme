@@ -341,7 +341,10 @@ uasort($blog_categories, function ($a, $b) {
     <?php endif; ?>
 
     <?php /* ── TOPIC FILTERS ── */ ?>
-    <?php if ($show_filters) : ?>
+    <?php /* Only render the bar when there are at least 2 categories to switch
+             between — with 0 or 1, "Tout voir" and the single pill would show
+             the exact same list, a fake choice that only confuses visitors. */ ?>
+    <?php if ($show_filters && count($blog_categories) >= 2) : ?>
     <div class="blg-filters-container"<?php if ($has_common_hero) echo ' style="border-top:none;"'; ?>>
         <div class="blog-grid-wrap">
             <div style="display:flex;align-items:center;gap:8px;padding:12px 0;overflow-x:auto;" id="blg-topic-pills">
