@@ -318,6 +318,57 @@ function v5_digital_acf_load_amd_forms($field) {
 }
 add_filter('acf/load_field/key=field_amd_form_id', 'v5_digital_acf_load_amd_forms');
 
+/**
+ * Editor feedback (page builder → blog grid layout): the front end hides the
+ * category filter bar when there are fewer than 2 categories to switch
+ * between, but ACF's conditional logic can't count selections — so without
+ * this, an editor who limits the grid to ONE category sees the "Afficher les
+ * boutons de filtrage" switch turn on with no visible effect on the site.
+ * This watches the category limiter live and shows an inline warning (and
+ * greys the switch) whenever exactly one category is selected.
+ */
+function v5_digital_blog_grid_filter_switch_notice() {
+    ?>
+    <script>
+    (function ($) {
+        if (typeof acf === 'undefined') return;
+
+        function sync(field) {
+            var val = field.val() || [];
+            var count = Array.isArray(val) ? val.length : (val ? 1 : 0);
+            var single = (count === 1);
+
+            // The matching switch lives in the same flexible-content layout.
+            var $switch = field.$el
+                .closest('.acf-fields')
+                .find('> .acf-field[data-key="field_blog_grid_show_filters"]');
+            if (!$switch.length) return;
+
+            $switch.css('opacity', single ? '0.55' : '');
+
+            var $note = $switch.find('.amd-single-cat-note');
+            if (single && !$note.length) {
+                $('<p class="amd-single-cat-note" style="margin:8px 0 0;padding:8px 10px;border-radius:6px;background:#fef3c7;border:1px solid #fde68a;color:#92400e;font-size:12px;">' +
+                    'Une seule catégorie sélectionnée : les boutons de filtrage ne s\'afficheront pas sur le site (il n\'y a rien à filtrer).' +
+                  '</p>').appendTo($switch.find('.acf-input'));
+            } else if (!single && $note.length) {
+                $note.remove();
+            }
+        }
+
+        function bind(field) {
+            field.on('change', function () { sync(field); });
+            sync(field);
+        }
+
+        acf.addAction('ready_field/key=field_blog_grid_display_categories', bind);
+        acf.addAction('append_field/key=field_blog_grid_display_categories', bind);
+    })(jQuery);
+    </script>
+    <?php
+}
+add_action('acf/input/admin_footer', 'v5_digital_blog_grid_filter_switch_notice');
+
 function v5_digital_acf_has_json_field_groups() {
     $files = glob(v5_digital_acf_json_path() . '/group_*.json');
     return !empty($files);
