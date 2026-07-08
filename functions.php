@@ -2219,8 +2219,10 @@ function v5_digital_render_section_preview() {
 
     $tw_path  = get_template_directory() . '/assets/css/tailwind.css';
     $css_path = get_template_directory() . '/assets/css/theme-styles.css';
+    $js_path  = get_template_directory() . '/assets/js/theme-scripts.js';
     $tw_ver   = file_exists($tw_path) ? filemtime($tw_path) : '1';
     $css_ver  = file_exists($css_path) ? filemtime($css_path) : '1';
+    $js_ver   = file_exists($js_path) ? filemtime($js_path) : '1';
 
     nocache_headers();
     header('Content-Type: text/html; charset=utf-8');
@@ -2249,8 +2251,24 @@ function v5_digital_render_section_preview() {
            first rendered element, and give the frame a little breathing room. */
         body > *:first-child { margin-top: 0 !important; }
         body { padding-top: 1px; }
-        /* No GSAP here: `motion-enhanced` on <body> keeps hero titles visible
-           instead of stuck at the opacity:0 that header.php sets. */
+        /* Mirrors header.php's FOUC-prevention rules exactly, so the real GSAP
+           entrance animation (loaded below) has the same hidden starting point
+           it has on the live site instead of flashing in unstyled. */
+        .hero-title, .section-label, main h1 + p, main .hero-title + p {
+            opacity: 0;
+        }
+        .motion-enhanced .hero-title,
+        .motion-enhanced .section-label,
+        .motion-enhanced main h1 + p,
+        .motion-enhanced main .hero-title + p {
+            opacity: 1;
+        }
+        body:not(.motion-enhanced) .hero-title,
+        body:not(.motion-enhanced) .section-label,
+        body:not(.motion-enhanced) main h1 + p,
+        body:not(.motion-enhanced) main .hero-title + p {
+            opacity: 1;
+        }
         .v5-preview-empty {
             font-family: Inter, system-ui, sans-serif;
             color: #64748b;
@@ -2264,7 +2282,7 @@ function v5_digital_render_section_preview() {
         a { pointer-events: none; }
     </style>
 </head>
-<body class="motion-enhanced text-slate-800 antialiased">
+<body class="text-slate-800 antialiased">
 <?php if ($has_visible_content) : ?>
     <?php echo $section_html; // phpcs:ignore WordPress.Security.EscapeOutput — theme template output ?>
 <?php elseif ($row_index >= 0) : ?>
@@ -2284,6 +2302,15 @@ function v5_digital_render_section_preview() {
         window.lucide.createIcons();
     }
 </script>
+<!-- Same motion system as the live site (footer.php), so the preview shows
+     the real hero/section entrance animation and a running logo marquee
+     instead of a static frame. Every GSAP call in theme-scripts.js is
+     null-guarded (if (header), if (heroTitle), ...), so it degrades cleanly
+     when a single isolated section is missing elements (nav, other sections)
+     that exist on the real page. -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="<?php echo esc_url(get_template_directory_uri() . '/assets/js/theme-scripts.js?ver=' . $js_ver); ?>"></script>
 </body>
 </html>
     <?php

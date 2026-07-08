@@ -307,6 +307,29 @@ output. Open a page → Add Row → eye icon to confirm each layout renders.
 Admin-only and purely additive: no front-end output, no Tailwind rebuild, no
 data touched.
 
+## Real GSAP motion in the preview
+
+The preview originally hardcoded `motion-enhanced` on `<body>` and shipped no
+JS, on the theory that loading GSAP might leave hero titles stuck at
+`opacity:0` in an isolated single-section frame missing the header/other
+sections `theme-scripts.js` normally expects. Checked that assumption against
+the actual code instead of leaving it as a known limitation: every GSAP call
+in `theme-scripts.js` is null-guarded (`if (header)`, `if (heroTitle)`,
+`if (!title || ...) return`, etc.), so it already degrades cleanly with parts
+of the page missing. Traced `header.php`'s CSS cascade too — the fallback rule
+`body:not(.motion-enhanced) .hero-title{opacity:1}` outranks the base
+`opacity:0` by specificity, so even if the GSAP CDN fails to load, nothing
+gets stuck invisible; that's exactly why production doesn't need the hardcoded
+class either.
+
+Replaced the hardcode with the real thing: ported `header.php`'s three FOUC
+rules into the endpoint's `<style>` block, dropped the forced
+`motion-enhanced` class, and loaded the same three scripts `footer.php` loads
+(`gsap.min.js`, `ScrollTrigger.min.js`, `theme-scripts.js`, versioned by
+`filemtime` like the CSS already was) right before `</body>`. The preview now
+runs the actual hero/section entrance animation and the logo marquee's
+continuous scroll, instead of a static already-revealed frame.
+
 ## Row eye visibility — matched to ACF's actual reveal rule
 
 The eye appeared alone on a resting (collapsed, light-background) row, and was
@@ -336,3 +359,35 @@ invisible on the blue selected/hover header. Two separate mistakes:
    (`:hover`/`.-hover`/`.active-layout`), plus `:focus-visible` for keyboard
    users (harmless — never fires on mouse click, so it can't reintroduce the
    "visible after click" bug).
+
+### Follow-up: `color: inherit` produced a near-invisible "ghost" eye on hover
+
+A screenshot showed a faint white ring where the eye sits on a merely-hovered
+(not selected) row — still light gray, not blue. Checked ACF's real CSS
+(`acf-fc-layout-actions-wrap{background:#f9f9f9}` at rest,
+`.layout.active-layout>.acf-fc-layout-actions-wrap{background:...blue}` only
+on selection) and confirmed the header bar only turns blue when a row is
+*selected*, not on plain hover — hover just reveals the native icons in their
+existing (dark, resting) color. `color: inherit` had been applied on **both**
+hover and active-layout, so a merely-hovered row forced the eye white against
+its still-light background — a near-invisible ghost. Fixed by restricting
+`color: #fff` to `.layout.active-layout` only; on hover it now falls back to
+its natural dark `inherit` value, matching the native icons exactly (dark on
+hover, white when selected).
+
+**Verified against ACF's own files, not assumption:** copied the real compiled
+`acf-pro-input.min.css` (not a hand-rolled simulation) and the exact row
+markup from ACF Pro's `Layout.php` template into a headless-Chrome test,
+loaded `section-preview.css` after it in the same order WordPress enqueues it,
+and read computed styles for three states:
+
+| State | `visibility` | `color` |
+| --- | --- | --- |
+| Resting | `hidden` | — |
+| Hovered (not selected) | `visible` | dark (`rgb(0,0,0)`) |
+| Selected (`.active-layout`) | `visible` | white (`rgb(255,255,255)`) |
+
+Also confirmed in ACF's minified JS that `.layout` (not some inner wrapper) is
+exactly what gets `-hover`/`active-layout` classes, so the plain CSS
+descendant selectors (`.layout:hover .v5-sp-eye--row`, etc.) match the real
+DOM without any adjustment.
