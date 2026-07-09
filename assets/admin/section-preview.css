@@ -89,8 +89,8 @@
     line-height: 1.4;
     padding: 2px 7px;
     border-radius: 999px;
-    background: #eef0f2;
-    color: #475569;
+    background: var(--v5-chip-bg, #eef0f2);
+    color: var(--v5-chip-fg, #475569);
     white-space: nowrap;
 }
 
@@ -112,14 +112,25 @@
     overflow: hidden;
 }
 
-/* Category colour themes (chip + hover border tint). */
-.acf-fc-popup a[data-cat="accueil"] .v5-sp-card-cat { background: #e6effd; color: #1d4ed8; }
-.acf-fc-popup a[data-cat="commun"]  .v5-sp-card-cat { background: #eef0f2; color: #475569; }
-.acf-fc-popup a[data-cat="blog"]    .v5-sp-card-cat { background: #f3e8ff; color: #7c3aed; }
-.acf-fc-popup a[data-cat="contact"] .v5-sp-card-cat { background: #e6f6ec; color: #15803d; }
-.acf-fc-popup a[data-cat="methodo"] .v5-sp-card-cat { background: #fdf0dd; color: #b45309; }
-.acf-fc-popup a[data-cat="propos"]  .v5-sp-card-cat { background: #dff5f3; color: #0f766e; }
-.acf-fc-popup a[data-cat="form"]    .v5-sp-card-cat { background: #e6effd; color: #1d4ed8; }
+/* Category colour themes, declared ONCE as custom properties and consumed by
+   both the picker card chip (.v5-sp-card-cat) and the preview-modal chip
+   (.v5-sp-title-cat), so the two can never drift apart. The properties are set
+   on the chip's ancestor (card) or on the chip itself (modal); either way they
+   inherit down to the background/color declarations. */
+.acf-fc-popup a[data-cat="accueil"],
+.v5-sp-title-cat[data-cat="accueil"] { --v5-chip-bg: #e6effd; --v5-chip-fg: #1d4ed8; }
+.acf-fc-popup a[data-cat="commun"],
+.v5-sp-title-cat[data-cat="commun"]  { --v5-chip-bg: #eef0f2; --v5-chip-fg: #475569; }
+.acf-fc-popup a[data-cat="blog"],
+.v5-sp-title-cat[data-cat="blog"]    { --v5-chip-bg: #f3e8ff; --v5-chip-fg: #7c3aed; }
+.acf-fc-popup a[data-cat="contact"],
+.v5-sp-title-cat[data-cat="contact"] { --v5-chip-bg: #e6f6ec; --v5-chip-fg: #15803d; }
+.acf-fc-popup a[data-cat="methodo"],
+.v5-sp-title-cat[data-cat="methodo"] { --v5-chip-bg: #fdf0dd; --v5-chip-fg: #b45309; }
+.acf-fc-popup a[data-cat="propos"],
+.v5-sp-title-cat[data-cat="propos"]  { --v5-chip-bg: #dff5f3; --v5-chip-fg: #0f766e; }
+.acf-fc-popup a[data-cat="form"],
+.v5-sp-title-cat[data-cat="form"]    { --v5-chip-bg: #e6effd; --v5-chip-fg: #1d4ed8; }
 
 /* The eye button, top-right of each card. */
 .v5-sp-eye {
@@ -154,6 +165,94 @@
     width: 16px;
     height: 16px;
     line-height: 1;
+}
+
+/* ── Per-page grouping: this page / commun / (toggle) other pages ────────────
+   The picker groups the sections belonging to the page being edited, then the
+   reusable "commun" ones, and parks the rest behind a toggle (see
+   applyCategoryFilter / v5_digital_page_builder_category). Hidden cards are
+   hidden at the grid-cell level — hiding the <a> alone would leave the <li>
+   holding an empty gap in the grid.
+
+   The extra `ul` in the selector is load-bearing: it lifts specificity to
+   (0,2,2) so this beats BOTH `.acf-fc-popup li { display: flex !important }`
+   (0,1,1) and `.acf-fc-popup li.v5-sp-group { display: block !important }`
+   (0,2,1) below. Without it the group rule ties and, being later in the file,
+   wins — leaving the "autres pages" header visible while collapsed. */
+.acf-fc-popup ul li.v5-sp-hidden,
+.acf-fc-popup ul a.v5-sp-hidden {
+    display: none !important;
+}
+
+/* Group heading. Full-width so the cards below it read as one band. */
+.acf-fc-popup li.v5-sp-group {
+    grid-column: 1 / -1;
+    display: block !important;
+    margin: 6px 2px 0 !important;
+    padding: 0 !important;
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8c8f94;
+    pointer-events: none; /* a label, never a click target */
+}
+
+.acf-fc-popup li.v5-sp-group:first-child {
+    margin-top: 0 !important;
+}
+
+/* "Déjà utilisée" pill on a commun card already present on this page. */
+.v5-sp-card-used {
+    display: inline-block;
+    flex: 0 0 auto;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #e6f6ec;
+    color: #15803d;
+    white-space: nowrap;
+}
+
+/* The chip may now sit beside a pill; let the pair shrink before the eye does. */
+.v5-sp-card-head {
+    flex-wrap: wrap;
+}
+
+/* The toggle spans the full grid width, below every visible card. `1 / -1` also
+   holds in the single-column media query below, so it needs no override. */
+.acf-fc-popup li.v5-sp-more-li {
+    grid-column: 1 / -1;
+    margin-top: 2px !important;
+}
+
+.v5-sp-more {
+    flex: 1 1 auto;
+    display: block;
+    width: 100%;
+    padding: 9px 10px;
+    background: transparent;
+    border: 1px dashed #c3c4c7;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: #50575e;
+    text-align: center;
+    transition: border-color 0.12s ease, color 0.12s ease, background-color 0.12s ease;
+}
+
+.v5-sp-more:hover,
+.v5-sp-more:focus {
+    background: rgba(37, 99, 235, 0.04);
+    border-color: #2563eb;
+    color: #2563eb;
+    outline: none;
 }
 
 /* Single column when there isn't room for two. */
@@ -299,11 +398,40 @@ body.v5-sp-modal-open .acf-tooltip {
     border-bottom: 1px solid #dcdcde;
 }
 
+/* The heading is a coloured category chip + the section title (setModalTitle),
+   matching the picker cards rather than printing the raw "[Commun] …" label.
+   min-width:0 lets a long title shrink instead of shoving the close button. */
 .v5-sp-title {
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
     font-size: 15px;
     font-weight: 600;
     color: #1d2327;
+}
+
+.v5-sp-title-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Same palette as the card chip (shared --v5-chip-* vars), a step larger to sit
+   comfortably against the 15px heading. */
+.v5-sp-title-cat {
+    flex: 0 0 auto;
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--v5-chip-bg, #eef0f2);
+    color: var(--v5-chip-fg, #475569);
+    white-space: nowrap;
 }
 
 .v5-sp-close {

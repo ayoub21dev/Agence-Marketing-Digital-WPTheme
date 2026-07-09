@@ -1,14 +1,14 @@
-# Roadmap & Ideas — Agence Marketing Digital
+# Roadmap & Ideas
 
 Backlog of upcoming features, editor-UX improvements, and use cases to explore.
 Not committed work — a place to capture ideas before they become tasks.
-
 
 ---
 
 ## Page builder — editor UX
 
 ### 1. Live preview when selecting a section
+
 Give editors a visual preview of each section as they pick it in the page
 builder, so they see the result *before* saving.
 
@@ -20,6 +20,7 @@ builder, so they see the result *before* saving.
   admin script + a preview image per `template-parts/layouts/*` file.
 
 ### 2. Conditional fields in the section selector
+
 Show/hide fields based on context so only relevant settings appear.
 
 - **Duplicate-section warning:** if a section is added that already exists on
@@ -35,11 +36,44 @@ Show/hide fields based on context so only relevant settings appear.
   Related to the existing `display_categories` / `show_filters` sub-fields in
   `blog_posts_grid.php`.
 
+### 3. Page-scoped sections
+
+Make each section (component) belong to a single page rather than a shared,
+reusable block.
+
+- **Goal:** a section instance is unique to the page it's placed on and bound
+  to it — editing or deleting it affects only that page, never another.
+- **Why:** prevents accidental cross-page edits and keeps each page's content
+  self-contained and predictable.
+- **Notes:** ACF flexible-content rows in `page_layouts` are already stored
+  per-page (in the page's post meta), so a section is inherently local to its
+  page today. This item is about making that guarantee explicit — and, if any
+  shared/global blocks are ever introduced, keeping page sections cleanly
+  separate from them.
+
+### 4. Global options page
+
+Add a central admin screen for site-wide info that isn't tied to any single
+page.
+
+- **Goal:** one place to manage global content — contact details (email,
+  phone, address), social links, default logo, footer text, tracking IDs,
+  and any recurring CTA copy — editable once and reused everywhere.
+- **Why:** these values are currently scattered or hardcoded across templates;
+  a single source stops the same data being re-entered per page and keeps it
+  consistent site-wide.
+- **Notes:** use ACF's `acf_add_options_page()` (register in `functions.php`);
+  read values with `get_field('name', 'option')` via the existing
+  `v5_digital_get_field()` wrapper (pass `'option'` as the post ID). Contrast
+  with item 3 — options-page fields are intentionally global, page sections
+  are intentionally local.
+
 ---
 
 ## Front-end features
 
-### 3. Mega menu in the header
+### 5. Mega menu in the header
+
 Replace the flat header nav with a mega menu.
 
 - **Goal:** surface more of the site (services, cities, top agencies, recent
@@ -48,7 +82,8 @@ Replace the flat header nav with a mega menu.
   a mega menu means a richer markup layer on top of the WP menu, plus mobile
   behaviour. Touches `header.php` + `theme-scripts.js`.
 
-### 4. Exit-intent pop-up modal
+### 6. Exit-intent pop-up modal
+
 Show a modal when a visitor is about to leave the page.
 
 - **Trigger:** cursor exits toward the browser chrome (desktop `mouseout` at
@@ -60,14 +95,15 @@ Show a modal when a visitor is about to leave the page.
   respect a global on/off switch (ACF option or theme option).
 - **Notes:** must be dismissible (Escape, backdrop click, close button),
   focus-trapped, `aria-modal`, and respect reduced-motion — same constraints
-  as item 5. Lives in `theme-scripts.js` + a small markup partial in
+  as item 7. Lives in `theme-scripts.js` + a small markup partial in
   `footer.php`.
 
 ---
 
 ## Research / exploration
 
-### 5. Engagement & accessibility patterns
+### 7. Engagement & accessibility patterns
+
 Investigate UI patterns that raise on-page engagement and improve
 accessibility, then recommend which to implement and how.
 
@@ -83,5 +119,3 @@ accessibility, then recommend which to implement and how.
 ## Ideas parking lot
 
 _Add loose ideas here before they're fleshed out._
-
--

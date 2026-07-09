@@ -2561,6 +2561,46 @@ function v5_digital_render_section_preview() {
 }
 add_action('wp_ajax_v5_section_preview', 'v5_digital_render_section_preview');
 
+/**
+ * The page-builder category a given page belongs to, as a slug matching
+ * catSlug() in section-preview.js (which derives it from the "[Catégorie]"
+ * prefix on each layout label). Drives which sections the "Ajouter une
+ * Section" picker shows by default; the rest stay reachable behind the
+ * "autres sections" toggle.
+ *
+ * Returns '' for pages we don't scope (a brand-new custom page, say) — the
+ * picker then shows everything, so an editor is never left without options.
+ * Filterable so custom pages can opt into a category without touching code.
+ *
+ * Slugs mirror $pages_to_seed, the theme's canonical page↔sections mapping.
+ */
+function v5_digital_page_builder_category($post_id) {
+    $cat = '';
+
+    // Pages only: `page_layouts` lives on pages, and the edit screen this
+    // feeds also loads for posts (which have their own `blog_layouts` field).
+    // Without this guard a post slugged "contact" would report a page category.
+    if ($post_id && get_post_type($post_id) === 'page') {
+        if ((int) $post_id === (int) get_option('page_on_front')) {
+            $cat = 'accueil';
+        } else {
+            $slug = get_post_field('post_name', $post_id);
+            $map  = array(
+                'blog'         => 'blog',
+                'annuaire'     => 'accueil', // directory: search/filter/picks are [Accueil]
+                'about'        => 'propos',
+                'contact'      => 'contact',
+                'methodologie' => 'methodo',
+            );
+            if (isset($map[$slug])) {
+                $cat = $map[$slug];
+            }
+        }
+    }
+
+    return apply_filters('v5_digital_page_builder_category', $cat, $post_id);
+}
+
 /** Load the preview modal assets on the post/page edit screens only. */
 function v5_digital_admin_section_preview_assets($hook) {
     if ($hook !== 'post.php' && $hook !== 'post-new.php') {
@@ -2600,6 +2640,8 @@ function v5_digital_admin_section_preview_assets($hook) {
         'nonce'   => wp_create_nonce('v5_section_preview'),
         'postId'  => $preview_post_id ? (int) $preview_post_id : 0,
         'layouts' => v5_digital_layout_preview_data(),
+        // Which sections the picker shows by default. '' = show them all.
+        'pageCategory' => v5_digital_page_builder_category($preview_post_id),
         'i18n'    => array(
             'previewTitle' => __('Aperçu de la section', 'agence-marketing-digital'),
             'insert'       => __('Insérer cette section', 'agence-marketing-digital'),
@@ -2611,6 +2653,20 @@ function v5_digital_admin_section_preview_assets($hook) {
             'dirtyHint'    => __('Modifications non enregistrées : l\'aperçu montre la dernière version enregistrée. Cliquez sur « Mettre à jour » pour les voir.', 'agence-marketing-digital'),
             'newRowHint'   => __('Cette section n\'a jamais été enregistrée. Cliquez sur « Mettre à jour » puis rouvrez l\'aperçu.', 'agence-marketing-digital'),
             'refresh'      => __('Rafraîchir', 'agence-marketing-digital'),
+            // The toggle reveals unused commun sections AND other pages'
+            // sections, so it can't name only the latter.
+            'showOther'        => __('Afficher les autres sections', 'agence-marketing-digital'),
+            'hideOther'        => __('Masquer les autres sections', 'agence-marketing-digital'),
+            'groupPage'        => __('Sections de cette page', 'agence-marketing-digital'),
+            'groupCommon'      => __('Sections communes', 'agence-marketing-digital'),
+            'groupOtherCommon' => __('Autres sections communes', 'agence-marketing-digital'),
+            'groupOther'       => __('Sections des autres pages', 'agence-marketing-digital'),
+            // Short pill text — it sits beside the category chip on a narrow
+            // card. The full sentence lives in the tooltip below.
+            'used'         => __('Utilisée', 'agence-marketing-digital'),
+            /* translators: %d: how many times the section already appears on this page. */
+            'usedTimes'    => __('Déjà utilisée %d fois sur cette page', 'agence-marketing-digital'),
+            'usedOnce'     => __('Déjà utilisée sur cette page', 'agence-marketing-digital'),
         ),
     ));
 }
@@ -2658,6 +2714,25 @@ function v5_digital_enqueue_assets() {
     );
 }
 add_action('wp_enqueue_scripts', 'v5_digital_enqueue_assets');
+
+// ----------------------------------------------------
+// 3b. EXIT-INTENT NEWSLETTER POPUP
+// ----------------------------------------------------
+// Detection/dismissal lives entirely in theme-scripts.js (mouseout toward the
+// browser chrome on desktop, rapid scroll-up near the top on mobile). This
+// side only decides WHETHER the popup is allowed to fire on the current
+// request, exposed to JS via window.wpThemeSettings.exitIntentEnabled
+// (header.php).
+
+/**
+ * Global on/off switch for the exit-intent popup. Article pages only
+ * (single-blog.php, via single.php); filterable so it can be disabled
+ * site-wide without touching code
+ * (`add_filter('v5_digital_exit_intent_enabled', '__return_false')`).
+ */
+function v5_digital_exit_intent_enabled() {
+    return (bool) apply_filters('v5_digital_exit_intent_enabled', is_singular('post'));
+}
 
 // ----------------------------------------------------
 // 4. THEME SWITCH AUTOMATION (INITIALIZE PAGES & SITE DATA)
@@ -4029,6 +4104,8 @@ function v5_digital_ui_strings() {
         'Analyses indépendantes des agences de marketing digital au Maroc. Évaluations objectives, guides de sélection pratiques et absence d\'influence publicitaire.',
         'Rechercher des agences, des pages, des villes...',
         'Fermer la recherche',
+        // Exit-intent newsletter popup
+        'Fermer',
         // Blog / article meta
         'Par',
         // Recent-posts rail (article sidebar + blog listing)

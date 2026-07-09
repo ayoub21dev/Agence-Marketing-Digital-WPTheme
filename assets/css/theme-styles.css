@@ -235,6 +235,29 @@ dialog:focus-visible {
     outline: none;
 }
 
+/* Exit-intent popup: the browser's own dialog:modal centering (inset-block:0
+   + margin:auto) is left alone — it already centers correctly, and GSAP's
+   open/close animation is applied to #exit-intent-inner (a wrapper one level
+   in), never to the <dialog> itself, for the same reason: transforming the
+   dialog element directly was found to break its native top-layer centering
+   (confirmed in isolation — it rendered far off-screen, offset by roughly
+   however far the page had scrolled). What's still needed is a height cap:
+   on a short viewport the dialog's natural content height can exceed what's
+   visible, and this dialog's own `overflow-hidden` (needed to clip the
+   rounded corners against the gradient header) would silently crop whatever
+   doesn't fit instead of centering something shorter. dvh (with a vh
+   fallback for older browsers) caps it to what's actually visible, and the
+   body section (#ei-body) scrolls internally if content still doesn't fit. */
+#exit-intent-modal {
+    max-height: 90vh;
+    max-height: 90dvh;
+}
+#ei-body {
+    max-height: calc(90vh - 96px);
+    max-height: calc(90dvh - 96px);
+    overflow-y: auto;
+}
+
 /* ----------------------------------------------------
  * Site Footer Centered & Self-Balancing Layout Rules
  * ---------------------------------------------------- */

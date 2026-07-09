@@ -35,6 +35,24 @@ jobs:
           timeout: 600000
           local-dir: ./
           server-dir: /wp-content/themes/agence-marketing-digital/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .github/**
+            .vscode/**
+            changes/**
+            docs/**
+            src/**
+            CLAUDE.md
+            README.md
+            ROADMAP.md
+            SITEMAP.md
+            STRUCTURED-DATA.md
+            package.json
+            package-lock.json
+            tailwind.config.js
+            .gitignore
 
       - name: Wait before retry 2
         if: steps.deploy1.outcome == 'failure'
@@ -54,6 +72,24 @@ jobs:
           timeout: 600000
           local-dir: ./
           server-dir: /wp-content/themes/agence-marketing-digital/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .github/**
+            .vscode/**
+            changes/**
+            docs/**
+            src/**
+            CLAUDE.md
+            README.md
+            ROADMAP.md
+            SITEMAP.md
+            STRUCTURED-DATA.md
+            package.json
+            package-lock.json
+            tailwind.config.js
+            .gitignore
 
       - name: Wait before retry 3
         if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
@@ -73,6 +109,24 @@ jobs:
           timeout: 600000
           local-dir: ./
           server-dir: /wp-content/themes/agence-marketing-digital/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .github/**
+            .vscode/**
+            changes/**
+            docs/**
+            src/**
+            CLAUDE.md
+            README.md
+            ROADMAP.md
+            SITEMAP.md
+            STRUCTURED-DATA.md
+            package.json
+            package-lock.json
+            tailwind.config.js
+            .gitignore
 
       - name: Fail job if all attempts failed
         if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure' && steps.deploy3.outcome == 'failure'

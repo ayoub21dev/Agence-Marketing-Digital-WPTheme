@@ -256,6 +256,51 @@ if (empty($matchmaker_services)) {
         </div>
     </dialog>
 
+    <!-- Exit-intent newsletter capture. Opened by theme-scripts.js
+         (initExitIntent) on desktop mouse-out-toward-chrome / mobile
+         rapid-scroll-up; suppressed per-request via
+         window.wpThemeSettings.exitIntentEnabled (v5_digital_exit_intent_enabled()). -->
+    <dialog id="exit-intent-modal" aria-labelledby="ei-title" aria-describedby="ei-desc" class="backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-0 bg-white overflow-hidden outline-none">
+        <!-- theme-scripts.js animates THIS wrapper, never the <dialog> itself:
+             applying GSAP's transform tween directly to the dialog element
+             was found to break its native top-layer centering (it would
+             render far off-screen, offset by roughly however far the page
+             had been scrolled — reproduced and confirmed in isolation). -->
+        <div id="exit-intent-inner">
+            <div class="bg-gradient-to-br from-brand-900 to-brand-700 px-6 py-5 text-white flex items-start justify-between">
+                <div>
+                    <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-300 mb-1">Newsletter</p>
+                    <h2 class="text-[1.2rem] font-extrabold tracking-tight font-display" id="ei-title">Avant de partir…</h2>
+                    <p class="text-[12px] text-blue-200 mt-0.5" id="ei-desc">Recevez nos analyses d'agences par email</p>
+                </div>
+                <button type="button" onclick="closeExitIntent()" aria-label="<?php echo esc_attr(v5_t('Fermer')); ?>" class="text-blue-300 hover:text-white transition-colors mt-0.5 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div class="p-6" id="ei-body">
+                <div id="ei-form-state">
+                    <p class="text-[13px] text-slate-500 mb-4 leading-relaxed">Chaque quinzaine : un audit d'agence, un signal SEO à surveiller, une sélection de ressources pour les fondateurs et directeurs marketing au Maroc.</p>
+                    <form id="exit-intent-form" class="flex flex-col gap-3">
+                        <input type="email" id="ei-email" name="email" required placeholder="votre@email.com" autocomplete="email" class="w-full border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-700 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-500/10 transition-all">
+                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg text-[13px] transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                            <span>S'abonner</span>
+                        </button>
+                    </form>
+                    <p class="text-[11px] text-slate-400 font-mono mt-3">Aucun spam · Désabonnement en 1 clic</p>
+                </div>
+                <div id="ei-success-state" class="hidden flex-col items-center text-center gap-1 py-2">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center border border-emerald-100 flex-shrink-0 mb-2">
+                        <i data-lucide="check" class="w-6 h-6 stroke-[3px]"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-slate-900 text-[16px]">Merci pour votre inscription !</h3>
+                    <p class="text-[13px] text-slate-500">Vous recevrez notre prochaine analyse par email.</p>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
     <style>
         .step-option-btn.active {
             border-color: #2563eb;

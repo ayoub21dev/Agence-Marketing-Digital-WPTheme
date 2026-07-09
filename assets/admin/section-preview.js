@@ -317,6 +317,37 @@
      *   always a demo. Deriving it from `rowIndex >= 0` let a failed index
      *   computation silently degrade a row preview into a demo.
      */
+    /** Render the modal heading as a coloured category chip + the section title,
+        mirroring the picker cards, instead of printing the raw
+        "[Commun] Bandeau — logos partenaires" label with its brackets. The chip
+        carries data-cat so it picks up the same colour theme as the cards.
+
+        The <h2> keeps its id, so aria-labelledby still names the dialog — and
+        it now reads "Commun Bandeau — logos partenaires", which is the natural
+        spoken form of what's on screen. */
+    function setModalTitle(full) {
+        var h = modal.querySelector('.v5-sp-title');
+        var parts = splitLabel(String(full || '').trim());
+
+        h.textContent = '';
+        if (parts.cat) {
+            var chip = document.createElement('span');
+            chip.className = 'v5-sp-title-cat';
+            chip.setAttribute('data-cat', catSlug(parts.cat));
+            chip.textContent = parts.cat;
+            h.appendChild(chip);
+            // The gap between chip and title is pure CSS, so the accessible name
+            // would otherwise run together as "CommunBandeau — …". A whitespace
+            // text node separates them for assistive tech; flexbox does not
+            // render whitespace-only anonymous items, so nothing moves visually.
+            h.appendChild(document.createTextNode(' '));
+        }
+        var text = document.createElement('span');
+        text.className = 'v5-sp-title-text';
+        text.textContent = parts.title;
+        h.appendChild(text);
+    }
+
     function openModal(opts) {
         var info = layouts[opts.layout];
         if (!info) return;
@@ -334,7 +365,7 @@
         lastFocused = document.activeElement;
         buildModal();
 
-        modal.querySelector('.v5-sp-title').textContent = info.label || opts.layout;
+        setModalTitle(info.label || opts.layout);
         modal.querySelector('.v5-sp-desc').textContent = info.desc || '';
 
         // Demo caption only makes sense for the Add-Row preview.
@@ -415,6 +446,20 @@
 
     // ── 1. "Add Row" popup entries → card grid ───────────────────────────────
 
+    /** Split an ACF label — "[Catégorie] Titre — sous-titre" — into its chip and
+        title parts. Shared by the picker cards and the preview modal header so
+        both render the category the same way. Falls back to the whole string as
+        the title when there is no "[…]" prefix. */
+    function splitLabel(full) {
+        var out = { cat: '', title: full };
+        var m = /^\[([^\]]+)\]\s*(.*)$/.exec(full);
+        if (m) {
+            out.cat = m[1].trim();
+            out.title = m[2].trim() || full;
+        }
+        return out;
+    }
+
     /** Map the "[Catégorie]" label prefix to a colour-theme slug. */
     function catSlug(cat) {
         var c = (cat || '').toLowerCase();
@@ -446,6 +491,191 @@
         });
     }
 
+    /** Categories that belong on ANY page (they have no page of their own), so
+        they sit in their own always-visible group rather than behind the
+        toggle. Without this, `common_hero` — the first section on every
+        non-home page — would be hidden by default. */
+    var COMMON_CATS = ['commun', 'form'];
+
+    /** The grid cell a card occupies (ACF wraps each anchor in an <li>), so we
+        hide the cell rather than the anchor — hiding the anchor alone would
+        leave an empty cell holding a gap in the grid. */
+    function cardCell(card) {
+        return card.closest('li') || card;
+    }
+
+    /** The flexible-content field the popup was opened from. `lastFieldKey` is
+        set when the "Add" button is clicked; fall back to the only such field
+        on the screen. */
+    function builderField() {
+        if (lastFieldKey) {
+            var f = document.querySelector('.acf-field-flexible-content[data-key="' + lastFieldKey + '"]');
+            if (f) return f;
+        }
+        return document.querySelector('.acf-field-flexible-content');
+    }
+
+    /** How many times each layout is currently on the page, as a {name: count}
+        map. Read live from the DOM rather than from the server, so rows added
+        (or removed) since the last save are reflected too. Clone templates are
+        excluded via isRealRow, and nested flexible fields via the closest()
+        check — otherwise a nested row would count toward the outer field. */
+    function usedLayoutCounts() {
+        var field = builderField();
+        var used = {};
+        if (!field) return used;
+        field.querySelectorAll('.layout[data-layout]').forEach(function (row) {
+            if (!isRealRow(row)) return;
+            if (row.closest('.acf-field-flexible-content') !== field) return;
+            var n = row.getAttribute('data-layout');
+            used[n] = (used[n] || 0) + 1;
+        });
+        return used;
+    }
+
+    /** A full-width row in the card grid (group header or the toggle). */
+    function fullWidthCell(className) {
+        var li = document.createElement('li');
+        li.className = className;
+        return li;
+    }
+
+    function groupHeader(text) {
+        var li = fullWidthCell('v5-sp-group');
+        li.setAttribute('role', 'presentation');
+        li.textContent = text;
+        return li;
+    }
+
+    /** Mark a card whose layout is already on the page. Purely informational —
+        the card stays fully clickable, since most sections may legitimately
+        repeat. Complements the after-the-fact duplicate warning in
+        functions.php. */
+    function markUsed(card, count) {
+        var head = card.querySelector('.v5-sp-card-head');
+        var eye = card.querySelector('.v5-sp-card-eye');
+        if (!head || head.querySelector('.v5-sp-card-used')) return;
+
+        var badge = document.createElement('span');
+        badge.className = 'v5-sp-card-used';
+        badge.textContent = i18n.used || 'Utilisée';
+        badge.title = count > 1
+            ? (i18n.usedTimes || 'Déjà utilisée %d fois sur cette page').replace('%d', count)
+            : (i18n.usedOnce || 'Déjà utilisée sur cette page');
+
+        // Before the eye, which is pinned right by `margin-left: auto`.
+        if (eye) head.insertBefore(badge, eye); else head.appendChild(badge);
+    }
+
+    /** Reorganise the picker into, visible by default:
+          "Sections de cette page"   → the page's own category
+          "Sections communes"        → ONLY the commun/formulaire sections the
+                                       page actually uses (omitted if none)
+        and, behind the toggle:
+          "Autres sections communes" → the commun/formulaire ones not in use
+          "Sections des autres pages" → every other category
+
+        Every card whose layout is already on the page — in any group — gets a
+        "utilisée" badge.
+
+        No-ops (leaving every card visible, ungrouped, no toggle) when the page
+        has no category or nothing matches it — an empty picker would be worse
+        than an unfiltered one. */
+    function applyCategoryFilter(popup) {
+        var pageCat = cfg.pageCategory || '';
+        if (!pageCat) return;
+
+        var list = popup.querySelector('ul');
+        if (!list || list.dataset.v5Filtered) return;
+
+        var cards = Array.prototype.slice.call(popup.querySelectorAll('a.v5-sp-card'));
+        if (!cards.length) return;
+
+        var used = usedLayoutCounts();
+        var isUsed = function (c) { return !!used[c.getAttribute('data-layout')]; };
+
+        var pageCards = [], usedCommon = [], unusedCommon = [], otherCards = [];
+        cards.forEach(function (c) {
+            var cat = c.getAttribute('data-cat');
+            if (cat === pageCat) pageCards.push(c);
+            else if (COMMON_CATS.indexOf(cat) !== -1) (isUsed(c) ? usedCommon : unusedCommon).push(c);
+            else otherCards.push(c);
+        });
+
+        // Never leave the editor with an empty picker.
+        if (!pageCards.length) return;
+        var hiddenCount = unusedCommon.length + otherCards.length;
+        // Only one group and nothing to reveal → grouping adds noise, not signal.
+        if (!usedCommon.length && !hiddenCount) return;
+
+        list.dataset.v5Filtered = '1';
+
+        // Badge every section already on the page, whichever group it lands in.
+        cards.forEach(function (c) {
+            if (isUsed(c)) markUsed(c, used[c.getAttribute('data-layout')]);
+        });
+
+        // Rebuild the grid in group order. Moving <li> nodes is safe: ACF binds
+        // insertion by delegation on `[data-layout]`, not on element identity.
+        list.appendChild(groupHeader(i18n.groupPage || 'Sections de cette page'));
+        pageCards.forEach(function (c) { list.appendChild(cardCell(c)); });
+
+        // Only the commun sections in use — an unused one is not "this page's".
+        if (usedCommon.length) {
+            list.appendChild(groupHeader(i18n.groupCommon || 'Sections communes'));
+            usedCommon.forEach(function (c) { list.appendChild(cardCell(c)); });
+        }
+
+        if (!hiddenCount) return; // nothing to reveal, so no toggle
+
+        var toggleLi = fullWidthCell('v5-sp-more-li');
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'v5-sp-more';
+        btn.textContent = i18n.showOther || 'Afficher les autres sections';
+        btn.setAttribute('aria-expanded', 'false');
+        toggleLi.appendChild(btn);
+        list.appendChild(toggleLi);
+
+        // Everything below the toggle, collapsed together. Kept as two labelled
+        // sub-groups: an unused newsletter CTA is not "another page's" section.
+        var hidden = [];
+        var addGroup = function (label, group) {
+            if (!group.length) return;
+            var h = groupHeader(label);
+            list.appendChild(h);
+            hidden.push(h);
+            group.forEach(function (c) {
+                var cell = cardCell(c);
+                list.appendChild(cell);
+                hidden.push(cell);
+            });
+        };
+        addGroup(i18n.groupOtherCommon || 'Autres sections communes', unusedCommon);
+        addGroup(i18n.groupOther || 'Sections des autres pages', otherCards);
+
+        var hide = function (on) {
+            hidden.forEach(function (el) { el.classList.toggle('v5-sp-hidden', on); });
+        };
+        hide(true);
+
+        btn.addEventListener('click', function (e) {
+            // ACF closes the popup on outside clicks and inserts on anchor
+            // clicks — this button is neither.
+            e.preventDefault();
+            e.stopPropagation();
+
+            var expanded = btn.getAttribute('aria-expanded') === 'true';
+            hide(expanded);
+            btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+            btn.textContent = expanded
+                ? (i18n.showOther || 'Afficher les autres sections')
+                : (i18n.hideOther || 'Masquer les autres sections');
+
+            clampPopup(popup); // the grid just grew or shrank
+        });
+    }
+
     function decoratePopup(popup) {
         popup.querySelectorAll('a[data-layout]').forEach(function (anchor) {
             if (anchor.dataset.v5Preview) return;
@@ -457,10 +687,8 @@
 
             var full = (info.label || anchor.textContent || name).trim();
 
-            // Split "[Catégorie] Titre — sous-titre" into chip + title.
-            var cat = '', title = full;
-            var m = /^\[([^\]]+)\]\s*(.*)$/.exec(full);
-            if (m) { cat = m[1].trim(); title = m[2].trim() || full; }
+            var parts = splitLabel(full);
+            var cat = parts.cat, title = parts.title;
 
             anchor.title = full;                 // full text on hover
             anchor.textContent = '';             // rebuild as a card
@@ -500,6 +728,9 @@
                 anchor.appendChild(d);
             }
         });
+
+        // After the cards exist (they carry the data-cat this filters on).
+        applyCategoryFilter(popup);
 
         clampPopup(popup);
     }

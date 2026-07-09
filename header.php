@@ -21,7 +21,8 @@
 
     <script type="text/javascript">
         window.wpThemeSettings = {
-            homeUrl: "<?php echo esc_url(home_url('/')); ?>"
+            homeUrl: "<?php echo esc_url(home_url('/')); ?>",
+            exitIntentEnabled: <?php echo v5_digital_exit_intent_enabled() ? 'true' : 'false'; ?>
         };
     </script>
 

@@ -112,7 +112,7 @@ get_header();
                             <i data-lucide="chevron-right" class="w-3 h-3"></i>
                             <span class="text-slate-900 font-semibold truncate max-w-[150px] sm:max-w-xs"><?php the_title(); ?></span>
                         </div>
-                        <a href="<?php echo esc_url($blog_url); ?>" class="bg-white hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] text-slate-600 flex items-center gap-1 transition-all no-underline">
+                        <a id="v5-back-to-articles" href="<?php echo esc_url($blog_url); ?>" class="bg-white hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] text-slate-600 flex items-center gap-1 transition-all no-underline">
                             <i data-lucide="arrow-left" class="w-3 h-3"></i> <span>retour aux articles</span>
                         </a>
                     </div>

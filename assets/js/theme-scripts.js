@@ -14,6 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 4. Initialise Search / Command Palette and Matchmaker bindings
     initModalBindings();
+
+    // 5. Exit-intent newsletter popup
+    initExitIntentModal();
+    initExitIntent();
 });
 
 const motionState = {
@@ -788,6 +792,187 @@ function triggerStarBurst(x, y) {
     setTimeout(() => {
         container.remove();
     }, 450);
+}
+
+/* Exit-intent newsletter popup */
+// Set when the popup interrupts an actual navigation (the "retour aux
+// articles" link) rather than a passive signal (mouseout/scroll) — whatever
+// closes the modal (X, backdrop, Escape, or auto-close after submit) then
+// completes that navigation, so the popup never traps a visitor who was
+// already on their way somewhere.
+let exitIntentPendingRedirect = null;
+
+function openExitIntent() {
+    const modal = document.getElementById("exit-intent-modal");
+    if (modal && !modal.open) {
+        modal.showModal();
+        // Animate the inner wrapper, NOT the <dialog> itself — GSAP's tween
+        // sets an inline `transform` on its target, and applying that
+        // directly to the dialog broke its native top-layer centering (it
+        // would render far off-screen, offset by roughly the page's current
+        // scroll position). Reproduced and confirmed in isolation; the
+        // dialog's own position is left completely untouched.
+        animateModalOpen(document.getElementById("exit-intent-inner"));
+    }
+}
+
+function closeExitIntent() {
+    const modal = document.getElementById("exit-intent-modal");
+    const inner = document.getElementById("exit-intent-inner");
+    if (modal && modal.open) {
+        animateModalClose(inner, () => {
+            modal.close();
+            if (typeof gsap !== "undefined" && inner) {
+                gsap.set(inner, { clearProps: "all" });
+            }
+            if (exitIntentPendingRedirect) {
+                const url = exitIntentPendingRedirect;
+                exitIntentPendingRedirect = null;
+                window.location.href = url;
+            }
+        });
+    }
+}
+
+/** Wires the modal itself: backdrop-click dismissal, Escape dismissal, and
+ * the (cosmetic — matches the footer newsletter band, which is also
+ * front-end only with no backend storage yet) submit handling. Runs once at
+ * init regardless of whether exit-intent detection is enabled, so the modal
+ * still works if something else ever opens it. */
+function initExitIntentModal() {
+    const modal = document.getElementById("exit-intent-modal");
+    if (!modal) return;
+
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeExitIntent();
+    });
+
+    // Native <dialog> closes on Escape by itself (a "cancel" event, then an
+    // implicit .close()) without going through closeExitIntent() — which
+    // would skip the closing animation and, worse, leave
+    // exitIntentPendingRedirect unresolved when the popup interrupted the
+    // "retour aux articles" link, silently stranding the visitor. Intercept
+    // it and route through the same close path instead.
+    modal.addEventListener("cancel", (e) => {
+        e.preventDefault();
+        closeExitIntent();
+    });
+
+    const form = document.getElementById("exit-intent-form");
+    if (!form) return;
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        try {
+            localStorage.setItem("v5_newsletter_subscribed", "1");
+        } catch (err) {
+            // Storage unavailable (private mode, quota) — the popup will just
+            // offer itself again next session, which is harmless.
+        }
+
+        const formState = document.getElementById("ei-form-state");
+        const successState = document.getElementById("ei-success-state");
+        if (formState) formState.classList.add("hidden");
+        if (successState) {
+            successState.classList.remove("hidden");
+            successState.classList.add("flex");
+        }
+        if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
+            lucide.createIcons();
+        }
+
+        window.setTimeout(closeExitIntent, 2200);
+    });
+}
+
+/**
+ * Fires the popup once per session on a strong "about to leave" signal:
+ * desktop cursor exiting toward the browser chrome, or a rapid scroll-up
+ * near the top of the page on touch devices (no mouse to read exit intent
+ * from). Skipped entirely if the server-side gate
+ * (window.wpThemeSettings.exitIntentEnabled — v5_digital_exit_intent_enabled())
+ * is off, if it already fired this session, or if this visitor already
+ * subscribed on a previous visit.
+ */
+function initExitIntent() {
+    const modal = document.getElementById("exit-intent-modal");
+    if (!modal) return;
+    if (!window.wpThemeSettings || window.wpThemeSettings.exitIntentEnabled === false) return;
+
+    try {
+        if (sessionStorage.getItem("v5_exit_intent_shown") === "1") return;
+    } catch (err) {
+        // Storage unavailable — proceed; worst case it can fire again later.
+    }
+    try {
+        if (localStorage.getItem("v5_newsletter_subscribed") === "1") return;
+    } catch (err) {
+        // Storage unavailable — proceed.
+    }
+
+    let fired = false;
+    const trigger = (redirectUrl) => {
+        if (fired) return;
+        fired = true;
+        try {
+            sessionStorage.setItem("v5_exit_intent_shown", "1");
+        } catch (err) {
+            // Storage unavailable — the once-per-session cap just won't hold.
+        }
+        document.removeEventListener("mouseout", onMouseOut);
+        window.removeEventListener("scroll", onScroll);
+        if (backLink) backLink.removeEventListener("click", onBackLinkClick);
+
+        if (redirectUrl) {
+            exitIntentPendingRedirect = redirectUrl;
+        }
+
+        // A short delay, not an immediate open. The mobile trigger fires
+        // mid-scroll-gesture, exactly when the browser's address bar may be
+        // showing/hiding and transiently resizing the viewport; opening
+        // before that settles centers the dialog against a viewport size
+        // that's about to change, and it ends up looking shifted up once the
+        // chrome finishes animating. Harmless on desktop too — an unnoticeable
+        // delay before a popup the visitor didn't ask for.
+        window.setTimeout(openExitIntent, 220);
+    };
+
+    // Desktop: cursor leaves the viewport upward with no related target —
+    // i.e. toward the tab bar/address bar, not onto another element.
+    const onMouseOut = (e) => {
+        if (e.clientY <= 0 && !e.relatedTarget) trigger();
+    };
+    document.addEventListener("mouseout", onMouseOut);
+
+    // Touch devices have no cursor to read exit intent from; a fast upward
+    // scroll back near the top of the page is the closest equivalent signal.
+    let lastScrollY = window.scrollY;
+    let lastScrollTime = performance.now();
+    const onScroll = () => {
+        const now = performance.now();
+        const deltaUp = lastScrollY - window.scrollY;
+        const deltaTime = now - lastScrollTime;
+
+        if (deltaUp > 80 && deltaTime < 300 && window.scrollY < window.innerHeight) {
+            trigger();
+        }
+
+        lastScrollY = window.scrollY;
+        lastScrollTime = now;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Explicit signal: the visitor clicked away from the article. Stronger
+    // than mouseout/scroll (it's an actual navigation, not an inference), so
+    // it interrupts the click and completes it once the popup is dismissed
+    // (see exitIntentPendingRedirect / closeExitIntent).
+    const backLink = document.getElementById("v5-back-to-articles");
+    const onBackLinkClick = (e) => {
+        e.preventDefault();
+        trigger(backLink.href);
+    };
+    if (backLink) backLink.addEventListener("click", onBackLinkClick);
 }
 
 // Redirect shortcut clicks to annuaire page with filters
