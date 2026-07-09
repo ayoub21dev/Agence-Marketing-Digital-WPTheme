@@ -53,6 +53,10 @@ jobs:
             package-lock.json
             tailwind.config.js
             .gitignore
+            .gitattributes
+            languages/*.po
+            languages/*.pot
+            assets/images/Screenshot*.png
 
       - name: Wait before retry 2
         if: steps.deploy1.outcome == 'failure'
@@ -90,6 +94,10 @@ jobs:
             package-lock.json
             tailwind.config.js
             .gitignore
+            .gitattributes
+            languages/*.po
+            languages/*.pot
+            assets/images/Screenshot*.png
 
       - name: Wait before retry 3
         if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
@@ -127,6 +135,10 @@ jobs:
             package-lock.json
             tailwind.config.js
             .gitignore
+            .gitattributes
+            languages/*.po
+            languages/*.pot
+            assets/images/Screenshot*.png
 
       - name: Fail job if all attempts failed
         if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure' && steps.deploy3.outcome == 'failure'

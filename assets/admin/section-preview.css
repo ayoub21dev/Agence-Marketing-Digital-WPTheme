@@ -9,15 +9,22 @@
    pickers use (Gutenberg pattern inserter, Elementor block panel). */
 /* ACF constrains the popup wrapper (narrow width) and its rows (fixed height,
    nowrap, block display). Every structural override below needs !important to
-   win against acf-input.css, which loads after this stylesheet. */
-.acf-fc-popup,
-.acf-tooltip.acf-fc-popup {
+   win against acf-input.css, which loads after this stylesheet.
+
+   `:not(.acf-more-layout-actions)` is load-bearing. Since ACF 6.5 the
+   `acf-fc-popup` class is reused by a SECOND popup — the per-row "more layout
+   actions" menu (Rename / Disable), rendered by `tmpl-more-layout-actions` as
+   `<ul role="menu">`. Without this guard the rules below turned that little
+   dropdown into a 540px two-column card grid. The layout-picker rules must
+   therefore only ever match the layout picker. */
+.acf-fc-popup:not(.acf-more-layout-actions),
+.acf-tooltip.acf-fc-popup:not(.acf-more-layout-actions) {
     width: auto !important;
     max-width: none !important;
     white-space: normal !important;
 }
 
-.acf-fc-popup ul {
+.acf-fc-popup:not(.acf-more-layout-actions) ul {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 8px !important;
@@ -32,7 +39,7 @@
     border-radius: 8px;
 }
 
-.acf-fc-popup li {
+.acf-fc-popup:not(.acf-more-layout-actions) li {
     margin: 0 !important;
     padding: 0 !important;
     display: flex !important;   /* let the card fill the grid cell height */
@@ -257,7 +264,7 @@
 
 /* Single column when there isn't room for two. */
 @media (max-width: 620px) {
-    .acf-fc-popup ul {
+    .acf-fc-popup:not(.acf-more-layout-actions) ul {
         grid-template-columns: 1fr;
         width: min(340px, calc(100vw - 24px));
     }

@@ -325,7 +325,7 @@
         The <h2> keeps its id, so aria-labelledby still names the dialog — and
         it now reads "Commun Bandeau — logos partenaires", which is the natural
         spoken form of what's on screen. */
-    function setModalTitle(full) {
+    function setModalTitle(full, layoutName) {
         var h = modal.querySelector('.v5-sp-title');
         var parts = splitLabel(String(full || '').trim());
 
@@ -333,7 +333,7 @@
         if (parts.cat) {
             var chip = document.createElement('span');
             chip.className = 'v5-sp-title-cat';
-            chip.setAttribute('data-cat', catSlug(parts.cat));
+            chip.setAttribute('data-cat', layoutCat(layoutName, parts.cat));
             chip.textContent = parts.cat;
             h.appendChild(chip);
             // The gap between chip and title is pure CSS, so the accessible name
@@ -365,7 +365,7 @@
         lastFocused = document.activeElement;
         buildModal();
 
-        setModalTitle(info.label || opts.layout);
+        setModalTitle(info.label || opts.layout, opts.layout);
         modal.querySelector('.v5-sp-desc').textContent = info.desc || '';
 
         // Demo caption only makes sense for the Add-Row preview.
@@ -460,7 +460,23 @@
         return out;
     }
 
-    /** Map the "[Catégorie]" label prefix to a colour-theme slug. */
+    /** A layout's category slug. Prefers the value PHP supplies
+        (v5_digital_layout_categories(), keyed on the stable layout name); falls
+        back to parsing the label's "[Catégorie]" prefix only for a layout with
+        no map entry.
+
+        The distinction matters: the label is translatable/renameable display
+        text, the layout name is not. Parsing the label alone meant that
+        translating "[Accueil] …" to "[Home] …" would silently dump every
+        section into the "other pages" group. */
+    function layoutCat(name, labelCat) {
+        var info = layouts[name];
+        if (info && info.cat) return info.cat;
+        return catSlug(labelCat);
+    }
+
+    /** Map the "[Catégorie]" label prefix to a colour-theme slug. Fallback only
+        — see layoutCat(). Necessarily language-dependent. */
     function catSlug(cat) {
         var c = (cat || '').toLowerCase();
         if (c.indexOf('accueil') >= 0)  return 'accueil';
@@ -693,7 +709,9 @@
             anchor.title = full;                 // full text on hover
             anchor.textContent = '';             // rebuild as a card
             anchor.classList.add('v5-sp-card');
-            anchor.setAttribute('data-cat', catSlug(cat));
+            // Chip TEXT comes from the label (translatable); the slug that
+            // drives grouping and colour comes from the layout name (stable).
+            anchor.setAttribute('data-cat', layoutCat(name, cat));
 
             var head = document.createElement('div');
             head.className = 'v5-sp-card-head';

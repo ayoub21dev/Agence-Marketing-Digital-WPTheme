@@ -2287,8 +2287,28 @@ if (function_exists('acf_add_local_field_group') && !v5_digital_acf_has_json_fie
 // stats_band, logos_band, outcomes) render real content from the database.
 // ----------------------------------------------------
 
-/** Human descriptions for each `page_layouts` layout, shown under the preview. */
+/**
+ * Human descriptions for each `page_layouts` layout, shown under the preview.
+ *
+ * Translated at call time (not at definition time) so they follow the editing
+ * admin's profile language, like every other admin string. The dynamic `__()`
+ * is invisible to `wp i18n make-pot`; these msgids are collected into
+ * languages/agence-marketing-digital.pot by the theme's own extractor instead.
+ */
 function v5_digital_layout_descriptions() {
+    // Explicit loop rather than array_map(). array_map() with a single array
+    // *does* preserve string keys (verified), so this is defensive, not a fix:
+    // the layout NAME keys are load-bearing — v5_digital_layout_preview_data()
+    // looks descriptions up by layout name — and the loop states that outright.
+    $out = array();
+    foreach (v5_digital_layout_descriptions_source() as $layout => $text) {
+        $out[$layout] = v5_digital_translate_admin_string($text);
+    }
+    return $out;
+}
+
+/** @return array The raw French descriptions. Source strings for gettext. */
+function v5_digital_layout_descriptions_source() {
     return array(
         'hero_section'                 => 'Grand titre d\'accroche, boutons d\'action et preuve sociale. À placer en haut de la page d\'accueil.',
         'common_hero_section'          => 'En-tête simple (titre + description) pour les pages internes.',
@@ -2315,11 +2335,52 @@ function v5_digital_layout_descriptions() {
 }
 
 /**
- * layout name => {label, desc}. Labels are read from the real ACF field group
- * so they never drift from the picker. Doubles as the security allowlist.
+ * layout name => category slug, for the picker's grouping and chip colour.
+ *
+ * Keyed on the layout NAME, which is a stable identifier, never on the "[Cat]"
+ * prefix of the display label: a label is user-facing text that can be
+ * translated (Polylang Pro's ACF integration, WPML) or simply renamed in the
+ * ACF admin, and the moment it stops containing the French word "Accueil" the
+ * label-parsing fallback silently drops that section into "other".
+ *
+ * Filterable, so a new layout can declare its category without editing core.
+ */
+function v5_digital_layout_categories() {
+    return apply_filters('v5_digital_layout_categories', array(
+        // Home page
+        'hero_section'                 => 'accueil',
+        'stats_band_section'           => 'accueil',
+        'search_filter_section'        => 'accueil',
+        'challenge_section'            => 'accueil',
+        'approach_section'             => 'accueil',
+        'outcomes_section'             => 'accueil',
+        'picks_section'                => 'accueil',
+        'specialties_section'          => 'accueil',
+        // Reusable on any page
+        'logos_band_section'           => 'commun',
+        'footer_cta_section'           => 'commun',
+        'common_hero_section'          => 'commun',
+        'newsletter_cta_section'       => 'commun',
+        'form_section'                 => 'form',
+        // Page-specific
+        'guides_section'               => 'blog',
+        'blog_posts_grid_section'      => 'blog',
+        'contact_form_section'         => 'contact',
+        'methodology_process_section'  => 'methodo',
+        'methodology_evidence_section' => 'methodo',
+        'methodology_monitor_section'  => 'methodo',
+        'about_grid_section'           => 'propos',
+        'about_cta_section'            => 'propos',
+    ));
+}
+
+/**
+ * layout name => {label, desc, cat}. Labels are read from the real ACF field
+ * group so they never drift from the picker. Doubles as the security allowlist.
  */
 function v5_digital_layout_preview_data() {
     $descriptions = v5_digital_layout_descriptions();
+    $categories   = v5_digital_layout_categories();
     $labels       = array();
 
     if (function_exists('acf_get_field_group') && function_exists('acf_get_fields')) {
@@ -2347,6 +2408,9 @@ function v5_digital_layout_preview_data() {
         $data[$name] = array(
             'label' => isset($labels[$name]) ? $labels[$name] : ucwords(str_replace('_', ' ', $name)),
             'desc'  => isset($descriptions[$name]) ? $descriptions[$name] : '',
+            // '' lets the JS fall back to parsing the label prefix, so a layout
+            // added without a map entry still gets a category (in French).
+            'cat'   => isset($categories[$name]) ? $categories[$name] : '',
         );
     }
     return $data;
@@ -4052,6 +4116,16 @@ add_action('after_switch_theme', function () {
 // ----------------------------------------------------
 
 function v5_digital_theme_setup() {
+    // MUST come before the first __() below. load_theme_textdomain() registers
+    // this theme's /languages path; until it does, a __() call falls through to
+    // just-in-time loading, finds nothing (core only looks in
+    // WP_LANG_DIR/themes/), and get_translations_for_domain() then caches a
+    // NOOP_Translations for the whole domain. load_theme_textdomain() clears
+    // that NOOP so later calls recover — but the strings already evaluated are
+    // stuck on their untranslated (French) msgid. With the menu labels below
+    // running first, they never translated for an English-profile admin.
+    load_theme_textdomain('agence-marketing-digital', get_template_directory() . '/languages');
+
     // Navigation registration
     register_nav_menus(array(
         'primary' => __('Primary Menu', 'agence-marketing-digital'),
@@ -4067,9 +4141,6 @@ function v5_digital_theme_setup() {
     // Native featured images ("Image mise en avant" panel in the editor).
     // Templates prefer this over the legacy ACF cover-image fields.
     add_theme_support('post-thumbnails');
-
-    // Load translations for the theme's own __() strings.
-    load_theme_textdomain('agence-marketing-digital', get_template_directory() . '/languages');
 }
 add_action('after_setup_theme', 'v5_digital_theme_setup');
 
@@ -4081,6 +4152,138 @@ add_action('after_setup_theme', 'v5_digital_theme_setup');
 // registered with Polylang so it appears under "Langues > Traductions des
 // chaînes" in wp-admin, where the team translates it per language — no code and
 // no .po files needed. Templates output them via v5_t().
+//
+// NOTE: this is the FRONT END only. The wp-admin language is WordPress core's
+// business (determine_locale()), served by languages/*.mo — see section 5c.
+
+/**
+ * Translate an admin-facing string through the theme's text domain.
+ *
+ * A thin named wrapper so it can be used as an `array_map` callback; the msgid
+ * is the French source text. See changes/2026-07-09-acf-admin-translation.md.
+ *
+ * @param string $text French source string.
+ * @return string
+ */
+function v5_digital_translate_admin_string($text) {
+    // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- msgids are collected by the theme's own extractor.
+    return __($text, 'agence-marketing-digital');
+}
+
+// ----------------------------------------------------
+// 5c. ACF ADMIN LANGUAGE
+// ----------------------------------------------------
+//
+// The CPT/taxonomy labels, field-group titles, field labels + instructions and
+// flexible-content layout labels all live as French literals in acf-json/, so
+// gettext never sees them and `v5_digital_register_cpts()` (which does wrap its
+// labels in __()) is skipped entirely whenever acf-json/ is present.
+//
+// ACF solves this itself: set `l10n_textdomain` and ACF pipes every one of those
+// strings through acf_translate(), which ends in `__($string, $textdomain)`.
+// Because __() resolves via determine_locale() on each request, the whole ACF
+// admin follows each editor's own profile language, with no per-string plumbing.
+
+/** Tell ACF which text domain its labels are translated in. */
+add_filter('acf/settings/l10n_textdomain', 'v5_digital_acf_textdomain');
+function v5_digital_acf_textdomain() {
+    return 'agence-marketing-digital';
+}
+
+/**
+ * ...but never while ACF's own *structure* editors are being rendered or saved.
+ *
+ * `acf_update_field()` runs the submitted values back through
+ * `acf_validate_field()` → `acf/validate_field` → `acf_translate_field()`. With
+ * translation on, an English-profile admin who opens a field group and saves it
+ * would write the ENGLISH labels straight into acf-json/, destroying the French
+ * source strings — the same hazard as the seeded nav-menu titles, which is why
+ * those are excluded from the catalogue.
+ *
+ * Turning l10n off on those screens means structures are always authored and
+ * saved in French, whatever language the editor's profile is in.
+ */
+add_filter('acf/settings/l10n', 'v5_digital_acf_l10n_enabled');
+function v5_digital_acf_l10n_enabled($enabled) {
+    // ACF labels/instructions are only ever RENDERED in wp-admin — no template
+    // prints them. Keeping translation off everywhere else closes a whole class
+    // of hazard: any acf_update_field() run from WP-CLI, a migration or the
+    // front end would otherwise translate the labels first and persist the
+    // result into acf-json/. (admin-ajax.php counts as admin, so the section
+    // preview endpoint is unaffected.)
+    if (!is_admin()) {
+        return false;
+    }
+
+    return v5_digital_editing_acf_structure() ? false : $enabled;
+}
+
+/**
+ * True while rendering or saving ACF's Field Groups / Post Types / Taxonomies /
+ * Options Pages editors, or the Tools import/export screens (a PHP export must
+ * emit the untranslated source strings).
+ *
+ * @return bool
+ */
+function v5_digital_editing_acf_structure() {
+    // Memoised: acf_translate() calls this once PER STRING, and a field group
+    // easily has hundreds. The superglobals cannot change mid-request.
+    static $editing = null;
+    if ($editing !== null) {
+        return $editing;
+    }
+
+    $editing = false;
+
+    if (!is_admin()) {
+        return $editing;
+    }
+
+    $internal = array('acf-field-group', 'acf-post-type', 'acf-taxonomy', 'acf-ui-options-page');
+
+    // phpcs:disable WordPress.Security.NonceVerification -- read-only screen detection, no state changes.
+    if (isset($_POST['post_type']) && in_array(sanitize_key(wp_unslash($_POST['post_type'])), $internal, true)) {
+        return $editing = true;
+    }
+    if (isset($_GET['post_type']) && in_array(sanitize_key(wp_unslash($_GET['post_type'])), $internal, true)) {
+        return $editing = true;
+    }
+    // Tools → Export/Import would otherwise emit translated strings.
+    if (isset($_GET['page']) && strpos(sanitize_key(wp_unslash($_GET['page'])), 'acf-tools') === 0) {
+        return $editing = true;
+    }
+
+    // ACF's own AJAX for the field-group editor — `acf/field_group/move_field`
+    // in particular calls acf_update_field(), i.e. it PERSISTS.
+    //
+    // NB: sanitize_key() must NOT be used on the action. It strips "/", turning
+    // "acf/field_group/move_field" into "acffield_groupmove_field", and the
+    // prefix test below would never match. sanitize_text_field() keeps the
+    // slashes; the value is only ever compared, never emitted.
+    if (wp_doing_ajax() && isset($_REQUEST['action']) && is_string($_REQUEST['action'])) {
+        $action = sanitize_text_field(wp_unslash($_REQUEST['action']));
+        if (strpos($action, 'acf/field_group/') === 0 || strpos($action, 'acf/create_options_page') === 0) {
+            return $editing = true;
+        }
+    }
+
+    $post_id = 0;
+    if (isset($_GET['post'])) {
+        $post_id = absint($_GET['post']);
+    } elseif (isset($_POST['post_ID'])) {
+        $post_id = absint($_POST['post_ID']);
+    }
+    // phpcs:enable WordPress.Security.NonceVerification
+
+    if ($post_id) {
+        $type = get_post_type($post_id);
+        if ($type && in_array($type, $internal, true)) {
+            return $editing = true;
+        }
+    }
+
+    return $editing;
+}
 
 /**
  * The full list of translatable theme UI strings (French = the source text).

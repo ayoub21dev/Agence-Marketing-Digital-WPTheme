@@ -1,0 +1,1247 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Agence Marketing Digital 1.0.0\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: agence-marketing-digital\n"
+"X-Note: Source strings are French. See changes/2026-07-09-admin-language.md\n"
+
+#. source: code
+msgid "Accès refusé."
+msgstr "Access denied."
+
+#. source: field
+msgid "Afficher la colonne « Articles récents »"
+msgstr "Show the “Recent posts” column"
+
+#. source: code
+msgid "Afficher les autres sections"
+msgstr "Show other sections"
+
+#. source: field
+msgid "Afficher les boutons de filtrage"
+msgstr "Show the filter buttons"
+
+#. source: field
+msgid "Affiché après l'envoi réussi du formulaire. Si les deux champs de confirmation sont vides, le message par défaut est utilisé."
+msgstr "Shown after the form is submitted successfully. If both confirmation fields are empty, the default message is used."
+
+#. source: code,cpt,field
+msgid "Agence"
+msgstr "Agency"
+
+#. source: field
+msgid "Agence recrutée"
+msgstr "Hired agency"
+
+#. source: code,cpt
+msgid "Agences"
+msgstr "Agencies"
+
+#. source: field,layout
+msgid "Agences a inclure"
+msgstr "Agencies to include"
+
+#. source: field
+msgid "Agences a inclure dans l'article"
+msgstr "Agencies to include in the article"
+
+#. source: field
+msgid "Agences à afficher (Optionnel)"
+msgstr "Agencies to display (optional)"
+
+#. source: code,cpt
+msgid "Ajouter"
+msgstr "Add"
+
+#. source: code,cpt
+msgid "Ajouter un Logo Partenaire"
+msgstr "Add Partner Logo"
+
+#. source: code,tax
+msgid "Ajouter un Nouveau Service"
+msgstr "Add New Service"
+
+#. source: code,cpt
+msgid "Ajouter un Témoignage"
+msgstr "Add Testimonial"
+
+#. source: field
+msgid "Ajouter un bouton"
+msgstr "Add button"
+
+#. source: field
+msgid "Ajouter un service"
+msgstr "Add service"
+
+#. source: field
+msgid "Ajouter une Carte"
+msgstr "Add Card"
+
+#. source: code,cpt
+msgid "Ajouter une Nouvelle Agence"
+msgstr "Add New Agency"
+
+#. source: code,tax
+msgid "Ajouter une Nouvelle Ville"
+msgstr "Add New City"
+
+#. source: field
+msgid "Ajouter une Section"
+msgstr "Add a Section"
+
+#. source: code,cpt
+msgid "Ajouter une Spécialité"
+msgstr "Add Specialty"
+
+#. source: code,cpt
+msgid "Ajouter une Statistique"
+msgstr "Add Statistic"
+
+#. source: field
+msgid "Ajouter une analyse d'agence"
+msgstr "Add an agency review"
+
+#. source: field
+msgid "Ajouter une carte"
+msgstr "Add card"
+
+#. source: field
+msgid "Ajouter une carte d'avis"
+msgstr "Add review card"
+
+#. source: field
+msgid "Ajouter une ligne"
+msgstr "Add row"
+
+#. source: field
+msgid "Ajouter une métrique"
+msgstr "Add metric"
+
+#. source: field
+msgid "Ajouter une section agences"
+msgstr "Add agencies section"
+
+#. source: field
+msgid "Ajouter une étape"
+msgstr "Add step"
+
+#. source: field
+msgid "Ajoutez et modifiez chaque carte d'avis directement ici. Si vide, les avis sont tirés des publications « Témoignage »."
+msgstr "Add and edit each review card directly here. If empty, reviews are pulled from “Testimonial” posts."
+
+#. source: code
+msgid "Aperçu de cette section avec son contenu enregistré."
+msgstr "Preview of this section with its saved content."
+
+#. source: code
+msgid "Aperçu de démonstration — le contenu réel dépendra de vos réglages."
+msgstr "Demo preview — the actual content will depend on your settings."
+
+#. source: code
+msgid "Aperçu de la section"
+msgstr "Section preview"
+
+#. source: desc
+msgid "Appel à l'action large en bas de page."
+msgstr "Wide call to action at the bottom of the page."
+
+#. source: code,cpt
+msgid "Aucun logo partenaire trouvé"
+msgstr "No partner logos found"
+
+#. source: code,cpt
+msgid "Aucun logo partenaire trouvé dans la corbeille"
+msgstr "No partner logos found in Trash"
+
+#. source: code,cpt
+msgid "Aucun témoignage trouvé"
+msgstr "No testimonials found"
+
+#. source: code,cpt
+msgid "Aucun témoignage trouvé dans la corbeille"
+msgstr "No testimonials found in Trash"
+
+#. source: code,cpt
+msgid "Aucune agence trouvée"
+msgstr "No agencies found"
+
+#. source: code,cpt
+msgid "Aucune spécialité trouvée"
+msgstr "No specialties found"
+
+#. source: code,cpt
+msgid "Aucune spécialité trouvée dans la corbeille"
+msgstr "No specialties found in Trash"
+
+#. source: code,cpt
+msgid "Aucune statistique trouvée"
+msgstr "No statistics found"
+
+#. source: code,cpt
+msgid "Aucune statistique trouvée dans la corbeille"
+msgstr "No statistics found in Trash"
+
+#. source: field
+msgid "Auteur de la citation"
+msgstr "Quote author"
+
+#. source: code
+msgid "Autres sections communes"
+msgstr "Other shared sections"
+
+#. source: field
+msgid "Badge / Catégorie"
+msgstr "Badge / Category"
+
+#. source: field
+msgid "Badge d'analyse"
+msgstr "Review badge"
+
+#. source: desc
+msgid "Bande de chiffres clés, alimentée par les « Stat Metrics »."
+msgstr "Band of key figures, powered by “Stat Metrics”."
+
+#. source: desc
+msgid "Bandeau d'inscription à la newsletter."
+msgstr "Newsletter signup band."
+
+#. source: desc
+msgid "Barre de recherche et filtres redirigeant vers l'annuaire."
+msgstr "Search bar and filters redirecting to the directory."
+
+#. source: desc
+msgid "Bloc « problème » : cartes d'arguments et citation client."
+msgstr "“Problem” block: argument cards and a client quote."
+
+#. source: field
+msgid "Bouton principal"
+msgstr "Primary button"
+
+#. source: field
+msgid "Bouton secondaire"
+msgstr "Secondary button"
+
+#. source: field
+msgid "Boutons d'action (CTA)"
+msgstr "Call-to-action buttons (CTA)"
+
+#. source: desc
+msgid "Carrousel de logos partenaires (défilement automatique)."
+msgstr "Partner logo carousel (auto-scrolling)."
+
+#. source: field
+msgid "Cartes d'avis (contenu éditable ici)"
+msgstr "Review cards (content editable here)"
+
+#. source: desc
+msgid "Cartes de guides et articles mis en avant."
+msgstr "Cards for featured guides and articles."
+
+#. source: field
+msgid "Cartes de points faibles"
+msgstr "Pain-point cards"
+
+#. source: field
+msgid "Cartes de présentation"
+msgstr "Presentation cards"
+
+#. source: code
+msgid "Cette section n'a jamais été enregistrée. Cliquez sur « Mettre à jour » puis rouvrez l'aperçu."
+msgstr "This section has never been saved. Click “Update”, then reopen the preview."
+
+#. source: code
+msgid "Cette section n'affiche du contenu qu'une fois configurée (ou quand le contenu associé existe)."
+msgstr "This section only shows content once it is configured (or when the related content exists)."
+
+#. source: code
+msgid "Chargement de l'aperçu…"
+msgstr "Loading preview…"
+
+#. source: field
+msgid "Choisissez un formulaire créé dans « Submissions → Formulaires »."
+msgstr "Choose a form created in “Submissions → Forms”."
+
+#. source: field
+msgid "Code SVG de l'icône"
+msgstr "Icon SVG code"
+
+#. source: group
+msgid "Contenu Flexible de l'Article"
+msgstr "Article Flexible Content"
+
+#. source: field
+msgid "Contrôle uniquement les boutons au-dessus de la grille. Ils n'apparaissent que s'il y a au moins 2 catégories à filtrer."
+msgstr "Only controls the buttons above the grid. They appear only when there are at least 2 categories to filter."
+
+#. source: field
+msgid "Couleur de fond"
+msgstr "Background colour"
+
+#. source: field
+msgid "Couleur du texte"
+msgstr "Text colour"
+
+#. source: field
+msgid "Description (optionnel)"
+msgstr "Description (optional)"
+
+#. source: field
+msgid "Description / Libellé"
+msgstr "Description / Label"
+
+#. source: field
+msgid "Description / Paragraphe"
+msgstr "Description / Paragraph"
+
+#. source: field
+msgid "Description / Pourquoi ce choix"
+msgstr "Description / Why this choice"
+
+#. source: field
+msgid "Description / Sous-titre"
+msgstr "Description / Subtitle"
+
+#. source: field
+msgid "Description Bloc Garantie"
+msgstr "Guarantee Block Description"
+
+#. source: field
+msgid "Description de sous-titre"
+msgstr "Subtitle description"
+
+#. source: field
+msgid "Description du formulaire"
+msgstr "Form description"
+
+#. source: field
+msgid "Description lede"
+msgstr "Lede description"
+
+#. source: field
+msgid "Données clés (Compteurs)"
+msgstr "Key data (Counters)"
+
+#. source: code
+msgid "Déjà utilisée %d fois sur cette page"
+msgstr "Already used %d times on this page"
+
+#. source: code
+msgid "Déjà utilisée sur cette page"
+msgstr "Already used on this page"
+
+#. source: group
+msgid "Détails de l'Agence"
+msgstr "Agency Details"
+
+#. source: group
+msgid "Détails de la Spécialité"
+msgstr "Specialty Details"
+
+#. source: group
+msgid "Détails de la Statistique"
+msgstr "Statistic Details"
+
+#. source: group
+msgid "Détails du Logo Partenaire"
+msgstr "Partner Logo Details"
+
+#. source: group
+msgid "Détails du Témoignage"
+msgstr "Testimonial Details"
+
+#. source: desc
+msgid "En-tête simple (titre + description) pour les pages internes."
+msgstr "Simple header (title + description) for internal pages."
+
+#. source: field
+msgid "Entrez l'URL complète du site web de l'agence (ex: https://nom-agence.ma)."
+msgstr "Enter the agency's full website URL (e.g. https://agency-name.ma)."
+
+#. source: field
+msgid "Exemple : 8 min de lecture, 6 min read"
+msgstr "Example: 8 min de lecture, 6 min read"
+
+#. source: code
+msgid "Fermer"
+msgstr "Close"
+
+#. source: code
+msgid "Footer Cities (Villes)"
+msgstr "Footer Cities"
+
+#. source: code
+msgid "Footer Explore (Découvrir)"
+msgstr "Footer Explore"
+
+#. source: code
+msgid "Footer Legal (Légal)"
+msgstr "Footer Legal"
+
+#. source: code
+msgid "Footer Resources (Ressources)"
+msgstr "Footer Resources"
+
+#. source: desc
+msgid "Formulaire créé dans le plugin « AMD Contact Forms » (au choix)."
+msgstr "Form created in the “AMD Contact Forms” plugin (your choice)."
+
+#. source: desc
+msgid "Formulaire de contact intégré + informations de contact."
+msgstr "Embedded contact form + contact details."
+
+#. source: field
+msgid "Formulaire à afficher"
+msgstr "Form to display"
+
+#. source: desc
+msgid "Grand titre d'accroche, boutons d'action et preuve sociale. À placer en haut de la page d'accueil."
+msgstr "Large headline, action buttons and social proof. Place it at the top of the home page."
+
+#. source: field
+msgid "Grille d'avis clients (publications Témoignage — optionnel)"
+msgstr "Client review grid (Testimonial posts — optional)"
+
+#. source: desc
+msgid "Grille des spécialités / canaux marketing."
+msgstr "Grid of specialties / marketing channels."
+
+#. source: field
+msgid "Hérité. Utilisez plutôt l'« Image mise en avant » (panneau latéral), qui est prioritaire. Ce champ ne sert que de repli pour les anciens articles."
+msgstr "Legacy. Use the “Featured image” panel instead (side panel), which takes priority. This field is only a fallback for old articles."
+
+#. source: field
+msgid "Hérité. Utilisez plutôt l'« Image mise en avant » (panneau latéral). Ce champ ne sert que de repli : URL d'une image externe (ex. Unsplash)."
+msgstr "Legacy. Use the “Featured image” panel instead (side panel). This field is only a fallback: URL of an external image (e.g. Unsplash)."
+
+#. source: field
+msgid "Icône Adresse"
+msgstr "Address Icon"
+
+#. source: field
+msgid "Icône Email"
+msgstr "Email Icon"
+
+#. source: field
+msgid "Icône Lucide"
+msgstr "Lucide Icon"
+
+#. source: field
+msgid "Icône Lucide (e.g. search-check, shield-check, users)"
+msgstr "Lucide icon (e.g. search-check, shield-check, users)"
+
+#. source: field
+msgid "Icône Lucide alternative (e.g. check-circle)"
+msgstr "Alternative Lucide icon (e.g. check-circle)"
+
+#. source: field
+msgid "Icône SVG"
+msgstr "SVG Icon"
+
+#. source: field
+msgid "Illustration personnalisée (Image/SVG)"
+msgstr "Custom illustration (Image/SVG)"
+
+#. source: field
+msgid "Image de couverture (Médiathèque)"
+msgstr "Cover image (Media Library)"
+
+#. source: field
+msgid "Image de couverture (URL externe)"
+msgstr "Cover image (external URL)"
+
+#. source: field
+msgid "Image de l'auteur (Lien URL externe)"
+msgstr "Author image (external URL)"
+
+#. source: field
+msgid "Image de l'auteur (Médiathèque)"
+msgstr "Author image (Media Library)"
+
+#. source: field
+msgid "Image du Logo"
+msgstr "Logo Image"
+
+#. source: field
+msgid "Image du Logo (Lien URL externe)"
+msgstr "Logo Image (external URL)"
+
+#. source: field
+msgid "Image du Logo (Médiathèque)"
+msgstr "Logo Image (Media Library)"
+
+#. source: code
+msgid "Impossible de charger l'aperçu."
+msgstr "Unable to load the preview."
+
+#. source: code
+msgid "Insérer cette section"
+msgstr "Insert this section"
+
+#. source: code
+msgid "L'aperçu affiche le contenu enregistré. Cliquez sur « Mettre à jour » puis rouvrez l'aperçu."
+msgstr "The preview shows the saved content. Click “Update”, then reopen the preview."
+
+#. source: field
+msgid "Laissez vide (ou -1) pour afficher tous les articles."
+msgstr "Leave empty (or -1) to show all articles."
+
+#. source: field
+msgid "Laissez vide pour l'icône par défaut (enveloppe). L'adresse email se gère dans Site Settings → Contact details."
+msgstr "Leave empty for the default icon (envelope). The email address is managed in Site Settings → Contact details."
+
+#. source: field
+msgid "Laissez vide pour l'icône par défaut (épingle). Le texte de l'adresse se gère dans Site Settings → Contact details."
+msgstr "Leave empty for the default icon (pin). The address text is managed in Site Settings → Contact details."
+
+#. source: field
+msgid "Le contenu normal de l'article se redige dans l'editeur WordPress. Utilisez ce champ seulement pour choisir les agences a afficher."
+msgstr "The article's normal content is written in the WordPress editor. Use this field only to choose the agencies to display."
+
+#. source: field
+msgid "Libellé"
+msgstr "Label"
+
+#. source: field
+msgid "Lien Bouton Principal"
+msgstr "Primary Button Link"
+
+#. source: field
+msgid "Lien Bouton Secondaire"
+msgstr "Secondary Button Link"
+
+#. source: field
+msgid "Lien de blog"
+msgstr "Blog link"
+
+#. source: field
+msgid "Lien du bouton CTA"
+msgstr "CTA button link"
+
+#. source: field
+msgid "Lignes de preuves"
+msgstr "Evidence rows"
+
+#. source: field
+msgid "Limiter la grille à certaines catégories"
+msgstr "Limit the grid to certain categories"
+
+#. source: field
+msgid "Liste des agences recommandées"
+msgstr "List of recommended agencies"
+
+#. source: field
+msgid "Liste des sous-services"
+msgstr "List of sub-services"
+
+#. source: desc
+msgid "Listing complet du blog : filtres par catégorie et grille d'articles."
+msgstr "Full blog listing: category filters and article grid."
+
+#. source: code,cpt
+msgid "Logo Partenaire"
+msgstr "Partner Logo"
+
+#. source: code,cpt
+msgid "Logos Partenaires"
+msgstr "Partner Logos"
+
+#. source: code
+msgid "Masquer les autres sections"
+msgstr "Hide other sections"
+
+#. source: code,tax
+msgid "Mettre à jour la Ville"
+msgstr "Update City"
+
+#. source: code,tax
+msgid "Mettre à jour le Service"
+msgstr "Update Service"
+
+#. source: field
+msgid "Mises en page"
+msgstr "Layouts"
+
+#. source: group
+msgid "Mises en page de la Page"
+msgstr "Page Layouts"
+
+#. source: code
+msgid "Modifications non enregistrées : l'aperçu montre la dernière version enregistrée. Cliquez sur « Mettre à jour » pour les voir."
+msgstr "Unsaved changes: the preview shows the last saved version. Click “Update” to see them."
+
+#. source: code,cpt
+msgid "Modifier l'Agence"
+msgstr "Edit Agency"
+
+#. source: code,cpt
+msgid "Modifier la Spécialité"
+msgstr "Edit Specialty"
+
+#. source: code,cpt
+msgid "Modifier la Statistique"
+msgstr "Edit Statistic"
+
+#. source: code,tax
+msgid "Modifier la Ville"
+msgstr "Edit City"
+
+#. source: code,cpt
+msgid "Modifier le Logo Partenaire"
+msgstr "Edit Partner Logo"
+
+#. source: code,tax
+msgid "Modifier le Service"
+msgstr "Edit Service"
+
+#. source: code,cpt
+msgid "Modifier le Témoignage"
+msgstr "Edit Testimonial"
+
+#. source: group
+msgid "Métadonnées de l'Article"
+msgstr "Article Metadata"
+
+#. source: desc
+msgid "Méthodologie : le suivi et la surveillance continue."
+msgstr "Methodology: continuous tracking and monitoring."
+
+#. source: desc
+msgid "Méthodologie : les preuves et critères retenus."
+msgstr "Methodology: the evidence and criteria used."
+
+#. source: desc
+msgid "Méthodologie : les étapes du processus d'évaluation."
+msgstr "Methodology: the steps of the evaluation process."
+
+#. source: field
+msgid "Nom de l'agence recrutée"
+msgstr "Hired agency name"
+
+#. source: field
+msgid "Nom de l'auteur"
+msgstr "Author name"
+
+#. source: field
+msgid "Nom de l'auteur affiché. Si vide, affichera l'auteur WordPress de l'article."
+msgstr "Displayed author name. If empty, the article's WordPress author is shown."
+
+#. source: field
+msgid "Nom de l'icône Lucide (e.g. calendar-sync)"
+msgstr "Lucide icon name (e.g. calendar-sync)"
+
+#. source: code,tax
+msgid "Nom de la Nouvelle Ville"
+msgstr "New City Name"
+
+#. source: code,tax
+msgid "Nom du Nouveau Service"
+msgstr "New Service Name"
+
+#. source: field
+msgid "Nom du service"
+msgstr "Service name"
+
+#. source: field
+msgid "Nombre d'articles affichés"
+msgstr "Number of articles displayed"
+
+#. source: field
+msgid "Nombre d'articles dans la colonne"
+msgstr "Number of articles in the column"
+
+#. source: field
+msgid "Nombre d'avis"
+msgstr "Number of reviews"
+
+#. source: field
+msgid "Note (1 à 5)"
+msgstr "Rating (1 to 5)"
+
+#. source: field
+msgid "Note / Étoiles (1-5)"
+msgstr "Rating / Stars (1-5)"
+
+#. source: field
+msgid "Note globale"
+msgstr "Overall rating"
+
+#. source: desc
+msgid "Notre approche en étapes numérotées."
+msgstr "Our approach in numbered steps."
+
+#. source: code,cpt
+msgid "Nouveau Logo Partenaire"
+msgstr "New Partner Logo"
+
+#. source: code,cpt
+msgid "Nouveau Témoignage"
+msgstr "New Testimonial"
+
+#. source: code,cpt
+msgid "Nouvelle Agence"
+msgstr "New Agency"
+
+#. source: code,cpt
+msgid "Nouvelle Spécialité"
+msgstr "New Specialty"
+
+#. source: code,cpt
+msgid "Nouvelle Statistique"
+msgstr "New Statistic"
+
+#. source: field
+msgid "Numéro"
+msgstr "Number"
+
+#. source: field
+msgid "Numéro (e.g. 01)"
+msgstr "Number (e.g. 01)"
+
+#. source: field
+msgid "Optionnel : utilisé seulement si « Cartes d'avis » ci-dessus est vide."
+msgstr "Optional: used only if “Review cards” above is empty."
+
+#. source: field
+msgid "Optionnel. Laissez vide pour utiliser automatiquement la catégorie WordPress de l'article."
+msgstr "Optional. Leave empty to automatically use the article's WordPress category."
+
+#. source: field
+msgid "Page interne"
+msgstr "Internal page"
+
+#. source: field
+msgid "Paramètre de filtre de lien direct"
+msgstr "Direct link filter parameter"
+
+#. source: field
+msgid "Photo de l'auteur"
+msgstr "Author photo"
+
+#. source: field
+msgid "Photo de l'auteur (Médiathèque)"
+msgstr "Author photo (Media Library)"
+
+#. source: field
+msgid "Preuve sociale 1"
+msgstr "Social proof 1"
+
+#. source: field
+msgid "Preuve sociale 2"
+msgstr "Social proof 2"
+
+#. source: field
+msgid "Projet réalisé"
+msgstr "Completed project"
+
+#. source: code
+msgid "Rafraîchir"
+msgstr "Refresh"
+
+#. source: field
+msgid "Rang de l'Agence"
+msgstr "Agency Rank"
+
+#. source: field
+msgid "Rang de recommandation"
+msgstr "Recommendation rank"
+
+#. source: code,cpt
+msgid "Rechercher des Agences"
+msgstr "Search Agencies"
+
+#. source: code,cpt
+msgid "Rechercher des Logos Partenaires"
+msgstr "Search Partner Logos"
+
+#. source: code,tax
+msgid "Rechercher des Services"
+msgstr "Search Services"
+
+#. source: code,cpt
+msgid "Rechercher des Spécialités"
+msgstr "Search Specialties"
+
+#. source: code,cpt
+msgid "Rechercher des Statistiques"
+msgstr "Search Statistics"
+
+#. source: code,cpt
+msgid "Rechercher des Témoignages"
+msgstr "Search Testimonials"
+
+#. source: code,tax
+msgid "Rechercher des Villes"
+msgstr "Search Cities"
+
+#. source: code
+msgid "Rien à afficher pour le moment"
+msgstr "Nothing to display yet"
+
+#. source: field
+msgid "Résultat obtenu"
+msgstr "Result achieved"
+
+#. source: desc
+msgid "Résultats et témoignages clients avec métriques."
+msgstr "Client results and testimonials with metrics."
+
+#. source: field
+msgid "Rôle / Entreprise"
+msgstr "Role / Company"
+
+#. source: field
+msgid "Rôle / Poste de l'auteur"
+msgstr "Author's role / position"
+
+#. source: field
+msgid "Rôle de l'auteur"
+msgstr "Author role"
+
+#. source: code
+msgid "Section inconnue."
+msgstr "Unknown section."
+
+#. source: code
+msgid "Section non encore enregistrée"
+msgstr "Section not saved yet"
+
+#. source: code
+msgid "Sections communes"
+msgstr "Shared sections"
+
+#. source: code
+msgid "Sections de cette page"
+msgstr "Sections on this page"
+
+#. source: code
+msgid "Sections des autres pages"
+msgstr "Sections from other pages"
+
+#. source: field
+msgid "Site Web de l'Agence"
+msgstr "Agency Website"
+
+#. source: field
+msgid "Site web de l'agence"
+msgstr "Agency website"
+
+#. source: field
+msgid "Site web de l'agence recrutée"
+msgstr "Hired agency website"
+
+#. source: field
+msgid "Slug de l'agence recrutée"
+msgstr "Hired agency slug"
+
+#. source: field
+msgid "Sourcil"
+msgstr "Eyebrow"
+
+#. source: field
+msgid "Sous-titre / description"
+msgstr "Subtitle / description"
+
+#. source: code,cpt
+msgid "Spécialité"
+msgstr "Specialty"
+
+#. source: code,cpt
+msgid "Spécialités"
+msgstr "Specialties"
+
+#. source: code,cpt
+msgid "Statistique"
+msgstr "Statistic"
+
+#. source: code,cpt,field
+msgid "Statistiques"
+msgstr "Statistics"
+
+#. source: field
+msgid "Style du bouton"
+msgstr "Button style"
+
+#. source: field
+msgid "Surligné / Sourcil"
+msgstr "Highlighted / Eyebrow"
+
+#. source: desc
+msgid "Sélection d'agences recommandées (fiches agences)."
+msgstr "Selection of recommended agencies (agency cards)."
+
+#. source: field
+msgid "Sélectionner des articles à afficher"
+msgstr "Select articles to display"
+
+#. source: field
+msgid "Sélectionnez manuellement les agences à afficher. Laissez vide pour recommander automatiquement le top 3 trié par rang."
+msgstr "Manually select the agencies to display. Leave empty to automatically recommend the top 3 sorted by rank."
+
+#. source: field
+msgid "Tag d'étendue du projet"
+msgstr "Project scope tag"
+
+#. source: field
+msgid "Tag vérifié"
+msgstr "Verified tag"
+
+#. source: field
+msgid "Tags (séparés par des virgules)"
+msgstr "Tags (comma separated)"
+
+#. source: field
+msgid "Temps de lecture"
+msgstr "Reading time"
+
+#. source: field
+msgid "Texte / Initiales du Logo"
+msgstr "Logo Text / Initials"
+
+#. source: field
+msgid "Texte Bouton Principal"
+msgstr "Primary Button Text"
+
+#. source: field
+msgid "Texte Bouton Secondaire"
+msgstr "Secondary Button Text"
+
+#. source: field
+msgid "Texte de bas de formulaire"
+msgstr "Form footer text"
+
+#. source: field
+msgid "Texte de la Citation"
+msgstr "Quote Text"
+
+#. source: field
+msgid "Texte de saisie (Placeholder)"
+msgstr "Input text (Placeholder)"
+
+#. source: field
+msgid "Texte de surbrillance (Sourcil)"
+msgstr "Highlight text (Eyebrow)"
+
+#. source: field
+msgid "Texte du bouton"
+msgstr "Button text"
+
+#. source: field
+msgid "Texte du bouton CTA"
+msgstr "CTA button text"
+
+#. source: field
+msgid "Texte du lien d'action"
+msgstr "Action link text"
+
+#. source: field
+msgid "Texte du lien de blog"
+msgstr "Blog link text"
+
+#. source: field
+msgid "Texte du lien méthodologique"
+msgstr "Methodology link text"
+
+#. source: field
+msgid "Texte du message de confirmation"
+msgstr "Confirmation message text"
+
+#. source: field
+msgid "Texte lien d'accueil"
+msgstr "Home link text"
+
+#. source: field
+msgid "Texte page active (Fil d'ariane)"
+msgstr "Active page text (Breadcrumb)"
+
+#. source: field
+msgid "Titre"
+msgstr "Title"
+
+#. source: field
+msgid "Titre (HTML)"
+msgstr "Title (HTML)"
+
+#. source: field
+msgid "Titre Bloc Garantie"
+msgstr "Guarantee Block Title"
+
+#. source: field
+msgid "Titre de l'étape"
+msgstr "Step title"
+
+#. source: field
+msgid "Titre de la Hero (HTML)"
+msgstr "Hero Title (HTML)"
+
+#. source: field
+msgid "Titre de la carte"
+msgstr "Card title"
+
+#. source: field
+msgid "Titre de la colonne"
+msgstr "Column title"
+
+#. source: field
+msgid "Titre de la ligne"
+msgstr "Row title"
+
+#. source: field
+msgid "Titre de la section"
+msgstr "Section title"
+
+#. source: field
+msgid "Titre de la section (HTML)"
+msgstr "Section title (HTML)"
+
+#. source: field
+msgid "Titre de la section (optionnel)"
+msgstr "Section title (optional)"
+
+#. source: field
+msgid "Titre de la section héro"
+msgstr "Hero section title"
+
+#. source: field
+msgid "Titre du formulaire"
+msgstr "Form title"
+
+#. source: field
+msgid "Titre du message de confirmation"
+msgstr "Confirmation message title"
+
+#. source: field
+msgid "Titre principal"
+msgstr "Main title"
+
+#. source: code,cpt
+msgid "Tous les Logos Partenaires"
+msgstr "All Partner Logos"
+
+#. source: code,tax
+msgid "Tous les Services"
+msgstr "All Services"
+
+#. source: code,cpt
+msgid "Tous les Témoignages"
+msgstr "All Testimonials"
+
+#. source: code,cpt
+msgid "Toutes les Agences"
+msgstr "All Agencies"
+
+#. source: code,cpt
+msgid "Toutes les Spécialités"
+msgstr "All Specialties"
+
+#. source: code,cpt
+msgid "Toutes les Statistiques"
+msgstr "All Statistics"
+
+#. source: code,tax
+msgid "Toutes les Villes"
+msgstr "All Cities"
+
+#. source: field
+msgid "Type de lien"
+msgstr "Link type"
+
+#. source: code,cpt
+msgid "Témoignage"
+msgstr "Testimonial"
+
+#. source: field
+msgid "Témoignage (citation)"
+msgstr "Testimonial (quote)"
+
+#. source: code,cpt
+msgid "Témoignages"
+msgstr "Testimonials"
+
+#. source: field
+msgid "URL complète du site de l'agence, e.g. \"https://exemple.com\". Le nom devient un lien vers ce site."
+msgstr "Full URL of the agency site, e.g. \"https://example.com\". The name becomes a link to this site."
+
+#. source: field
+msgid "URL complète, e.g. \"https://exemple.com\". Le nom de l'agence devient un lien vers ce site."
+msgstr "Full URL, e.g. \"https://example.com\". The agency name becomes a link to this site."
+
+#. source: field
+msgid "URL de la photo de l'auteur"
+msgstr "Author photo URL"
+
+#. source: field
+msgid "URL du lien méthodologique"
+msgstr "Methodology link URL"
+
+#. source: field
+msgid "URL personnalisée"
+msgstr "Custom URL"
+
+#. source: code
+msgid "Utilisée"
+msgstr "Used"
+
+#. source: field
+msgid "Valeur (e.g. 92%)"
+msgstr "Value (e.g. 92%)"
+
+#. source: field
+msgid "Valeur / Nombre"
+msgstr "Value / Number"
+
+#. source: field
+msgid "Vide = tous les articles. Limite les articles de la grille — fonctionne même sans les boutons de filtrage."
+msgstr "Empty = all articles. Limits the grid's articles — works even without the filter buttons."
+
+#. source: code,tax
+msgid "Ville"
+msgstr "City"
+
+#. source: code,tax
+msgid "Villes"
+msgstr "Cities"
+
+#. source: code,cpt
+msgid "Voir l'Agence"
+msgstr "View Agency"
+
+#. source: code,cpt
+msgid "Voir la Spécialité"
+msgstr "View Specialty"
+
+#. source: code,cpt
+msgid "Voir la Statistique"
+msgstr "View Statistic"
+
+#. source: code,tax
+msgid "Voir la Ville"
+msgstr "View City"
+
+#. source: code,cpt
+msgid "Voir le Logo Partenaire"
+msgstr "View Partner Logo"
+
+#. source: code,tax
+msgid "Voir le Service"
+msgstr "View Service"
+
+#. source: code,cpt
+msgid "Voir le Témoignage"
+msgstr "View Testimonial"
+
+#. source: field
+msgid "Vous pouvez utiliser des balises HTML simples comme <span>."
+msgstr "You can use simple HTML tags such as <span>."
+
+#. source: field,layout
+msgid "[Accueil] Avis — témoignages clients"
+msgstr "[Home] Reviews — client testimonials"
+
+#. source: field,layout
+msgid "[Accueil] Bandeau — chiffres clés"
+msgstr "[Home] Band — key figures"
+
+#. source: field,layout
+msgid "[Accueil] Bannière — accroche principale"
+msgstr "[Home] Banner — main headline"
+
+#. source: field,layout
+msgid "[Accueil] Bloc — le défi"
+msgstr "[Home] Block — the challenge"
+
+#. source: field,layout
+msgid "[Accueil] Bloc — notre approche"
+msgstr "[Home] Block — our approach"
+
+#. source: field,layout
+msgid "[Accueil] Grille — spécialités"
+msgstr "[Home] Grid — specialties"
+
+#. source: field,layout
+msgid "[Accueil] Grille — sélection de l'éditeur"
+msgstr "[Home] Grid — editor's picks"
+
+#. source: field,layout
+msgid "[Accueil] Recherche — barre + filtres"
+msgstr "[Home] Search — bar + filters"
+
+#. source: field,layout
+msgid "[Blog] Grille — articles"
+msgstr "[Blog] Grid — articles"
+
+#. source: field,layout
+msgid "[Blog] Liste — guides & analyses"
+msgstr "[Blog] List — guides & analysis"
+
+#. source: field,layout
+msgid "[Commun] Bandeau — logos partenaires"
+msgstr "[Shared] Band — partner logos"
+
+#. source: field,layout
+msgid "[Commun] Bannière — en-tête de page (simple)"
+msgstr "[Shared] Banner — page header (simple)"
+
+#. source: field,layout
+msgid "[Commun] CTA — bas de page (titre + boutons)"
+msgstr "[Shared] CTA — page footer (title + buttons)"
+
+#. source: field,layout
+msgid "[Commun] CTA — newsletter (email)"
+msgstr "[Shared] CTA — newsletter (email)"
+
+#. source: field,layout
+msgid "[Contact] Formulaire — contact & infos"
+msgstr "[Contact] Form — contact & info"
+
+#. source: field,layout
+msgid "[Formulaire] Afficher un formulaire de contact"
+msgstr "[Form] Display a contact form"
+
+#. source: field,layout
+msgid "[Méthodologie] Bloc — suivi continu"
+msgstr "[Methodology] Block — continuous monitoring"
+
+#. source: field,layout
+msgid "[Méthodologie] Grille — preuves & données"
+msgstr "[Methodology] Grid — evidence & data"
+
+#. source: field,layout
+msgid "[Méthodologie] Étapes — processus de validation"
+msgstr "[Methodology] Steps — validation process"
+
+#. source: field,layout
+msgid "[À Propos] CTA — bas de page (titre + boutons)"
+msgstr "[About] CTA — page footer (title + buttons)"
+
+#. source: field,layout
+msgid "[À Propos] Grille — présentation"
+msgstr "[About] Grid — presentation"
+
+#. source: field
+msgid "e.g. \"rmd\", \"pixagram\", \"mediaboost\". Laissez vide si non applicable."
+msgstr "e.g. \"rmd\", \"pixagram\", \"mediaboost\". Leave empty if not applicable."
+
+#. source: desc
+msgid "À propos : appel à l'action de fin de page."
+msgstr "About: end-of-page call to action."
+
+#. source: desc
+msgid "À propos : grille de valeurs ou de membres d'équipe."
+msgstr "About: grid of values or team members."
+
+#. source: field
+msgid "Étapes d'approche"
+msgstr "Approach steps"
+
+#. source: field
+msgid "Étapes de suivi"
+msgstr "Monitoring steps"
+
+#. source: field
+msgid "Étapes du processus"
+msgstr "Process steps"

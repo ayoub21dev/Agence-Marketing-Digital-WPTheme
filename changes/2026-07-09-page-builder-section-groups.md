@@ -11,11 +11,12 @@ the category as a coloured chip instead of a raw `[Commun] …` label.
 
 ## How it works
 
-Every layout already encodes its page in its label prefix (`[Accueil]`,
-`[Blog]`, `[Commun]`, `[Contact]`, `[Méthodologie]`, `[À Propos]`,
-`[Formulaire]`), and `section-preview.js` already parsed that prefix into a
-slug and stamped it on each card as `data-cat` (it drove the chip colour).
-This change reuses that signal rather than introducing a parallel one.
+Every layout encodes its page in its label prefix (`[Accueil]`, `[Blog]`,
+`[Commun]`, `[Contact]`, `[Méthodologie]`, `[À Propos]`, `[Formulaire]`), and
+`section-preview.js` stamps a category slug on each card as `data-cat` (it also
+drives the chip colour). This change reuses that signal rather than introducing
+a parallel one — but see "Translation-proof categories" below for where the
+slug actually comes from.
 
 **Filtering is client-side, deliberately.** A server-side
 `acf/fields/flexible_content/layout` filter would *remove* layouts, which would
@@ -127,6 +128,32 @@ so it never becomes a card, so the filter never hides it: it would stay visible
 in every category. All 21 layouts currently have templates, so this is latent,
 not live. Documented rather than fixed.
 
+## Translation-proof categories
+
+`catSlug()` originally decided a section's category by **matching French words in
+its display label** (`accueil`, `commun`, `thodo`, `propos`, `formulaire`). That
+made the entire grouping depend on the label staying French — and a label is
+user-facing text that can be translated (Polylang Pro's ACF integration, WPML) or
+simply renamed in the ACF admin.
+
+Reproduced in headless Chrome with the labels translated to English
+(`[Home] …`, `[Shared] …`): **15 of 21 cards fell through to `default`**, zero
+page-category cards stayed visible, and the group headers, toggle and badges all
+vanished. A silent, total collapse of the picker — no error.
+
+So the category now comes from **`v5_digital_layout_categories()`**, a
+`layout name => slug` map keyed on the stable layout name (`about_grid_section
+=> propos`), exposed per layout as `cat` in `v5_digital_layout_preview_data()`.
+The JS helper `layoutCat(name, labelCat)` prefers that value and only falls back
+to parsing the label for a layout with no map entry.
+
+Consequence, by design: the chip's **text** still follows the (translatable)
+label, while the chip's **colour** and the grouping follow the stable slug. Both
+were asserted.
+
+The map is filterable (`v5_digital_layout_categories`), so a new layout can
+declare its category without editing the function.
+
 ## A CSS specificity trap (found by test, worth keeping)
 
 `.acf-fc-popup li.v5-sp-group { display: block !important }` and
@@ -179,6 +206,12 @@ and `section-preview.css`, with ACF's actual popup markup:
 | Hard audit — grid spans, idempotency under re-observation, insert path | 110 |
 | Modal chip — colour parity with cards, no raw brackets, a11y name | 70 |
 | ACF "more layout actions" menu unaffected | 7 |
+| Translation-proof categories: French labels, English labels | 22 |
+
+Plus a **negative control** for the last suite: run with the server-supplied
+`cat` removed (i.e. the old label-parsing code) against English labels, and
+7 of 11 checks fail exactly as described above. The test detects the bug it
+claims to prevent.
 
 All pass. Notable individual checks: the toggle spans `grid-column: 1 / -1` and
 sits below every visible card; a re-observed popup grows no second toggle; a
@@ -198,17 +231,28 @@ contact page `[Contact]` has exactly one layout, so once it is added ACF
 disables that card and the default band can look sparse until the toggle is
 expanded.
 
-## Pre-existing bug found during this work (NOT introduced here, NOT fixed)
+## Pre-existing bug found during this work (NOT introduced here — now fixed)
 
 `.acf-fc-popup ul { display: grid !important; width: 540px !important }` (from
-the 2026-07-08 card-grid restyle) is unscoped, so it also matches ACF 6.5+'s
+the 2026-07-08 card-grid restyle) was unscoped, so it also matched ACF 6.5+'s
 Rename/Disable menu, which reuses the `acf-fc-popup` class. Measured on that
 menu: `display: grid`, `width: 540px`, `grid-template-columns: 256px 256px` —
 a two-column card grid where a small dropdown belongs.
 
-Fix would be scoping those selectors to
-`.acf-fc-popup:not(.acf-more-layout-actions)`. Left alone: out of scope, and it
-predates this change.
+**Fixed** by scoping the three structural picker rules (wrapper, `ul`, `li`) and
+the single-column media query to
+`.acf-fc-popup:not(.acf-more-layout-actions)`. The `:not()` is load-bearing and
+is commented as such in the stylesheet.
+
+Specificity was re-checked: `:not(.acf-more-layout-actions)` lifts the `li` rule
+from (0,1,1) to (0,2,1), which still loses to `.acf-fc-popup ul li.v5-sp-hidden`
+(0,2,2) — so hidden cards stay hidden — and still ties-then-loses to the later
+`.v5-sp-group` / `.v5-sp-more-li` rules, exactly as before.
+
+Verified both directions in headless Chrome against ACF's real markup: the
+actions menu now computes `display: block` at its natural width with
+`grid-template-columns: none` and unforced `<li>`, while the real layout picker
+still computes `display: grid` at `540px`.
 
 ## How to revert
 

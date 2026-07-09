@@ -1,3 +1,4 @@
+
 # Roadmap & Ideas
 
 Backlog of upcoming features, editor-UX improvements, and use cases to explore.
@@ -68,11 +69,30 @@ page.
   with item 3 — options-page fields are intentionally global, page sections
   are intentionally local.
 
+### 5. Back-office language: French by default, switchable to English per user
+
+Ship the wp-admin back-office in French by default, while letting each
+individual editor switch their own admin interface to English — independent
+of which market/sub-site they're working in.
+
+- **Goal:** the dashboard stays French out of the box (matches the team's
+  day-to-day language), but any editor who prefers English — e.g. someone
+  collaborating on the US or UAE market — can switch their own admin UI
+  without changing it for anyone else.
+- **Why:** this is a per-person convenience setting, not a per-market one —
+  it shouldn't be tied to the Multisite front-end language split (`/fr-fr/`,
+  `/en-us/`, `/ar-ae/`), which is about site content, not admin UI.
+- **Notes:** WordPress core supports this natively — set the network's
+  default site locale to `fr_FR`, install the `en_US` language pack, and
+  each user picks their own admin language from their profile's "Language"
+  field. Likely no custom development needed, just confirming the language
+  packs are installed and available network-wide.
+
 ---
 
 ## Front-end features
 
-### 5. Mega menu in the header
+### 6. Mega menu in the header
 
 Replace the flat header nav with a mega menu.
 
@@ -82,7 +102,7 @@ Replace the flat header nav with a mega menu.
   a mega menu means a richer markup layer on top of the WP menu, plus mobile
   behaviour. Touches `header.php` + `theme-scripts.js`.
 
-### 6. Exit-intent pop-up modal
+### 7. Exit-intent pop-up modal
 
 Show a modal when a visitor is about to leave the page.
 
@@ -95,14 +115,14 @@ Show a modal when a visitor is about to leave the page.
   respect a global on/off switch (ACF option or theme option).
 - **Notes:** must be dismissible (Escape, backdrop click, close button),
   focus-trapped, `aria-modal`, and respect reduced-motion — same constraints
-  as item 7. Lives in `theme-scripts.js` + a small markup partial in
+  as item 8. Lives in `theme-scripts.js` + a small markup partial in
   `footer.php`.
 
 ---
 
 ## Research / exploration
 
-### 7. Engagement & accessibility patterns
+### 8. Engagement & accessibility patterns
 
 Investigate UI patterns that raise on-page engagement and improve
 accessibility, then recommend which to implement and how.
