@@ -16,6 +16,16 @@ WordPress theme for a **French-language digital-agency directory / marketplace**
   - Before claiming nothing has been pushed, check the **remote**, not just `origin/main`: `git ls-remote --heads origin <branch>`. The local `origin/<branch>` ref only reflects the last fetch, and the owner pushes from his IDE, outside Claude Code.
 - **`.gitignore`:** `node_modules/` ignored; compiled `assets/css/tailwind.css` IS committed on purpose.
 
+### Versioning & changelog
+
+- **One source of truth: the `Version:` header in `style.css`.** `package.json` mirrors it. Nothing hardcodes it — `v5_digital_theme_version()` reads the *installed* header at runtime, because the deploy appends the build number to the deployed copy (`1.2.0.57`).
+- **`npm run release`** (`bin/release.mjs`, zero deps) bumps the version from Conventional Commits since the last tag (`!`/`BREAKING CHANGE:`→major, `feat:`→minor, else patch), writes `CHANGELOG.md`, commits and tags. **It never pushes.**
+  - `npm run release:dry` first. `npm run changelog:check` lists commits that changed code without adding a `changes/` doc.
+  - It **refuses** to release when a commit isn't conventional (a missed `feat:` would ship as a patch). Override with `--bump minor` or `--allow-unconventional`.
+- **Changelog entries come from `changes/*.md`** added since the last tag: the `# H1` is the entry. Set its section with `<!-- changelog: Fixed -->` inside the doc — otherwise it's inferred from the adding commit's type, which is often wrong.
+- **Never hand-edit `CHANGELOG.md` under `## [Unreleased]`** — the generator owns that region.
+- Surfaced in wp-admin (§3c of `functions.php`): **Appearance → Nouveautés du thème** and a dashboard widget. `CHANGELOG.md` is deployed; `bin/**` and `changes/**` are not, so relative links in entries are flattened to plain text on purpose.
+
 ---
 
 ## Architecture
@@ -34,6 +44,7 @@ the numbers below drift with every change (they were ~1,200 lines out of date be
 | `2b.` | 2281 | **Page builder — live section preview** (admin only): the eye-button modal, the grouped "Add Section" picker, `v5_digital_layout_categories()`, the `wp_ajax_v5_section_preview` endpoint. |
 | `3.` | 2740 | **Asset enqueue** — `v5_digital_enqueue_assets()`: tailwind.css, theme-styles.css, theme-scripts.js, versioned by `filemtime`. |
 | `3b.` | 2783 | **Exit-intent newsletter popup** — `v5_digital_exit_intent_enabled()` gate (`is_singular('post')`). |
+| `3c.` | 2802 | **Version & changelog** — `v5_digital_theme_version()` (reads the installed `style.css` header, build suffix included), `v5_digital_parse_changelog()`, the Appearance → *Nouveautés du thème* page and the dashboard widget. Admin-only; the front end never touches it. |
 | `4.` | 2802 | **Activation seeding** — `v5_digital_setup_theme_content()` on `after_switch_theme`: creates pages, the primary + 4 footer menus, seeds demo CPT content. ⚠ Its nav-menu **titles are written to the database**, which is why those 6 strings are excluded from `languages/en_US.mo`. |
 | `5.` | 4115 | **Theme setup / menus** — `load_theme_textdomain()` **must stay the first statement** (see below), then `register_nav_menus()`, title-tag, post-thumbnails. |
 | `5b.` | 4148 | **Polylang string integration** — `v5_t()` + `v5_digital_ui_strings()`. **Front end only.** |

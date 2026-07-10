@@ -1,5 +1,7 @@
 # Admin language: French backoffice + English for admins who need it (2026-07-09)
 
+<!-- changelog: Added -->
+
 ## The actual starting state (not what it looked like)
 
 The theme's strings are French, so the backoffice *felt* French. It wasn't:

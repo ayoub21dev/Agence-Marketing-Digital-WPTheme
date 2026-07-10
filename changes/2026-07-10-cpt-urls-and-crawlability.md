@@ -1,5 +1,7 @@
 # CPT URLs, `/blog/` prefix, and crawlability (2026-07-10)
 
+<!-- changelog: Fixed -->
+
 Found during a full audit in which every route was rendered through a real
 WordPress boot (PHP 8.4, `E_ALL`) rather than reasoned about statically.
 

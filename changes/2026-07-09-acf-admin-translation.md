@@ -1,5 +1,7 @@
 # Translate the whole ACF admin, dynamically (2026-07-09)
 
+<!-- changelog: Added -->
+
 Follows `2026-07-09-admin-language.md`. That change shipped `languages/en_US.mo`
 and an English admin correctly saw "SECTIONS ON THIS PAGE" — but the CPT menu
 still said **Agences**, and every layout card in the picker was still French.

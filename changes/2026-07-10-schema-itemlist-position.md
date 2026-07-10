@@ -1,5 +1,7 @@
 # ItemList: `position` was the RANK badge, not the list position (2026-07-10)
 
+<!-- changelog: Fixed -->
+
 Found by extracting the real JSON-LD from rendered pages while checking whether
 `STRUCTURED-DATA.md` still matched the code.
 

@@ -1,5 +1,7 @@
 # Structured data (JSON-LD) désactivé (2026-07-10)
 
+<!-- changelog: Changed -->
+
 Demandé : *« deactivate the schema markup till i tell u »*. Le balisage n'est
 **pas supprimé** — il passe derrière un interrupteur unique, à réactiver d'un
 mot le jour venu.

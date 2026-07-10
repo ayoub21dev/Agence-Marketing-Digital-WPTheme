@@ -1,4 +1,3 @@
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: Agence Marketing Digital 1.0.0\n"
@@ -1245,3 +1244,55 @@ msgstr "Monitoring steps"
 #. source: field
 msgid "Étapes du processus"
 msgstr "Process steps"
+
+#: functions.php
+msgid "Ajouté"
+msgstr "Added"
+
+#: functions.php
+msgid "Modifié"
+msgstr "Changed"
+
+#: functions.php
+msgid "Corrigé"
+msgstr "Fixed"
+
+#: functions.php
+msgid "Performance"
+msgstr "Performance"
+
+#: functions.php
+msgid "Supprimé"
+msgstr "Removed"
+
+#: functions.php
+msgid "Documentation"
+msgstr "Documentation"
+
+#: functions.php
+msgid "Sécurité"
+msgstr "Security"
+
+#: functions.php
+msgid "Nouveautés du thème"
+msgstr "What's new"
+
+#: functions.php
+msgid "Vous n’avez pas accès à cette page."
+msgstr "You do not have permission to access this page."
+
+#: functions.php
+msgid "Version installée"
+msgstr "Installed version"
+
+#: functions.php
+msgid "Le fichier CHANGELOG.md est introuvable ou vide."
+msgstr "CHANGELOG.md is missing or empty."
+
+#: functions.php
+msgid "À venir"
+msgstr "Unreleased"
+
+#: functions.php
+msgid "Voir le journal complet"
+msgstr "View the full changelog"

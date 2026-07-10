@@ -2799,6 +2799,279 @@ function v5_digital_exit_intent_enabled() {
 }
 
 // ----------------------------------------------------
+// 3c. VERSION & CHANGELOG
+// ----------------------------------------------------
+// The version lives in ONE place: the `Version:` header of style.css. Nothing
+// here hardcodes it. `npm run release` bumps that header, mirrors it into
+// package.json, and writes CHANGELOG.md from the `changes/*.md` docs added
+// since the last git tag (see bin/release.mjs).
+//
+// On production the deploy workflow appends the GitHub Actions run number to
+// the header (`1.2.0.57`), so the version shown in the admin is the exact
+// build that is live. That is why we read the INSTALLED header at runtime
+// rather than defining a constant that the deploy could not touch.
+//
+// Note on assets: enqueues below still cache-bust with `filemtime`, not the
+// theme version. Do not "improve" that — WP_DEBUG is false and
+// WP_ENVIRONMENT_TYPE is unset on the local Studio install, so every
+// dev/prod signal reads as "production" locally, and a version-keyed URL
+// would stop refreshing while you edit CSS.
+
+/**
+ * Version of the installed theme, read from style.css.
+ *
+ * In production this carries the deploy's build suffix (`1.2.0.57`); in the
+ * repo it is the clean semantic version (`1.2.0`).
+ */
+function v5_digital_theme_version() {
+    static $version = null;
+    if ($version !== null) {
+        return $version;
+    }
+    $theme   = wp_get_theme(get_template());
+    $version = $theme->exists() ? (string) $theme->get('Version') : '';
+    if ($version === '') {
+        $version = '0.0.0';
+    }
+    return $version;
+}
+
+/** Absolute path of the shipped changelog (CHANGELOG.md is NOT deploy-excluded). */
+function v5_digital_changelog_path() {
+    return get_template_directory() . '/CHANGELOG.md';
+}
+
+/**
+ * Parse the subset of Keep a Changelog that bin/release.mjs emits:
+ *
+ *     ## [1.2.0] - 2026-07-10      -> a release
+ *     ### Fixed                    -> a section
+ *     - some entry                 -> an entry
+ *
+ * Link-reference lines (`[1.2.0]: https://…`) start with `[`, never `##`, so
+ * they fall through. An `## [Unreleased]` heading with no entries is dropped.
+ *
+ * @return array<int, array{version:string, date:string, sections:array<string, string[]>}>
+ */
+function v5_digital_parse_changelog($markdown) {
+    $releases = array();
+    $release  = null;
+    $section  = null;
+
+    foreach (preg_split('/\R/', (string) $markdown) as $line) {
+        if (preg_match('/^##\s+\[([^\]]+)\](?:\s*-\s*(\d{4}-\d{2}-\d{2}))?/', $line, $m)) {
+            if ($release !== null) {
+                $releases[] = $release;
+            }
+            $release = array(
+                'version'  => $m[1],
+                'date'     => isset($m[2]) ? $m[2] : '',
+                'sections' => array(),
+            );
+            $section = null;
+            continue;
+        }
+        if ($release !== null && preg_match('/^###\s+(.+?)\s*$/', $line, $m)) {
+            $section = $m[1];
+            if (!isset($release['sections'][$section])) {
+                $release['sections'][$section] = array();
+            }
+            continue;
+        }
+        if ($release !== null && $section !== null && preg_match('/^-\s+(.+?)\s*$/', $line, $m)) {
+            $release['sections'][$section][] = $m[1];
+        }
+    }
+    if ($release !== null) {
+        $releases[] = $release;
+    }
+
+    return array_values(array_filter($releases, function ($rel) {
+        return !empty($rel['sections']) || strtolower($rel['version']) !== 'unreleased';
+    }));
+}
+
+/**
+ * Parsed changelog, cached so the file is not re-read on every admin request.
+ *
+ * The cache key is mtime AND size: `filemtime()` only has one-second
+ * resolution, so a rewrite landing in the same second as the cached parse is
+ * invisible to mtime alone (observed while testing). Size catches those,
+ * because an edited changelog is virtually never byte-for-byte the same length.
+ */
+function v5_digital_changelog_cache_key($path) {
+    return filemtime($path) . ':' . filesize($path);
+}
+
+function v5_digital_get_changelog() {
+    static $cache = null;
+    if ($cache !== null) {
+        return $cache;
+    }
+    $path = v5_digital_changelog_path();
+    if (!is_readable($path)) {
+        return $cache = array();
+    }
+    clearstatcache(true, $path);
+    $key    = v5_digital_changelog_cache_key($path);
+    $stored = get_transient('v5_digital_changelog');
+    if (is_array($stored) && isset($stored['key'], $stored['data']) && $stored['key'] === $key) {
+        return $cache = $stored['data'];
+    }
+    $data = v5_digital_parse_changelog(file_get_contents($path));
+    set_transient('v5_digital_changelog', array('key' => $key, 'data' => $data), DAY_IN_SECONDS);
+    return $cache = $data;
+}
+
+/** Keep a Changelog section names, shown in the admin's language. */
+function v5_digital_changelog_section_label($section) {
+    $labels = array(
+        'Added'         => v5_digital_translate_admin_string('Ajouté'),
+        'Changed'       => v5_digital_translate_admin_string('Modifié'),
+        'Fixed'         => v5_digital_translate_admin_string('Corrigé'),
+        'Performance'   => v5_digital_translate_admin_string('Performance'),
+        'Removed'       => v5_digital_translate_admin_string('Supprimé'),
+        'Documentation' => v5_digital_translate_admin_string('Documentation'),
+        'Security'      => v5_digital_translate_admin_string('Sécurité'),
+    );
+    return isset($labels[$section]) ? $labels[$section] : $section;
+}
+
+/**
+ * Render one changelog entry's inline markdown: `code`, **bold**, [label](url).
+ *
+ * Relative links are flattened to their label on purpose: the `changes/*.md`
+ * docs they point at are excluded from the deploy, so on production those
+ * hrefs would 404. Only absolute http(s) links survive as anchors.
+ */
+function v5_digital_changelog_inline($text) {
+    $html = esc_html($text);
+    $html = preg_replace('/`([^`]+)`/', '<code>$1</code>', $html);
+    $html = preg_replace('/\*\*([^*]+)\*\*/', '<strong>$1</strong>', $html);
+    return preg_replace_callback('/\[([^\]]+)\]\(([^)]+)\)/', function ($m) {
+        if (preg_match('#^https?://#i', $m[2])) {
+            return '<a href="' . esc_url($m[2]) . '" target="_blank" rel="noopener noreferrer">' . $m[1] . '</a>';
+        }
+        return $m[1];
+    }, $html);
+}
+
+/** Appearance → Nouveautés du thème. */
+function v5_digital_register_changelog_page() {
+    add_theme_page(
+        v5_digital_translate_admin_string('Nouveautés du thème'),
+        v5_digital_translate_admin_string('Nouveautés du thème'),
+        'edit_theme_options',
+        'v5-digital-changelog',
+        'v5_digital_render_changelog_page'
+    );
+}
+add_action('admin_menu', 'v5_digital_register_changelog_page');
+
+function v5_digital_render_changelog_page() {
+    if (!current_user_can('edit_theme_options')) {
+        wp_die(esc_html(v5_digital_translate_admin_string('Vous n’avez pas accès à cette page.')));
+    }
+    $releases = v5_digital_get_changelog();
+    ?>
+    <div class="wrap v5-changelog">
+        <h1><?php echo esc_html(v5_digital_translate_admin_string('Nouveautés du thème')); ?></h1>
+        <p class="description">
+            <?php echo esc_html(v5_digital_translate_admin_string('Version installée')); ?> :
+            <code><?php echo esc_html(v5_digital_theme_version()); ?></code>
+        </p>
+
+        <?php if (empty($releases)) : ?>
+            <div class="notice notice-warning inline"><p>
+                <?php echo esc_html(v5_digital_translate_admin_string('Le fichier CHANGELOG.md est introuvable ou vide.')); ?>
+            </p></div>
+        <?php else : ?>
+            <?php foreach ($releases as $release) : ?>
+                <div class="card" style="max-width:820px;margin-top:16px;padding:16px 20px;">
+                    <h2 style="margin-top:0;">
+                        <?php
+                        echo strtolower($release['version']) === 'unreleased'
+                            ? esc_html(v5_digital_translate_admin_string('À venir'))
+                            : esc_html($release['version']);
+                        ?>
+                        <?php if ($release['date']) : ?>
+                            <span style="font-weight:400;color:#646970;font-size:13px;">— <?php echo esc_html($release['date']); ?></span>
+                        <?php endif; ?>
+                    </h2>
+                    <?php foreach ($release['sections'] as $section => $entries) : ?>
+                        <h3 style="margin-bottom:4px;"><?php echo esc_html(v5_digital_changelog_section_label($section)); ?></h3>
+                        <ul style="list-style:disc;margin:0 0 12px 20px;">
+                            <?php foreach ($entries as $entry) : ?>
+                                <li><?php echo wp_kses_post(v5_digital_changelog_inline($entry)); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+    <?php
+}
+
+/** Dashboard widget: installed version + the newest release's entries. */
+function v5_digital_register_changelog_widget() {
+    if (!current_user_can('edit_theme_options')) {
+        return;
+    }
+    wp_add_dashboard_widget(
+        'v5_digital_changelog_widget',
+        v5_digital_translate_admin_string('Nouveautés du thème'),
+        'v5_digital_render_changelog_widget'
+    );
+}
+add_action('wp_dashboard_setup', 'v5_digital_register_changelog_widget');
+
+function v5_digital_render_changelog_widget() {
+    $releases = v5_digital_get_changelog();
+    printf(
+        '<p style="margin-top:0;">%s : <code>%s</code></p>',
+        esc_html(v5_digital_translate_admin_string('Version installée')),
+        esc_html(v5_digital_theme_version())
+    );
+
+    if (empty($releases)) {
+        printf('<p>%s</p>', esc_html(v5_digital_translate_admin_string('Le fichier CHANGELOG.md est introuvable ou vide.')));
+        return;
+    }
+
+    $latest = $releases[0];
+    printf(
+        '<h4 style="margin:8px 0 4px;">%s%s</h4>',
+        strtolower($latest['version']) === 'unreleased'
+            ? esc_html(v5_digital_translate_admin_string('À venir'))
+            : esc_html($latest['version']),
+        $latest['date'] ? ' <span style="font-weight:400;color:#646970;">— ' . esc_html($latest['date']) . '</span>' : ''
+    );
+
+    echo '<ul style="list-style:disc;margin:0 0 8px 20px;">';
+    $shown = 0;
+    foreach ($latest['sections'] as $section => $entries) {
+        foreach ($entries as $entry) {
+            if ($shown++ >= 5) {
+                break 2;
+            }
+            printf(
+                '<li><strong>%s</strong> — %s</li>',
+                esc_html(v5_digital_changelog_section_label($section)),
+                wp_kses_post(v5_digital_changelog_inline($entry))
+            );
+        }
+    }
+    echo '</ul>';
+
+    printf(
+        '<a href="%s">%s</a>',
+        esc_url(admin_url('themes.php?page=v5-digital-changelog')),
+        esc_html(v5_digital_translate_admin_string('Voir le journal complet'))
+    );
+}
+
+// ----------------------------------------------------
 // 4. THEME SWITCH AUTOMATION (INITIALIZE PAGES & SITE DATA)
 // ----------------------------------------------------
 
