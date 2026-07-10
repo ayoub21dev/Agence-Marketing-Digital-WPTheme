@@ -19,17 +19,25 @@ Articles avec classement d'agences (« Analyses Éditoriales »)
 ## Organization — toutes les pages
 
 Émis par `v5_digital_organization_schema()` dans `functions.php` (hook
-`wp_head`). Les valeurs suivent la configuration WordPress — rien à modifier
-dans le code :
+`wp_head`), **sur chaque page rendue par le thème, y compris la 404 et les
+archives de taxonomies**. Les valeurs suivent la configuration WordPress —
+rien à modifier dans le code :
 
-| Propriété     | Source                                              |
-| ------------- | --------------------------------------------------- |
-| `name`        | Réglages → Général → Titre du site                  |
-| `description` | Réglages → Général → Slogan                         |
-| `url`         | URL du site                                         |
-| `email`       | `contact@<domaine>` (automatique)                   |
-| `logo`        | Logo personnalisé (Customizer) — omis tant qu'aucun |
-| `@id`         | `/#organization` (référence stable)                 |
+| Propriété     | Source                                              | Émis quand            |
+| ------------- | --------------------------------------------------- | --------------------- |
+| `@id`         | `/#organization` (référence stable)                  | toujours              |
+| `name`        | Réglages → Général → Titre du site                   | toujours              |
+| `url`         | URL du site                                          | toujours              |
+| `email`       | `contact@<domaine>` (automatique)                    | toujours              |
+| `description` | Réglages → Général → Slogan                          | **omis si vide**      |
+| `logo`        | Logo personnalisé (Customizer)                       | **omis si absent**    |
+| `sameAs`      | Site Settings → Social links (Twitter/X, LinkedIn,   | **omis si aucun lien**|
+|               | Instagram, Facebook)                                 |                       |
+
+> Sur l'installation locale actuelle, seuls `@id`, `name`, `url` et `email`
+> apparaissent : le slogan, le logo et les réseaux sociaux ne sont pas encore
+> renseignés. Ce n'est pas un bug — les trois clés sont volontairement omises
+> plutôt qu'émises vides.
 
 ## ItemList — articles « classement »
 
@@ -42,9 +50,23 @@ le lecteur voit :
 | `name` / `url`    | Titre et permalien de l'article                    |
 | `numberOfItems`   | Nombre d'agences classées                          |
 | `itemListElement` | Une entrée `ListItem` par agence                   |
-| — `position`      | Le badge RANK de l'agence (sinon l'ordre du bloc)  |
+| — `position`      | **Rang dans la liste : 1, 2, 3… consécutifs**      |
 | — `name`          | Titre de la fiche agence                           |
-| — `url`           | Site web de l'agence (si renseigné)                |
+| — `url`           | Site web **externe** de l'agence (si renseigné)    |
+
+L'ordre de la liste suit le badge **RANK** de l'agence (tri croissant), mais
+`position` n'est **pas** ce badge : c'est la place de l'élément *dans cette
+liste*, 1-based et consécutive, comme l'exigent schema.org et Google.
+
+> **Corrigé le 2026-07-10.** `position` valait auparavant le badge RANK :
+> `/blog/seo-casablanca/` émettait un `ItemList` avec `numberOfItems: 1` et
+> `position: 4`, un balisage invalide. `/blog/top-agencies/` passait seulement
+> par chance (rangs 1 et 2). Voir `changes/2026-07-10-schema-itemlist-position.md`.
+
+`url` pointe vers le **site web de l'agence**, jamais vers son permalien
+WordPress : les CPT `agency` ne sont plus publiquement interrogeables et leurs
+URL renvoient un 404 (cf. `SITEMAP.md`). Le balisage ne contient donc aucun lien
+mort.
 
 Un article sans bloc de classement n'émet **aucun** ItemList (pas de schéma
 vide ou trompeur).

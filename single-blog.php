@@ -193,6 +193,8 @@ get_header();
 
                                 $item = array(
                                     '@type'    => 'ListItem',
+                                    // Sort key only — replaced below by the item's real
+                                    // position in the list. See the renumbering note.
                                     'position' => intval($schema_rev['rank']) ?: count($schema_items) + 1,
                                     'name'     => $schema_agency->post_title,
                                 );
@@ -206,6 +208,19 @@ get_header();
                                 usort($schema_items, function ($a, $b) {
                                     return $a['position'] - $b['position'];
                                 });
+
+                                // `ListItem.position` is the item's place IN THIS LIST — it
+                                // must be 1-based and consecutive. It is NOT the agency's
+                                // RANK badge: an article ranking agencies #4 and #6 would
+                                // otherwise emit positions [4, 6] with numberOfItems = 2,
+                                // which schema.org and Google reject. The rank is still what
+                                // orders the list (usort above); it just isn't the position.
+                                $schema_position = 0;
+                                foreach ($schema_items as &$schema_item) {
+                                    $schema_item['position'] = ++$schema_position;
+                                }
+                                unset($schema_item); // break the reference from foreach-by-ref
+
                                 $item_list = array(
                                     '@context'        => 'https://schema.org',
                                     '@type'           => 'ItemList',
