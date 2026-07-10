@@ -1,5 +1,35 @@
 # Données structurées — agencemarketingdigital.com
 
+> ## ⛔ DÉSACTIVÉ — 2026-07-10
+>
+> **Le thème n'émet plus aucun JSON-LD.** Ni `Organization`, ni `ItemList`, sur
+> aucune page. Désactivé à la demande, en attendant le feu vert.
+>
+> Le code n'est **pas supprimé** : il est derrière un interrupteur unique,
+> `v5_digital_schema_enabled()` ([functions.php](functions.php)), qui renvoie
+> `false` par défaut.
+>
+> **Pour réactiver**, au choix :
+>
+> ```php
+> // 1. Sans toucher au thème (mu-plugin, plugin, functions.php enfant) :
+> add_filter('v5_digital_schema_enabled', '__return_true');
+>
+> // 2. Ou basculer la valeur par défaut dans functions.php :
+> return (bool) apply_filters('v5_digital_schema_enabled', true);
+> ```
+>
+> Rien d'autre à modifier : les deux émetteurs (`v5_digital_organization_schema()`
+> et le bloc `ItemList` de `single-blog.php`) consultent ce même interrupteur.
+>
+> **Le reste de la page est intact.** Le classement visible « Analyses
+> Éditoriales » (cartes agences, logos, badges RANK, boutons « voir le site
+> de… ») s'affiche exactement comme avant : seul le `<script type="application/
+> ld+json">` disparaît. Vérifié sur les 12 routes — voir
+> `changes/2026-07-10-schema-disabled.md`.
+>
+> **Le reste de ce document décrit ce qui sera émis une fois réactivé.**
+
 Carte des schémas JSON-LD (schema.org) émis par le thème. Complément de
 `SITEMAP.md`. Détail de l'implémentation et retour arrière :
 `changes/2026-07-07-structured-data.md`.
@@ -73,9 +103,15 @@ vide ou trompeur).
 
 ## Vérification
 
+> Tant que l'interrupteur est sur `false` (état actuel), le code source ne
+> contient **aucun** `<script type="application/ld+json">` : c'est le résultat
+> attendu, pas une régression. Les étapes ci-dessous supposent le schéma
+> réactivé.
+
 1. Afficher le code source d'un article classement
    (ex. `/blog/top-agencies/`) → deux blocs
-   `<script type="application/ld+json">`.
+   `<script type="application/ld+json">` (`Organization` + `ItemList`) ;
+   une page sans classement n'en a qu'un (`Organization`).
 2. Après déploiement : tester l'URL dans le
    [Rich Results Test](https://search.google.com/test/rich-results) de Google
    ou sur [validator.schema.org](https://validator.schema.org/).

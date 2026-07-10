@@ -4716,11 +4716,37 @@ add_filter('redirect_canonical', function($redirect_url, $requested_url) {
 }, 10, 2);
 
 /**
+ * Master switch for ALL JSON-LD structured data emitted by the theme:
+ * the Organization schema below, and the ItemList in single-blog.php.
+ *
+ * ---------------------------------------------------------------------------
+ * CURRENTLY OFF — disabled on request, 2026-07-10. No JSON-LD is emitted
+ * anywhere on the front end. The code is intact, not deleted.
+ *
+ * To switch it back on, either flip the default below to `true`, or without
+ * touching this file:
+ *
+ *     add_filter('v5_digital_schema_enabled', '__return_true');
+ * ---------------------------------------------------------------------------
+ *
+ * @return bool
+ */
+function v5_digital_schema_enabled() {
+    return (bool) apply_filters('v5_digital_schema_enabled', false);
+}
+
+/**
  * Organization JSON-LD on every page — tells search engines who publishes
  * the site (name, URL, contact). Complements the ItemList schema emitted on
  * ranked-list articles (see single-blog.php).
+ *
+ * Gated by v5_digital_schema_enabled() — currently a no-op.
  */
 function v5_digital_organization_schema() {
+    if (!v5_digital_schema_enabled()) {
+        return;
+    }
+
     $schema = array(
         '@context' => 'https://schema.org',
         '@type'    => 'Organization',

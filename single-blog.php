@@ -183,55 +183,62 @@ get_header();
                         endif;
 
                         if (!empty($agency_reviews)) :
-                            // ItemList JSON-LD mirroring the ranked agency list below —
-                            // this is the schema Google reads for "Top X" ranking articles.
-                            $schema_items = array();
-                            foreach ($agency_reviews as $schema_rev) {
-                                if (empty($schema_rev['agency'])) continue;
-                                $schema_agency = get_post($schema_rev['agency']);
-                                if (!$schema_agency) continue;
+                            // ItemList JSON-LD mirroring the ranked agency list below — this is
+                            // the schema Google reads for "Top X" ranking articles.
+                            //
+                            // Only the JSON-LD is behind v5_digital_schema_enabled() (see
+                            // functions.php); the visible "Analyses Éditoriales" list further
+                            // down always renders. Keep the gate inside this block, never on
+                            // the `if (!empty($agency_reviews))` above it.
+                            if (v5_digital_schema_enabled()) {
+                                $schema_items = array();
+                                foreach ($agency_reviews as $schema_rev) {
+                                    if (empty($schema_rev['agency'])) continue;
+                                    $schema_agency = get_post($schema_rev['agency']);
+                                    if (!$schema_agency) continue;
 
-                                $item = array(
-                                    '@type'    => 'ListItem',
-                                    // Sort key only — replaced below by the item's real
-                                    // position in the list. See the renumbering note.
-                                    'position' => intval($schema_rev['rank']) ?: count($schema_items) + 1,
-                                    'name'     => $schema_agency->post_title,
-                                );
-                                $schema_site = get_post_meta($schema_agency->ID, 'website', true);
-                                if ($schema_site) {
-                                    $item['url'] = strpos($schema_site, 'http') === 0 ? $schema_site : 'https://' . $schema_site;
+                                    $item = array(
+                                        '@type'    => 'ListItem',
+                                        // Sort key only — replaced below by the item's real
+                                        // position in the list. See the renumbering note.
+                                        'position' => intval($schema_rev['rank']) ?: count($schema_items) + 1,
+                                        'name'     => $schema_agency->post_title,
+                                    );
+                                    $schema_site = get_post_meta($schema_agency->ID, 'website', true);
+                                    if ($schema_site) {
+                                        $item['url'] = strpos($schema_site, 'http') === 0 ? $schema_site : 'https://' . $schema_site;
+                                    }
+                                    $schema_items[] = $item;
                                 }
-                                $schema_items[] = $item;
-                            }
-                            if (!empty($schema_items)) {
-                                usort($schema_items, function ($a, $b) {
-                                    return $a['position'] - $b['position'];
-                                });
+                                if (!empty($schema_items)) {
+                                    usort($schema_items, function ($a, $b) {
+                                        return $a['position'] - $b['position'];
+                                    });
 
-                                // `ListItem.position` is the item's place IN THIS LIST — it
-                                // must be 1-based and consecutive. It is NOT the agency's
-                                // RANK badge: an article ranking agencies #4 and #6 would
-                                // otherwise emit positions [4, 6] with numberOfItems = 2,
-                                // which schema.org and Google reject. The rank is still what
-                                // orders the list (usort above); it just isn't the position.
-                                $schema_position = 0;
-                                foreach ($schema_items as &$schema_item) {
-                                    $schema_item['position'] = ++$schema_position;
+                                    // `ListItem.position` is the item's place IN THIS LIST — it
+                                    // must be 1-based and consecutive. It is NOT the agency's
+                                    // RANK badge: an article ranking agencies #4 and #6 would
+                                    // otherwise emit positions [4, 6] with numberOfItems = 2,
+                                    // which schema.org and Google reject. The rank is still what
+                                    // orders the list (usort above); it just isn't the position.
+                                    $schema_position = 0;
+                                    foreach ($schema_items as &$schema_item) {
+                                        $schema_item['position'] = ++$schema_position;
+                                    }
+                                    unset($schema_item); // break the reference from foreach-by-ref
+
+                                    $item_list = array(
+                                        '@context'        => 'https://schema.org',
+                                        '@type'           => 'ItemList',
+                                        'name'            => get_the_title(),
+                                        'url'             => get_permalink(),
+                                        'numberOfItems'   => count($schema_items),
+                                        'itemListElement' => $schema_items,
+                                    );
+                                    echo '<script type="application/ld+json">'
+                                        . wp_json_encode($item_list, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                                        . '</script>' . "\n";
                                 }
-                                unset($schema_item); // break the reference from foreach-by-ref
-
-                                $item_list = array(
-                                    '@context'        => 'https://schema.org',
-                                    '@type'           => 'ItemList',
-                                    'name'            => get_the_title(),
-                                    'url'             => get_permalink(),
-                                    'numberOfItems'   => count($schema_items),
-                                    'itemListElement' => $schema_items,
-                                );
-                                echo '<script type="application/ld+json">'
-                                    . wp_json_encode($item_list, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
-                                    . '</script>' . "\n";
                             }
                                         ?>
                                         <div class="mt-10 pt-8 border-t border-slate-200">
