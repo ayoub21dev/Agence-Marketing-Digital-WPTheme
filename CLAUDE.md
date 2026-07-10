@@ -18,16 +18,29 @@ WordPress theme for a **French-language digital-agency directory / marketplace**
 
 ## Architecture
 
-### functions.php (~4,350 lines) — the engine
-Organized in numbered sections:
-1. **ACF safety wrappers** (lines ~1–99): `v5_digital_get_field()`, `v5_digital_have_rows()`, `v5_digital_the_row()`, `v5_digital_get_row_layout()`, `v5_digital_get_sub_field()`, etc. — all no-op safely if ACF is inactive. **Templates should use these wrappers, not raw ACF functions.**
-2. **CPT/taxonomy registration** (~102–276): hooked to `init` priority 20.
-3. **ACF field groups in PHP** (~278–1966): a *fallback* only used if the matching `acf-json/group_*.json` is absent. The JSON is the source of truth.
-4. **Asset enqueue** (~1968–2009): `v5_digital_enqueue_assets()` — tailwind.css, theme-styles.css, theme-scripts.js, all versioned by `filemtime`.
-5. **Activation seeding** (~2011–3312): `v5_digital_setup_theme_content()` on `after_switch_theme` — creates pages, the primary + 4 footer menus, and seeds demo CPT content (agencies, testimonials, specialties, stats, partner logos, blog posts).
-6. **Theme setup / menus / i18n** (~3314–3612): register menus, title-tag, translations, primary-menu resolution.
-7. **Dynamic XML sitemap** (~3614–3691): custom `/sitemap.xml`.
-8. **Data migrations & self-healing** (~3693–4351): run once per version via `admin_init`; blog CPT→posts migration, category backfill, author sync, menu name fixes, footer-menu setup.
+### functions.php (~5,600 lines) — the engine
+
+Organized in banner-commented sections. **Navigate by banner, not by line number** —
+the numbers below drift with every change (they were ~1,200 lines out of date before
+2026-07-10). Grep: `grep -nE "^// [0-9]" functions.php`.
+
+| Banner | ~line | What |
+|---|---|---|
+| *(no banner)* | 1–108 | **ACF safety wrappers**: `v5_digital_get_field()`, `v5_digital_have_rows()`, `v5_digital_the_row()`, `v5_digital_get_row_layout()`, `v5_digital_get_sub_field()` — all no-op safely if ACF is inactive. **Templates must use these, not raw ACF functions.** |
+| `1.` | 109 | **CPT/taxonomy registration** — hooked to `init` priority 20, but **early-returns whenever `acf-json/post_type_*.json` exists**, which it always does. So this is a fallback that never runs; the JSON is the source of truth. (Its `__()` labels are therefore dead code — see `changes/2026-07-09-acf-admin-translation.md`.) |
+| `2.` | 286 | **ACF field groups in PHP** — same story: a fallback used only if `acf-json/group_*.json` is absent. |
+| `2b.` | 2281 | **Page builder — live section preview** (admin only): the eye-button modal, the grouped "Add Section" picker, `v5_digital_layout_categories()`, the `wp_ajax_v5_section_preview` endpoint. |
+| `3.` | 2740 | **Asset enqueue** — `v5_digital_enqueue_assets()`: tailwind.css, theme-styles.css, theme-scripts.js, versioned by `filemtime`. |
+| `3b.` | 2783 | **Exit-intent newsletter popup** — `v5_digital_exit_intent_enabled()` gate (`is_singular('post')`). |
+| `4.` | 2802 | **Activation seeding** — `v5_digital_setup_theme_content()` on `after_switch_theme`: creates pages, the primary + 4 footer menus, seeds demo CPT content. ⚠ Its nav-menu **titles are written to the database**, which is why those 6 strings are excluded from `languages/en_US.mo`. |
+| `5.` | 4115 | **Theme setup / menus** — `load_theme_textdomain()` **must stay the first statement** (see below), then `register_nav_menus()`, title-tag, post-thumbnails. |
+| `5b.` | 4148 | **Polylang string integration** — `v5_t()` + `v5_digital_ui_strings()`. **Front end only.** |
+| `5c.` | 4174 | **ACF admin language** — `acf/settings/l10n_textdomain` + the guard that turns translation **off** on ACF's structure editors, so an English-profile admin cannot save English labels back into `acf-json/`. |
+| `5c-bis.` | 4603 | **One-shot rewrite flush** — `v5_digital_flush_rewrites_once()`, gated by `V5_DIGITAL_REWRITE_VERSION`, on `init` so a visitor never hits stale rules. **Bump that constant whenever you touch CPT/taxonomy rewrite args.** |
+| `5c-ter.` | 4631 | **Keep the data-container CPTs out of `?s=`** — `pre_get_posts`; required because `agency` must keep `exclude_from_search: false`. |
+| `5d.` | 4652 | **Legacy taxonomy 301s** — `/blog/service/<t>/` → `/service/<t>/`. WordPress does *not* redirect after a rewrite-structure change. |
+| `6.` | 4698 | **Dynamic XML sitemap** — custom `/sitemap.xml`; core's `/wp-sitemap.xml` is disabled. Discovers published pages dynamically (skips the front page, protected pages and `annuaire`). |
+| *(no banner)* | ~5359+ | **Data migrations & self-healing** — `v5_digital_run_data_migrations()` on `admin_init`, gated by `V5_DIGITAL_MIGRATION_VERSION`: blog CPT→posts, category backfill, author sync, menu-name fixes, footer-menu setup. |
 
 ### Conventions
 - **Function prefix:** `v5_digital_*` (and a few `v5_*`). Match this when adding functions.
@@ -42,7 +55,39 @@ Organized in numbered sections:
 CPTs and taxonomies are defined as JSON in `acf-json/` (ACF "local JSON" sync — edits in the ACF admin UI save back to these files, so they version in git).
 
 **CPTs:** `agency` (title/editor/excerpt; taxonomies below), `partner_logo`, `specialty_hub`, `stat_metric`, `testimonial`.
-**Taxonomies:** `agency_service` (`/service/`), `agency_city` (`/city/`) — both on `agency`.
+All five have **no public front-end URL**: `publicly_queryable: false` **and**
+`rewrite.permalink_rewrite: "no_permalink"` (→ `rewrite: false`) **and**
+`query_var: "none"`. They exist to be queried by the layout templates
+(picks → `agency`, outcomes → `testimonial`, …), not to be visited. Re-enable on
+`agency` only once a real `single-agency.php` exists — `single.php` currently
+renders the *blog article* layout for anything.
+
+**Taxonomies:** `agency_service` (`/service/`), `agency_city` (`/city/`) — both on `agency`,
+both public. Their archives render through the `index.php` fallback.
+
+> **Four load-bearing flags in `acf-json/`. All were wrong before 2026-07-10.**
+>
+> - **`rewrite: false`, not just `publicly_queryable: false`.** With rewrite rules
+>   still generated, `WP::parse_request()` drops the (now non-public) query var,
+>   the request degrades to the front page, and `redirect_canonical()` **301s to
+>   the homepage**. Google calls that pattern a soft 404
+>   ([Search Central](https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes)).
+>   With `rewrite: false` no rule matches and WordPress returns a clean 404.
+> - **`query_var: "none"` is not a substitute.** With `rewrite` still on, a false
+>   `query_var` makes `add_rewrite_tag()` emit `post_type=…&name=…` — both public
+>   query vars — and the single *renders again*. Set both.
+> - **`with_front: false`** on every CPT and taxonomy. The blog permalink base is
+>   `/blog/%postname%/`, so `with_front: true` silently nests everything under it
+>   (`/blog/service/seo/`).
+> - **`exclude_from_search: false` on `agency`.** A taxonomy archive runs a
+>   `WP_Query` with no `post_type`, which resolves through
+>   `get_post_types(['exclude_from_search' => false])`. Set it to `true` and
+>   `/service/…` and `/city/…` return **zero agencies**, silently. The CPTs are
+>   kept out of site search by `v5_digital_exclude_cpts_from_search()` instead.
+>
+> Changing any of these requires a rewrite flush. `v5_digital_flush_rewrites_once()`
+> (§5c-bis) does it once per `V5_DIGITAL_REWRITE_VERSION`, on `init` so a **visitor**
+> never hits stale rules. Bump that constant whenever you touch these flags.
 
 **Field groups (`acf-json/group_*.json`):**
 - `group_agency_fields` — logo_text/image/url, rating_value, review_count, agency_rank, website
