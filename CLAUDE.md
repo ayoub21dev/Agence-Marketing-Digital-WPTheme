@@ -11,7 +11,9 @@ WordPress theme for a **French-language digital-agency directory / marketplace**
 - **Tailwind is compiled AND committed.** Source `src/tailwind.css` → output `assets/css/tailwind.css`. There is **no build step on the server**. If you add/change Tailwind classes in any `.php`, you MUST rebuild before committing or the styles won't appear in production:
   - `npm run build` (minified, one-shot) or `npm run watch` (dev).
   - Tailwind scans `./*.php`, `./template-parts/**/*.php`, `./assets/js/**/*.js` (see `tailwind.config.js`).
-- **Deploy:** GitHub Actions FTP-deploy (`.github/workflows/deploy1.yml`) on push to `main` → Hostinger `/public_html/wp-content/themes/agence-marketing-digital/`. Commit/push only when asked.
+- **Deploy:** GitHub Actions FTP-deploy (`.github/workflows/deploy1.yml`) on push to `main` → Hostinger `/public_html/wp-content/themes/agence-marketing-digital/`.
+- **⛔ Never `git push` on your own initiative — ask first, every time.** A push to `main` *is* a production release: no staging, no server-side build. Even a feature-branch push is the owner's call; he pushes and opens PRs himself. Committing to a local feature branch without asking is fine and expected — commit, then report how many commits are unpushed, and stop. One approval to push never carries over to the next push.
+  - Before claiming nothing has been pushed, check the **remote**, not just `origin/main`: `git ls-remote --heads origin <branch>`. The local `origin/<branch>` ref only reflects the last fetch, and the owner pushes from his IDE, outside Claude Code.
 - **`.gitignore`:** `node_modules/` ignored; compiled `assets/css/tailwind.css` IS committed on purpose.
 
 ---
