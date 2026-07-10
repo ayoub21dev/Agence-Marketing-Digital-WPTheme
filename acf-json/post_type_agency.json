@@ -10,7 +10,7 @@
     "public": true,
     "hierarchical": false,
     "exclude_from_search": false,
-    "publicly_queryable": true,
+    "publicly_queryable": false,
     "show_ui": true,
     "show_in_menu": true,
     "admin_menu_parent": "",
@@ -28,16 +28,16 @@
         "agency_service",
         "agency_city"
     ],
-    "has_archive": true,
+    "has_archive": false,
     "has_archive_slug": "",
     "rewrite": {
-        "permalink_rewrite": "post_type_key",
+        "permalink_rewrite": "no_permalink",
         "slug": "",
         "feeds": false,
         "pages": true,
-        "with_front": true
+        "with_front": false
     },
-    "query_var": "post_type_key",
+    "query_var": "none",
     "query_var_name": "",
     "can_export": true,
     "delete_with_user": false,

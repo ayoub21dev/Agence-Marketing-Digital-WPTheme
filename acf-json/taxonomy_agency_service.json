@@ -27,7 +27,7 @@
     "rewrite": {
         "permalink_rewrite": "custom_permalink",
         "slug": "service",
-        "with_front": true,
+        "with_front": false,
         "rewrite_hierarchical": false
     },
     "query_var": "taxonomy_key",

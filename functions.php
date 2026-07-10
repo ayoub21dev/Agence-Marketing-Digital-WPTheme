@@ -4600,6 +4600,101 @@ function v5_digital_nav_fallback_is_active($check) {
 }
 
 // ----------------------------------------------------
+// 5c-bis. REWRITE RULES: ONE-SHOT FLUSH AFTER THE URL CHANGE
+// ----------------------------------------------------
+//
+// The stored `rewrite_rules` option is a snapshot. Changing `rewrite`,
+// `with_front` or `publicly_queryable` in acf-json/ does NOT update it — the old
+// rules keep matching until something flushes. Deploying the theme alone would
+// therefore leave production serving `/blog/service/<term>/` and 404-ing
+// `/service/<term>/`.
+//
+// Hooked to `init` (not `admin_init`): a visitor must never hit stale rules while
+// waiting for an admin to log in. Runs exactly once per REWRITE_VERSION, gated by
+// a single autoloaded option, so the cost is one `get_option()` per request.
+// Priority 99 so it runs after ACF has registered the CPTs/taxonomies on `init`.
+// Soft flush ($hard = false): CPT/taxonomy rules live in the DB option, never in
+// .htaccess — and Studio/nginx have no .htaccess to write anyway.
+define('V5_DIGITAL_REWRITE_VERSION', '2026-07-10-cpt-urls');
+
+add_action('init', 'v5_digital_flush_rewrites_once', 99);
+function v5_digital_flush_rewrites_once() {
+    if (get_option('v5_digital_rewrite_version') === V5_DIGITAL_REWRITE_VERSION) {
+        return;
+    }
+
+    flush_rewrite_rules(false);
+    update_option('v5_digital_rewrite_version', V5_DIGITAL_REWRITE_VERSION);
+}
+
+// ----------------------------------------------------
+// 5c-ter. KEEP THE DATA-CONTAINER CPTs OUT OF SITE SEARCH
+// ----------------------------------------------------
+//
+// `agency` must keep `exclude_from_search: false`, because a taxonomy archive
+// (`/service/<term>/`) runs a WP_Query with no explicit post_type: WP_Query
+// resolves it through `get_post_types(array('exclude_from_search' => false))`,
+// so excluding `agency` there silently empties those archives (found_posts = 0).
+//
+// The consequence is that `?s=` would surface agencies whose permalinks now 404
+// (they are no longer publicly queryable). Strip them from the main search query
+// instead — the documented remedy, and it leaves taxonomy archives untouched.
+add_action('pre_get_posts', 'v5_digital_exclude_cpts_from_search');
+function v5_digital_exclude_cpts_from_search($query) {
+    if (is_admin() || !$query->is_main_query() || !$query->is_search()) {
+        return;
+    }
+
+    $query->set('post_type', array('post', 'page'));
+}
+
+// ----------------------------------------------------
+// 5d. LEGACY TAXONOMY URL REDIRECTS
+// ----------------------------------------------------
+//
+// Until 2026-07-10 the `agency_service` / `agency_city` taxonomies were
+// registered with `with_front: true`. Because the blog permalink base is
+// `/blog/%postname%/`, WordPress served their archives at `/blog/service/<term>/`
+// and `/blog/city/<term>/`. They now live at `/service/<term>/` and
+// `/city/<term>/`.
+//
+// WordPress does NOT redirect after a rewrite-structure change: `redirect_canonical()`
+// only enforces the CURRENT rules and per-post `_wp_old_slug` history, so the old
+// URLs would simply 404. These archives list real content and the new URL is a true
+// equivalent, so a 301 is the correct signal.
+//
+// Deliberately NOT redirected: `/blog/agency/<slug>/` and the other CPT singles.
+// Those post types are no longer publicly queryable and have no equivalent page —
+// Google's guidance is to 404/410 them rather than redirect to an unrelated URL,
+// which it treats as a soft 404.
+add_action('template_redirect', function () {
+    if (!is_404()) {
+        return;
+    }
+
+    $path = wp_parse_url(add_query_arg(array()), PHP_URL_PATH);
+    if (!is_string($path)) {
+        return;
+    }
+
+    // Only ever rewrite `/blog/service/…` and `/blog/city/…`, nothing else.
+    if (!preg_match('#^/blog/(service|city)/(.+)$#', $path, $m)) {
+        return;
+    }
+
+    $target = home_url('/' . $m[1] . '/' . $m[2]);
+
+    // Preserve the query string, if any.
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only, no state change.
+    if (!empty($_SERVER['QUERY_STRING'])) {
+        $target .= '?' . sanitize_text_field(wp_unslash($_SERVER['QUERY_STRING']));
+    }
+
+    wp_safe_redirect($target, 301);
+    exit;
+}, 1);
+
+// ----------------------------------------------------
 // 6. DYNAMIC XML SITEMAP
 // ----------------------------------------------------
 
