@@ -12,13 +12,18 @@ WordPress theme for a **French-language digital-agency directory / marketplace**
   - `npm run build` (minified, one-shot) or `npm run watch` (dev).
   - Tailwind scans `./*.php`, `./template-parts/**/*.php`, `./assets/js/**/*.js` (see `tailwind.config.js`).
 - **Deploy:** GitHub Actions FTP-deploy (`.github/workflows/deploy1.yml`) on push to `main` → Hostinger `/public_html/wp-content/themes/agence-marketing-digital/`.
-- **⛔ Never `git push` on your own initiative — ask first, every time.** A push to `main` *is* a production release: no staging, no server-side build. Even a feature-branch push is the owner's call; he pushes and opens PRs himself. Committing to a local feature branch without asking is fine and expected — commit, then report how many commits are unpushed, and stop. One approval to push never carries over to the next push.
-  - Before claiming nothing has been pushed, check the **remote**, not just `origin/main`: `git ls-remote --heads origin <branch>`. The local `origin/<branch>` ref only reflects the last fetch, and the owner pushes from his IDE, outside Claude Code.
+- **⛔ Never touch git history or GitHub. No `git commit`, no `git push`, no `git tag`, no PRs.** Do the work, leave it in the working tree, report what changed, and stop. The owner stages, commits and pushes from his own IDE. Read-only git (`status`, `log`, `diff`, `show`, `ls-remote`) is fine.
+  - A push to `main` *is* a production release: no staging, no server-side build.
+  - `npm run release` commits and tags by design — **the owner runs it, never an agent.**
+  - Before claiming nothing has been pushed, check the **remote**, not just `origin/main`: `git ls-remote --heads origin <branch>`. The local `origin/<branch>` ref only reflects the last fetch, and the owner pushes outside Claude Code.
 - **`.gitignore`:** `node_modules/` ignored; compiled `assets/css/tailwind.css` IS committed on purpose.
 
 ### Versioning & changelog
 
 - **One source of truth: the `Version:` header in `style.css`.** `package.json` mirrors it. Nothing hardcodes it — `v5_digital_theme_version()` reads the *installed* header at runtime, because the deploy appends the build number to the deployed copy (`1.2.0.57`).
+  - The repo always holds a **clean 3-part semver**. The deploy stamps `.{github.run_number}` onto the runner's checkout only; that stamped `style.css` must never be committed. Both the deploy step (asserts a 3-part header *before* stamping) and `npm run release` (refuses a stamped header) enforce this.
+  - `v5_digital_theme_version_parts()` splits `1.2.0.57` back into `semver` + `build`, so the admin can badge the changelog entry that is actually installed. Don't compare the raw header to a `## [x.y.z]` heading — it never matches.
+  - Do **not** switch the stamp to SemVer build metadata (`1.2.0+build.57`): PHP's `version_compare()` sorts that *below* `1.2.0`.
 - **`npm run release`** (`bin/release.mjs`, zero deps) bumps the version from Conventional Commits since the last tag (`!`/`BREAKING CHANGE:`→major, `feat:`→minor, else patch), writes `CHANGELOG.md`, commits and tags. **It never pushes.**
   - `npm run release:dry` first. `npm run changelog:check` lists commits that changed code without adding a `changes/` doc.
   - It **refuses** to release when a commit isn't conventional (a missed `feat:` would ship as a patch). Override with `--bump minor` or `--allow-unconventional`.

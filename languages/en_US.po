@@ -1296,3 +1296,11 @@ msgstr "Unreleased"
 #: functions.php
 msgid "Voir le journal complet"
 msgstr "View the full changelog"
+
+#: functions.php
+msgid "build %s"
+msgstr "build %s"
+
+#: functions.php
+msgid "installée"
+msgstr "installed"

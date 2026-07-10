@@ -87,11 +87,28 @@ function parseArgs(argv) {
 
 // ---------------------------------------------------------------- versioning
 
-/** The theme version lives in style.css. package.json only mirrors it. */
+/**
+ * The theme version lives in style.css. package.json only mirrors it.
+ *
+ * The repo always holds a clean 3-part semver. The deploy appends the GitHub
+ * run number to the DEPLOYED copy only (`1.2.0.53`), so a 4-part header here
+ * means a deployed style.css was committed by mistake — say so plainly instead
+ * of reporting "no Version header".
+ */
 function readThemeVersion() {
     const css = readFileSync(STYLE, 'utf8');
-    const m = css.match(/^Version:\s*(\d+\.\d+\.\d+)\s*$/m);
-    if (!m) die('no `Version: x.y.z` header in style.css');
+    const m = css.match(/^Version:\s*(\d+\.\d+\.\d+)(\.\d+)?\s*$/m);
+    if (!m) {
+        const found = css.match(/^Version:.*$/m);
+        die(`style.css needs a \`Version: X.Y.Z\` header${found ? ` (found: "${found[0].trim()}")` : ''}`);
+    }
+    if (m[2]) {
+        die(
+            `style.css carries a deploy build suffix: "Version: ${m[1]}${m[2]}".\n` +
+            `      That stamp belongs to the deployed copy only — a stamped style.css was committed.\n` +
+            `      Restore the clean version first:  Version: ${m[1]}`
+        );
+    }
     return m[1];
 }
 

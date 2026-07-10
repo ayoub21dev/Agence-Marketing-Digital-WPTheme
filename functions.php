@@ -2836,6 +2836,58 @@ function v5_digital_theme_version() {
     return $version;
 }
 
+/**
+ * Split the installed version into the release and the deploy build number.
+ *
+ *     1.2.0.57  ->  ['semver' => '1.2.0', 'build' => '57']
+ *     1.2.0     ->  ['semver' => '1.2.0', 'build' => '']
+ *
+ * Two different tools write those two halves: `npm run release` owns the
+ * semver in style.css, the deploy workflow appends `.{github.run_number}` to
+ * the deployed copy. Only `semver` can be matched against a `## [1.2.0]`
+ * heading in CHANGELOG.md — the raw `1.2.0.57` never equals it.
+ *
+ * Anything that is not `X.Y.Z[.B]` is returned untouched as the semver with no
+ * build: better a version we cannot match than a wrong match.
+ */
+function v5_digital_theme_version_parts() {
+    $version = v5_digital_theme_version();
+    if (preg_match('/^(\d+\.\d+\.\d+)(?:\.(\d+))?$/', $version, $m)) {
+        return array(
+            'semver' => $m[1],
+            'build'  => isset($m[2]) ? $m[2] : '',
+        );
+    }
+    return array('semver' => $version, 'build' => '');
+}
+
+/** True when $version is the release currently installed (build id ignored). */
+function v5_digital_is_installed_release($version) {
+    $parts = v5_digital_theme_version_parts();
+    return strtolower($version) !== 'unreleased' && $version === $parts['semver'];
+}
+
+/**
+ * `1.2.0` plus a muted `build 57` when the deploy stamped one.
+ *
+ * The build label is interpolated with str_replace(), not sprintf(): a
+ * translation that ever carried an extra placeholder ("build %s %d") would make
+ * sprintf() throw ArgumentCountError on PHP 8 and white-screen the admin. A
+ * translator typo must not be able to do that.
+ */
+function v5_digital_version_html() {
+    $parts = v5_digital_theme_version_parts();
+    $html  = '<code>' . esc_html($parts['semver']) . '</code>';
+    if ($parts['build'] !== '') {
+        $template = v5_digital_translate_admin_string('build %s');
+        $label    = strpos($template, '%s') !== false
+            ? str_replace('%s', $parts['build'], $template)
+            : $template . ' ' . $parts['build'];
+        $html .= ' <span style="color:#646970;font-size:12px;">' . esc_html($label) . '</span>';
+    }
+    return $html;
+}
+
 /** Absolute path of the shipped changelog (CHANGELOG.md is NOT deploy-excluded). */
 function v5_digital_changelog_path() {
     return get_template_directory() . '/CHANGELOG.md';
@@ -2858,13 +2910,21 @@ function v5_digital_parse_changelog($markdown) {
     $release  = null;
     $section  = null;
 
+    // Every captured string passes through here. A single invalid UTF-8 byte in
+    // CHANGELOG.md otherwise reaches set_transient() and the database rejects
+    // the write, spilling a raw SQL error into the admin page — and esc_html()
+    // would silently return '' for the entry anyway. Strip, don't trust.
+    $clean = function ($text) {
+        return wp_check_invalid_utf8($text, true);
+    };
+
     foreach (preg_split('/\R/', (string) $markdown) as $line) {
         if (preg_match('/^##\s+\[([^\]]+)\](?:\s*-\s*(\d{4}-\d{2}-\d{2}))?/', $line, $m)) {
             if ($release !== null) {
                 $releases[] = $release;
             }
             $release = array(
-                'version'  => $m[1],
+                'version'  => $clean($m[1]),
                 'date'     => isset($m[2]) ? $m[2] : '',
                 'sections' => array(),
             );
@@ -2872,14 +2932,17 @@ function v5_digital_parse_changelog($markdown) {
             continue;
         }
         if ($release !== null && preg_match('/^###\s+(.+?)\s*$/', $line, $m)) {
-            $section = $m[1];
+            $section = $clean($m[1]);
+            if ($section === '') {
+                continue;
+            }
             if (!isset($release['sections'][$section])) {
                 $release['sections'][$section] = array();
             }
             continue;
         }
         if ($release !== null && $section !== null && preg_match('/^-\s+(.+?)\s*$/', $line, $m)) {
-            $release['sections'][$section][] = $m[1];
+            $release['sections'][$section][] = $clean($m[1]);
         }
     }
     if ($release !== null) {
@@ -2978,7 +3041,7 @@ function v5_digital_render_changelog_page() {
         <h1><?php echo esc_html(v5_digital_translate_admin_string('Nouveautés du thème')); ?></h1>
         <p class="description">
             <?php echo esc_html(v5_digital_translate_admin_string('Version installée')); ?> :
-            <code><?php echo esc_html(v5_digital_theme_version()); ?></code>
+            <?php echo wp_kses_post(v5_digital_version_html()); ?>
         </p>
 
         <?php if (empty($releases)) : ?>
@@ -2987,7 +3050,8 @@ function v5_digital_render_changelog_page() {
             </p></div>
         <?php else : ?>
             <?php foreach ($releases as $release) : ?>
-                <div class="card" style="max-width:820px;margin-top:16px;padding:16px 20px;">
+                <?php $installed = v5_digital_is_installed_release($release['version']); ?>
+                <div class="card" style="max-width:820px;margin-top:16px;padding:16px 20px;<?php echo $installed ? 'border-left:4px solid #2271b1;' : ''; ?>">
                     <h2 style="margin-top:0;">
                         <?php
                         echo strtolower($release['version']) === 'unreleased'
@@ -2996,6 +3060,11 @@ function v5_digital_render_changelog_page() {
                         ?>
                         <?php if ($release['date']) : ?>
                             <span style="font-weight:400;color:#646970;font-size:13px;">— <?php echo esc_html($release['date']); ?></span>
+                        <?php endif; ?>
+                        <?php if ($installed) : ?>
+                            <span style="font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;background:#2271b1;color:#fff;padding:2px 8px;border-radius:9px;vertical-align:middle;margin-left:6px;">
+                                <?php echo esc_html(v5_digital_translate_admin_string('installée')); ?>
+                            </span>
                         <?php endif; ?>
                     </h2>
                     <?php foreach ($release['sections'] as $section => $entries) : ?>
@@ -3013,9 +3082,16 @@ function v5_digital_render_changelog_page() {
     <?php
 }
 
-/** Dashboard widget: installed version + the newest release's entries. */
+/**
+ * Dashboard widget: installed version + the newest release's entries.
+ *
+ * `wp_add_dashboard_widget()` lives in wp-admin/includes/dashboard.php, which
+ * core loads before it fires `wp_dashboard_setup`. A plugin that fires that
+ * action from anywhere else would otherwise fatal here, so guard rather than
+ * trust the caller.
+ */
 function v5_digital_register_changelog_widget() {
-    if (!current_user_can('edit_theme_options')) {
+    if (!function_exists('wp_add_dashboard_widget') || !current_user_can('edit_theme_options')) {
         return;
     }
     wp_add_dashboard_widget(
@@ -3029,9 +3105,9 @@ add_action('wp_dashboard_setup', 'v5_digital_register_changelog_widget');
 function v5_digital_render_changelog_widget() {
     $releases = v5_digital_get_changelog();
     printf(
-        '<p style="margin-top:0;">%s : <code>%s</code></p>',
+        '<p style="margin-top:0;">%s : %s</p>',
         esc_html(v5_digital_translate_admin_string('Version installée')),
-        esc_html(v5_digital_theme_version())
+        wp_kses_post(v5_digital_version_html())
     );
 
     if (empty($releases)) {

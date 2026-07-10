@@ -14,11 +14,35 @@ jobs:
         uses: actions/checkout@v4
 
       # Stamp the deploy number onto the theme version (deployed copy only —
-      # the repo keeps the clean semantic version). Appearance → Themes will
-      # show e.g. "1.0.0.53" so you can tell which deploy is live.
+      # the repo keeps the clean semantic version produced by `npm run release`).
+      # Appearance → Themes then shows e.g. "1.2.0.53" = semver + build id, and
+      # functions.php splits the two apart again (v5_digital_theme_version_parts()).
+      #
+      # Guard BEFORE stamping, not only after: the old pattern was `[0-9.]*`,
+      # which also matched an already-stamped header and produced
+      # "1.2.0.53.54". A post-check alone cannot tell "I stamped it" from "it
+      # arrived stamped", so the clean 3-part header is asserted up front.
+      #
+      # The pattern requires LF (`$` right after the digits). The runner checks
+      # out LF, so that holds; if it ever stops holding, the assertion fails the
+      # deploy loudly instead of shipping an unstamped or mangled header.
+      #
+      # Do NOT switch to SemVer build metadata ("1.2.0+build.53"): PHP's
+      # version_compare() sorts that BELOW "1.2.0".
       - name: Stamp build number on theme version
         run: |
-          sed -i "s/^Version: \([0-9.]*\)/Version: \1.${{ github.run_number }}/" style.css
+          set -euo pipefail
+          before="$(grep -m1 '^Version:' style.css || true)"
+          if ! grep -qE '^Version: [0-9]+\.[0-9]+\.[0-9]+$' style.css; then
+            echo "::error::style.css must carry a clean 3-part 'Version: X.Y.Z' header before deploy (found: '${before}'). A stamped style.css must never be committed; bump with 'npm run release'."
+            exit 1
+          fi
+          sed -i -E "s/^(Version: [0-9]+\.[0-9]+\.[0-9]+)$/\1.${{ github.run_number }}/" style.css
+          if ! grep -qE '^Version: [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' style.css; then
+            echo "::error::Version stamp did not apply to style.css."
+            exit 1
+          fi
+          echo "  ${before}  ->  $(grep -m1 '^Version:' style.css)"
 
       # Self-heal: Hostinger sometimes refuses a GitHub runner IP, so we retry
       # the proven action up to 3 times, each attempt landing on a fresh IP.

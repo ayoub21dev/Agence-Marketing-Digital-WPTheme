@@ -1386,3 +1386,11 @@ msgstr ""
 #: functions.php
 msgid "Voir le journal complet"
 msgstr ""
+
+#: functions.php
+msgid "build %s"
+msgstr ""
+
+#: functions.php
+msgid "installée"
+msgstr ""
