@@ -1,5 +1,7 @@
 # Audit fixes: the remaining High severity findings (2026-07-09)
 
+<!-- changelog: Fixed -->
+
 Follow-up to `2026-07-09-audit-medium-low-fixes.md`. Fixes findings #2–#7 from
 the full-theme audit's High severity list, in the order given. #1 (the
 `icon_svg` XSS in `specialties.php`/`challenge.php`) was deliberately excluded

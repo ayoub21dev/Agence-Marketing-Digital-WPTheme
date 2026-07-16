@@ -1,5 +1,7 @@
 # Audit fixes: all Medium and Low severity findings (2026-07-09)
 
+<!-- changelog: Fixed -->
+
 Follows the full-theme audit (six parallel reviews: security, template
 XSS/escaping, JS, performance/queries, SEO config consistency,
 accessibility/i18n). This covers every Medium and Low finding from that

@@ -1,5 +1,7 @@
 # Fix: blank white screen on Appearance → Patterns/Fonts (2026-07-09)
 
+<!-- changelog: Fixed -->
+
 Reported: clicking both "Patterns" and "Fonts" under Appearance showed a
 blank white screen.
 

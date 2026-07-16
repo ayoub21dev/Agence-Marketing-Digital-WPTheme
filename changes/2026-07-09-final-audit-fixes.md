@@ -1,5 +1,7 @@
 # Final audit: re-review the whole session's diff, fix what it found (2026-07-09)
 
+<!-- changelog: Fixed -->
+
 A full re-audit of every file touched this session (18 modified files + the
 new `theme.json`), run fresh against the actual current diff rather than
 relying on earlier descriptions — four parallel reviews: security, JS

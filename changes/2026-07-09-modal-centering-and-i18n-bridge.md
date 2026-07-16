@@ -1,5 +1,7 @@
 # Fix: search/matchmaker modal centering, JS i18n bridge, subtitle mismatch (2026-07-09)
 
+<!-- changelog: Fixed -->
+
 Closes the three remaining items flagged after the audit fix passes.
 
 ## 1. `#search-modal` / `#matchmaker-modal` GSAP-centering bug
