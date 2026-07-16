@@ -70,6 +70,7 @@ jobs:
             docs/**
             src/**
             CLAUDE.md
+            COMMANDS.md
             README.md
             ROADMAP.md
             SITEMAP.md
@@ -112,6 +113,7 @@ jobs:
             docs/**
             src/**
             CLAUDE.md
+            COMMANDS.md
             README.md
             ROADMAP.md
             SITEMAP.md
@@ -154,6 +156,7 @@ jobs:
             docs/**
             src/**
             CLAUDE.md
+            COMMANDS.md
             README.md
             ROADMAP.md
             SITEMAP.md
