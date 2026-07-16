@@ -156,6 +156,12 @@ h1, h2, h3, h4, h5, h6 {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
+/* Keyboard-highlighted option (arrow keys move this before Enter commits
+   it) — same visual treatment as the existing mouse :hover state. */
+.custom-select-option.is-active {
+    background-color: #f8fafc;
+    color: #0f172a;
+}
 
 /* Motion system style requirements */
 .motion-enhanced .nav-link {
@@ -233,6 +239,10 @@ dialog::backdrop {
 }
 dialog:focus-visible {
     outline: none;
+    /* Replacement ring so keyboard focus on the dialog root is still visible
+       — matches the .search-focus:focus treatment used elsewhere in the
+       theme, rather than leaving keyboard users with no focus indicator. */
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
 }
 
 /* Exit-intent popup: the browser's own dialog:modal centering (inset-block:0

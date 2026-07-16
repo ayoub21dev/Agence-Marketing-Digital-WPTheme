@@ -22,17 +22,23 @@ if (!empty($selected_agencies) && is_array($selected_agencies)) {
         'post__in'       => $selected_agencies,
         'posts_per_page' => count($selected_agencies),
         'post_status'    => 'publish',
-        'orderby'        => 'post__in'
+        'orderby'        => 'post__in',
+        'no_found_rows'  => true, // total count never read below
     ));
 } else {
-    // Default: Query top 3 agencies sorted by their rank (1 to 3)
+    // Default: Query top 3 agencies sorted by their rank (1 to 3).
+    // meta_value_num sorts on wp_postmeta, an unindexed EAV table by
+    // WordPress's own design — fine at today's agency count, but this is a
+    // filesort that grows with the table. Addressing it properly would mean
+    // a custom indexed table, out of scope for a query-flag fix.
     $picks_query = new WP_Query(array(
         'post_type'      => 'agency',
         'posts_per_page' => 3,
         'post_status'    => 'publish',
         'meta_key'       => 'agency_rank',
         'orderby'        => 'meta_value_num',
-        'order'          => 'ASC'
+        'order'          => 'ASC',
+        'no_found_rows'  => true, // total count never read below
     ));
 }
 

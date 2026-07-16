@@ -55,7 +55,7 @@ $footer_text       = v5_get_field_default('footer_text', 'Aucun spam · Désabon
             <form style="display:flex;flex-direction:column;gap:12px;max-width:420px;"
                   onsubmit="blgSubmitNewsletter(event)">
                 <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                    <input type="email" required placeholder="<?php echo esc_attr($email_placeholder); ?>" id="blg-nl-email"
+                    <input type="email" required placeholder="<?php echo esc_attr($email_placeholder); ?>" aria-label="<?php echo esc_attr(v5_t('Adresse email')); ?>" id="blg-nl-email"
                            style="flex:1;border:1.5px solid rgba(16,20,24,0.12);border-radius:10px;padding:10px 16px;font-size:14px;color:var(--blg-ink);background:white;outline:none;min-width:180px;transition:border-color 0.2s,box-shadow 0.2s;"
                            onfocus="this.style.borderColor='#2463eb';this.style.boxShadow='0 0 0 3px rgba(36,99,235,0.10)'"
                            onblur="this.style.borderColor='rgba(16,20,24,0.12)';this.style.boxShadow='none'">

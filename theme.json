@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 2,
+	"settings": {
+		"color": {
+			"custom": true,
+			"customGradient": true,
+			"defaultPalette": false,
+			"defaultGradients": false,
+			"defaultDuotone": false,
+			"palette": [
+				{ "slug": "brand-50", "color": "#eff6ff", "name": "Brand 50" },
+				{ "slug": "brand-100", "color": "#dbeafe", "name": "Brand 100" },
+				{ "slug": "brand-500", "color": "#3b82f6", "name": "Brand 500" },
+				{ "slug": "brand-600", "color": "#2563eb", "name": "Brand 600" },
+				{ "slug": "brand-700", "color": "#1d4ed8", "name": "Brand 700" },
+				{ "slug": "brand-800", "color": "#1e40af", "name": "Brand 800" },
+				{ "slug": "brand-900", "color": "#1e3a8a", "name": "Brand 900" },
+				{ "slug": "slate-50", "color": "#f8fafc", "name": "Slate 50" },
+				{ "slug": "slate-200", "color": "#e2e8f0", "name": "Slate 200" },
+				{ "slug": "slate-500", "color": "#64748b", "name": "Slate 500" },
+				{ "slug": "slate-700", "color": "#334155", "name": "Slate 700" },
+				{ "slug": "slate-900", "color": "#0f172a", "name": "Slate 900" },
+				{ "slug": "white", "color": "#ffffff", "name": "White" }
+			]
+		},
+		"typography": {
+			"customFontSize": true,
+			"fontFamilies": [
+				{
+					"fontFamily": "Inter, system-ui, sans-serif",
+					"slug": "sans",
+					"name": "Inter (Sans)"
+				},
+				{
+					"fontFamily": "\"Space Grotesk\", system-ui, sans-serif",
+					"slug": "display",
+					"name": "Space Grotesk (Display)"
+				},
+				{
+					"fontFamily": "\"JetBrains Mono\", monospace",
+					"slug": "mono",
+					"name": "JetBrains Mono (Mono)"
+				}
+			]
+		}
+	}
+}

@@ -65,11 +65,11 @@ $suggested = new WP_Query(array(
             </h1>
 
             <h2 class="text-[1.5rem] md:text-[2rem] font-extrabold text-slate-900 tracking-tight leading-tight mb-4 font-display">
-                Cette page s'est égarée.
+                <?php echo esc_html(v5_t("Cette page s'est égarée.")); ?>
             </h2>
 
             <p class="text-[15px] md:text-[16px] text-slate-500 leading-relaxed max-w-md mx-auto mb-8">
-                Le lien est peut-être rompu ou la page a été déplacée. Pas d'inquiétude — voici quelques pistes pour retrouver votre chemin.
+                <?php echo esc_html(v5_t("Le lien est peut-être rompu ou la page a été déplacée. Pas d'inquiétude — voici quelques pistes pour retrouver votre chemin.")); ?>
             </p>
 
             <!-- Primary CTA: identical classes to the hero.php primary button -->
@@ -77,22 +77,22 @@ $suggested = new WP_Query(array(
                 <a href="<?php echo esc_url(home_url('/')); ?>"
                    class="w-full sm:w-auto px-7 py-3.5 rounded-xl text-[14px] transition-all flex items-center justify-center gap-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold shadow-lg shadow-brand-600/10">
                     <i data-lucide="home" class="w-4 h-4"></i>
-                    <span>Retour à l'accueil</span>
+                    <span><?php echo esc_html(v5_t("Retour à l'accueil")); ?></span>
                 </a>
             </div>
 
             <!-- Mono quick-links, same hover language as home breadcrumbs/links -->
             <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12px] text-slate-500 font-mono">
                 <a href="<?php echo esc_url(home_url('/blog/')); ?>" class="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
-                    <i data-lucide="newspaper" class="w-3.5 h-3.5"></i><span>Blog</span>
+                    <i data-lucide="newspaper" class="w-3.5 h-3.5"></i><span><?php echo esc_html(v5_t('Blog')); ?></span>
                 </a>
                 <span class="text-slate-200">·</span>
                 <a href="<?php echo esc_url(home_url('/methodologie/')); ?>" class="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
-                    <i data-lucide="award" class="w-3.5 h-3.5"></i><span>Méthodologie</span>
+                    <i data-lucide="award" class="w-3.5 h-3.5"></i><span><?php echo esc_html(v5_t('Méthodologie')); ?></span>
                 </a>
                 <span class="text-slate-200">·</span>
                 <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
-                    <i data-lucide="mail" class="w-3.5 h-3.5"></i><span>Contact</span>
+                    <i data-lucide="mail" class="w-3.5 h-3.5"></i><span><?php echo esc_html(v5_t('Contact')); ?></span>
                 </a>
             </div>
         </div>
@@ -104,11 +104,11 @@ $suggested = new WP_Query(array(
         <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
             <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-10">
                 <div>
-                    <span class="section-label text-slate-800 mb-2 block">Continuer la lecture</span>
-                    <h2 class="text-[1.75rem] font-bold text-slate-900 tracking-tight font-display">Articles récents</h2>
+                    <span class="section-label text-slate-800 mb-2 block"><?php echo esc_html(v5_t('Continuer la lecture')); ?></span>
+                    <h2 class="text-[1.75rem] font-bold text-slate-900 tracking-tight font-display"><?php echo esc_html(v5_t('Articles récents')); ?></h2>
                 </div>
                 <a href="<?php echo esc_url(home_url('/blog/')); ?>" class="mt-3 sm:mt-0 text-[13px] font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1 transition-colors">
-                    <span>Tout le blog</span>
+                    <span><?php echo esc_html(v5_t('Tout le blog')); ?></span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                 </a>
             </div>
@@ -125,7 +125,8 @@ $suggested = new WP_Query(array(
                     if (!$cover_image) $cover_image = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop';
                     ?>
                     <div class="card-hover bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col cursor-pointer"
-                         onclick="window.location.href='<?php the_permalink(); ?>'">
+                         onclick="window.location.href='<?php the_permalink(); ?>'"
+                         onkeydown="handleCardKeydown(event)" tabindex="0" role="link" aria-label="<?php the_title_attribute(); ?>">
                         <div class="h-40 overflow-hidden bg-slate-100 flex-shrink-0">
                             <img src="<?php echo esc_url($cover_image); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy"
                                  class="w-full h-full object-cover">

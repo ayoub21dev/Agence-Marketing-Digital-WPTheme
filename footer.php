@@ -36,7 +36,7 @@ if (!function_exists('v5_digital_render_footer_column')) {
         }
         ?>
         <div>
-            <h4 class="font-semibold text-slate-900 text-[13px] mb-3 font-display"><?php echo esc_html($default_title); ?></h4>
+            <h4 class="font-semibold text-slate-900 text-[13px] mb-3 font-display"><?php echo esc_html(v5_t($default_title)); ?></h4>
             <ul class="space-y-2 text-[13px]">
                 <?php foreach ($menu_items as $item) : ?>
                     <li>
@@ -81,13 +81,13 @@ if (empty($matchmaker_services)) {
         <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-10">
             <div class="site-footer-main max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-start gap-10 md:gap-16 mb-10">
                 <div class="site-footer-brand md:w-72 shrink-0">
-                    <div class="flex items-center gap-2 mb-3 cursor-pointer" onclick="window.location.href='<?php echo esc_url(home_url('/')); ?>'">
+                    <a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center gap-2 mb-3">
                         <div class="flex items-center gap-1 font-display">
                             <span class="font-extrabold text-[16px] text-slate-900 tracking-tight">Agence</span>
                             <span class="font-extrabold text-[16px] text-brand-600 tracking-tight">Marketing</span>
                             <span class="font-light text-[16px] text-slate-500 tracking-tight">Digital</span>
                         </div>
-                    </div>
+                    </a>
                     <p class="text-[13px] text-slate-500 leading-relaxed">
                         <?php
                         // Precedence: Site Settings option → site tagline → translated fallback.
@@ -173,29 +173,40 @@ if (empty($matchmaker_services)) {
 
     <!-- Global Command Palette Search Overlay -->
     <dialog id="search-modal" class="backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm rounded-xl border border-slate-200 shadow-xl max-w-xl w-full p-0 bg-white overflow-hidden outline-none">
-        <div class="p-4 border-b border-slate-150 flex items-center gap-3">
-            <i data-lucide="search" class="w-5 h-5 text-slate-500 flex-shrink-0"></i>
-            <input type="text" id="search-input" placeholder="<?php echo esc_attr(v5_t('Rechercher des agences, des pages, des villes...')); ?>" class="w-full text-[15px] outline-none text-slate-700 bg-transparent font-sans">
-            <button onclick="closeSearchPalette()" aria-label="<?php echo esc_attr(v5_t('Fermer la recherche')); ?>" class="text-slate-500 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i></button>
-        </div>
-        <ul id="search-results" class="max-h-80 overflow-y-auto p-2 space-y-0.5 font-sans">
-            <!-- Search results populated dynamically -->
-        </ul>
-        <div class="px-4 py-2 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-            <span>Appuyez sur ÉCHAP pour fermer</span>
-            <span>recherche</span>
+        <!-- theme-scripts.js animates THIS wrapper, never the <dialog> itself
+             — see the identical note on #exit-intent-inner: GSAP's transform
+             tween applied directly to the dialog element breaks its native
+             top-layer centering. -->
+        <div id="search-modal-inner">
+            <div class="p-4 border-b border-slate-150 flex items-center gap-3">
+                <i data-lucide="search" class="w-5 h-5 text-slate-500 flex-shrink-0"></i>
+                <input type="text" id="search-input" placeholder="<?php echo esc_attr(v5_t('Rechercher des agences, des pages, des villes...')); ?>" aria-label="<?php echo esc_attr(v5_t('Rechercher des agences, des pages, des villes...')); ?>" class="w-full text-[15px] outline-none text-slate-700 bg-transparent font-sans">
+                <button onclick="closeSearchPalette()" aria-label="<?php echo esc_attr(v5_t('Fermer la recherche')); ?>" class="text-slate-500 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i></button>
+            </div>
+            <ul id="search-results" class="max-h-80 overflow-y-auto p-2 space-y-0.5 font-sans">
+                <!-- Search results populated dynamically -->
+            </ul>
+            <div class="px-4 py-2 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span><?php echo esc_html(v5_t('Appuyez sur ÉCHAP pour fermer')); ?></span>
+                <span><?php echo esc_html(v5_t('recherche')); ?></span>
+            </div>
         </div>
     </dialog>
 
     <!-- Global Matchmaker Briefing Wizard Modal -->
     <dialog id="matchmaker-modal" class="backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full p-0 bg-white overflow-hidden outline-none">
+        <!-- theme-scripts.js animates THIS wrapper, never the <dialog> itself
+             — see the identical note on #exit-intent-inner: GSAP's transform
+             tween applied directly to the dialog element breaks its native
+             top-layer centering. -->
+        <div id="matchmaker-modal-inner">
         <div class="bg-gradient-to-br from-brand-900 to-brand-700 px-6 py-5 text-white flex items-start justify-between">
             <div>
-                <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-300 mb-1">Matchmaker</p>
-                <h2 class="text-[1.2rem] font-extrabold tracking-tight font-display" id="mm-step-title">Trouvez votre agence idéale</h2>
-                <p class="text-[12px] text-blue-200 mt-0.5" id="mm-step-subtitle">2 questions · 30 secondes</p>
+                <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-300 mb-1"><?php echo esc_html(v5_t('Matchmaker')); ?></p>
+                <h2 class="text-[1.2rem] font-extrabold tracking-tight font-display" id="mm-step-title"><?php echo esc_html(v5_t('Trouvez votre agence idéale')); ?></h2>
+                <p class="text-[12px] text-blue-200 mt-0.5" id="mm-step-subtitle"><?php echo esc_html(v5_t('2 questions · 30 secondes')); ?></p>
             </div>
-            <button onclick="closeMatchmaker()" class="text-blue-300 hover:text-white transition-colors mt-0.5 cursor-pointer">
+            <button onclick="closeMatchmaker()" aria-label="<?php echo esc_attr(v5_t('Fermer')); ?>" class="text-blue-300 hover:text-white transition-colors mt-0.5 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
@@ -203,7 +214,7 @@ if (empty($matchmaker_services)) {
         <div class="p-6" id="matching-wizard">
             <!-- Wizard Step 1 -->
             <div class="matching-wizard__step active" data-step="1">
-                <p class="text-[13px] font-semibold text-slate-500 mb-3 uppercase tracking-wider">1. Quel service recherchez-vous ?</p>
+                <p class="text-[13px] font-semibold text-slate-500 mb-3 uppercase tracking-wider"><?php echo esc_html(v5_t('1. Quel service recherchez-vous ?')); ?></p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 step-options">
                     <?php foreach ($matchmaker_services as $service) : ?>
                         <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="<?php echo esc_attr($service['value']); ?>">
@@ -213,14 +224,14 @@ if (empty($matchmaker_services)) {
                     <?php endforeach; ?>
                 </div>
                 <button class="next-step-btn mt-6 w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg text-[13px] transition-colors flex items-center justify-center gap-1.5 cursor-pointer" disabled>
-                    <span>Étape suivante</span>
+                    <span><?php echo esc_html(v5_t('Étape suivante')); ?></span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
             
             <!-- Wizard Step 2 -->
             <div class="matching-wizard__step" data-step="2">
-                <p class="text-[13px] font-semibold text-slate-500 mb-3 uppercase tracking-wider">2. Quel est votre budget mensuel ?</p>
+                <p class="text-[13px] font-semibold text-slate-500 mb-3 uppercase tracking-wider"><?php echo esc_html(v5_t('2. Quel est votre budget mensuel ?')); ?></p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 step-options">
                     <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="small">
                         <span>5 000 MAD – 15 000 MAD</span>
@@ -241,7 +252,7 @@ if (empty($matchmaker_services)) {
                 </div>
                 <button class="submit-wizard-btn mt-6 w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg text-[13px] transition-colors flex items-center justify-center gap-1.5 cursor-pointer" disabled>
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span>Trouver mon agence</span>
+                    <span><?php echo esc_html(v5_t('Trouver mon agence')); ?></span>
                 </button>
             </div>
             
@@ -250,9 +261,10 @@ if (empty($matchmaker_services)) {
                 <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center border border-emerald-100 flex-shrink-0">
                     <i data-lucide="check" class="w-6 h-6 stroke-[3px]"></i>
                 </div>
-                <h3 class="font-display font-bold text-slate-900 text-[18px]">Agences recommandées trouvées !</h3>
-                <p class="text-[13px] text-slate-500 max-w-sm">Nous avons analysé nos profils. Un conseiller va vous envoyer une sélection personnalisée par email sous 24 heures.</p>
+                <h3 class="font-display font-bold text-slate-900 text-[18px]"><?php echo esc_html(v5_t('Agences recommandées trouvées !')); ?></h3>
+                <p class="text-[13px] text-slate-500 max-w-sm"><?php echo esc_html(v5_t('Nous avons analysé nos profils. Un conseiller va vous envoyer une sélection personnalisée par email sous 24 heures.')); ?></p>
             </div>
+        </div>
         </div>
     </dialog>
 
@@ -269,9 +281,9 @@ if (empty($matchmaker_services)) {
         <div id="exit-intent-inner">
             <div class="bg-gradient-to-br from-brand-900 to-brand-700 px-6 py-5 text-white flex items-start justify-between">
                 <div>
-                    <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-300 mb-1">Newsletter</p>
-                    <h2 class="text-[1.2rem] font-extrabold tracking-tight font-display" id="ei-title">Avant de partir…</h2>
-                    <p class="text-[12px] text-blue-200 mt-0.5" id="ei-desc">Recevez nos analyses d'agences par email</p>
+                    <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-300 mb-1"><?php echo esc_html(v5_t('Newsletter')); ?></p>
+                    <h2 class="text-[1.2rem] font-extrabold tracking-tight font-display" id="ei-title"><?php echo esc_html(v5_t('Avant de partir…')); ?></h2>
+                    <p class="text-[12px] text-blue-200 mt-0.5" id="ei-desc"><?php echo esc_html(v5_t("Recevez nos analyses d'agences par email")); ?></p>
                 </div>
                 <button type="button" onclick="closeExitIntent()" aria-label="<?php echo esc_attr(v5_t('Fermer')); ?>" class="text-blue-300 hover:text-white transition-colors mt-0.5 cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -280,22 +292,22 @@ if (empty($matchmaker_services)) {
 
             <div class="p-6" id="ei-body">
                 <div id="ei-form-state">
-                    <p class="text-[13px] text-slate-500 mb-4 leading-relaxed">Chaque quinzaine : un audit d'agence, un signal SEO à surveiller, une sélection de ressources pour les fondateurs et directeurs marketing au Maroc.</p>
+                    <p class="text-[13px] text-slate-500 mb-4 leading-relaxed"><?php echo esc_html(v5_t("Chaque quinzaine : un audit d'agence, un signal SEO à surveiller, une sélection de ressources pour les fondateurs et directeurs marketing au Maroc.")); ?></p>
                     <form id="exit-intent-form" class="flex flex-col gap-3">
-                        <input type="email" id="ei-email" name="email" required placeholder="votre@email.com" autocomplete="email" class="w-full border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-700 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-500/10 transition-all">
+                        <input type="email" id="ei-email" name="email" required placeholder="votre@email.com" aria-label="<?php echo esc_attr(v5_t('Adresse email')); ?>" autocomplete="email" class="w-full border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-700 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-500/10 transition-all">
                         <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg text-[13px] transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
                             <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                            <span>S'abonner</span>
+                            <span><?php echo esc_html(v5_t("S'abonner")); ?></span>
                         </button>
                     </form>
-                    <p class="text-[11px] text-slate-400 font-mono mt-3">Aucun spam · Désabonnement en 1 clic</p>
+                    <p class="text-[11px] text-slate-400 font-mono mt-3"><?php echo esc_html(v5_t('Aucun spam · Désabonnement en 1 clic')); ?></p>
                 </div>
                 <div id="ei-success-state" class="hidden flex-col items-center text-center gap-1 py-2">
                     <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center border border-emerald-100 flex-shrink-0 mb-2">
                         <i data-lucide="check" class="w-6 h-6 stroke-[3px]"></i>
                     </div>
-                    <h3 class="font-display font-bold text-slate-900 text-[16px]">Merci pour votre inscription !</h3>
-                    <p class="text-[13px] text-slate-500">Vous recevrez notre prochaine analyse par email.</p>
+                    <h3 class="font-display font-bold text-slate-900 text-[16px]"><?php echo esc_html(v5_t('Merci pour votre inscription !')); ?></h3>
+                    <p class="text-[13px] text-slate-500"><?php echo esc_html(v5_t('Vous recevrez notre prochaine analyse par email.')); ?></p>
                 </div>
             </div>
         </div>

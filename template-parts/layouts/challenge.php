@@ -51,7 +51,7 @@ if ($has_eyebrow || $has_title || $has_desc || $cards === null || $has_cards || 
                             <div class="flex items-start gap-3">
                                 <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                                     <?php if (!empty($card['icon_svg'])) : ?>
-                                        <?php echo $card['icon_svg']; ?>
+                                        <?php echo v5_digital_sanitize_svg_icon($card['icon_svg']); ?>
                                     <?php else : ?>
                                         <i data-lucide="x" class="w-3.5 h-3.5 text-slate-800"></i>
                                     <?php endif; ?>
@@ -112,7 +112,7 @@ if ($has_eyebrow || $has_title || $has_desc || $cards === null || $has_cards || 
                         <?php if (!empty($quote_author) || !empty($quote_role)) : ?>
                         <div class="flex items-center gap-3 pl-6">
                             <?php if ($quote_image) : ?>
-                                <img src="<?php echo esc_url($quote_image); ?>" alt="<?php echo esc_attr($quote_author); ?>" class="w-10 h-10 rounded-full object-cover">
+                                <img src="<?php echo esc_url($quote_image); ?>" alt="<?php echo esc_attr($quote_author); ?>" loading="lazy" class="w-10 h-10 rounded-full object-cover">
                             <?php endif; ?>
                             <div>
                                 <?php if (!empty($quote_author)) : ?>

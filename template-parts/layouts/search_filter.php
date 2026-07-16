@@ -46,10 +46,10 @@ $fallback_cities = array(
         <div class="max-w-3xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-4 md:p-5">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Service</label>
+                    <label for="home-filter-service" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider"><?php echo esc_html(v5_t('Service')); ?></label>
                     <div class="relative">
                         <select id="home-filter-service" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-[13px] text-slate-700 search-focus appearance-none cursor-pointer">
-                            <option value="all">Tous les services</option>
+                            <option value="all"><?php echo esc_html(v5_t('Tous les services')); ?></option>
                             <?php if (!empty($service_terms)) : ?>
                                 <?php foreach ($service_terms as $term) : ?>
                                     <option value="<?php echo esc_attr($term->name); ?>"><?php echo esc_html($term->name); ?></option>
@@ -63,10 +63,10 @@ $fallback_cities = array(
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Ville</label>
+                    <label for="home-filter-city" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider"><?php echo esc_html(v5_t('Ville')); ?></label>
                     <div class="relative">
                         <select id="home-filter-city" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-[13px] text-slate-700 search-focus appearance-none cursor-pointer">
-                            <option value="all">Toutes les villes</option>
+                            <option value="all"><?php echo esc_html(v5_t('Toutes les villes')); ?></option>
                             <?php if (!empty($city_terms)) : ?>
                                 <?php foreach ($city_terms as $term) : ?>
                                     <option value="<?php echo esc_attr($term->name); ?>"><?php echo esc_html($term->name); ?></option>
@@ -80,19 +80,19 @@ $fallback_cities = array(
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Note minimale</label>
+                    <label for="home-filter-rating" class="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wider"><?php echo esc_html(v5_t('Note minimale')); ?></label>
                     <div class="relative">
                         <select id="home-filter-rating" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-[13px] text-slate-700 search-focus appearance-none cursor-pointer">
-                            <option value="any">Toutes les notes</option>
-                            <option value="4.5">4.5+ Étoiles</option>
-                            <option value="4.0">4.0+ Étoiles</option>
+                            <option value="any"><?php echo esc_html(v5_t('Toutes les notes')); ?></option>
+                            <option value="4.5"><?php echo esc_html(v5_t('4.5+ Étoiles')); ?></option>
+                            <option value="4.0"><?php echo esc_html(v5_t('4.0+ Étoiles')); ?></option>
                         </select>
                     </div>
                 </div>
                 <div class="flex items-end">
                     <button onclick="triggerHomeSearch()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 rounded-lg text-[13px] transition-colors flex items-center justify-center gap-2">
                         <i data-lucide="search" class="w-3.5 h-3.5"></i>
-                        <span>Rechercher</span>
+                        <span><?php echo esc_html(v5_t('Rechercher')); ?></span>
                     </button>
                 </div>
             </div>

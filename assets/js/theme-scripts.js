@@ -142,7 +142,14 @@ function initLogoMarquees() {
             applyOffset();
         }, { passive: false });
 
-        window.addEventListener("resize", measure);
+        let resizeTimer = null;
+        window.addEventListener("resize", () => {
+            // measure() forces a layout read (track.scrollWidth); resize
+            // fires continuously while a window edge is dragged, so debounce
+            // it rather than recalculating on every event.
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(measure, 150);
+        });
         track.querySelectorAll("img").forEach((img) => {
             if (!img.complete) {
                 img.addEventListener("load", measure, { once: true });
@@ -419,12 +426,21 @@ function animateModalClose(modal, onComplete) {
     });
 }
 
-/* Custom selects implementation */
+/* Custom selects implementation.
+ *
+ * Follows the ARIA "listbox with active descendant" pattern: the trigger
+ * button keeps focus the whole time (never the options), and
+ * aria-activedescendant tells assistive tech which option is currently
+ * highlighted as the arrow keys move through the list. This was previously
+ * mouse-only — the real <select> was hidden and the options were plain
+ * <div>s with only onclick, so a keyboard user could open the menu (the
+ * trigger is a real <button>) but had no way to choose an option at all. */
 function openCustomSelectMenu(menu, trigger) {
     const wrapper = menu.closest(".custom-select-wrapper");
     if (wrapper) wrapper.style.zIndex = "80";
     menu.classList.remove("hidden");
     trigger.classList.add("open");
+    trigger.setAttribute("aria-expanded", "true");
     if (canUseMotion()) {
         gsap.fromTo(menu,
             { y: -8, autoAlpha: 0, scale: 0.98 },
@@ -438,7 +454,10 @@ function closeCustomSelectMenu(menu, trigger) {
         const wrapper = menu.closest(".custom-select-wrapper");
         if (wrapper) wrapper.style.zIndex = "";
         menu.classList.add("hidden");
-        if (trigger) trigger.classList.remove("open");
+        if (trigger) {
+            trigger.classList.remove("open");
+            trigger.setAttribute("aria-expanded", "false");
+        }
     };
 
     if (canUseMotion() && !menu.classList.contains("hidden")) {
@@ -447,6 +466,8 @@ function closeCustomSelectMenu(menu, trigger) {
         complete();
     }
 }
+
+let customSelectIdCounter = 0;
 
 function initCustomSelects() {
     document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
@@ -461,66 +482,98 @@ function initCustomSelects() {
     selectElements.forEach(select => {
         const wrapper = document.createElement('div');
         wrapper.className = 'relative custom-select-wrapper w-full';
-        
+
         select.parentNode.insertBefore(wrapper, select);
         wrapper.appendChild(select);
         select.style.display = 'none';
 
+        const baseId = select.id || ('custom-select-' + (++customSelectIdCounter));
+        const listboxId = baseId + '-listbox';
+
         const trigger = document.createElement('button');
         trigger.type = 'button';
         trigger.className = `custom-select-trigger flex items-center justify-between w-full bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-lg text-[13px] text-slate-700 shadow-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-500/10 outline-none transition-all duration-200 cursor-pointer pl-3.5 pr-4 py-2`;
-        
+        trigger.setAttribute('role', 'combobox');
+        trigger.setAttribute('aria-haspopup', 'listbox');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute('aria-controls', listboxId);
+
         const label = document.createElement('span');
         label.className = 'custom-select-label truncate';
-        
+
         const currentOpt = select.options[select.selectedIndex] || select.options[0];
         label.textContent = currentOpt ? currentOpt.textContent : "";
-        
+
         const arrow = document.createElement('span');
         arrow.className = 'chevron-icon flex items-center flex-shrink-0 ml-2';
         arrow.innerHTML = '<i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>';
-        
+
         trigger.appendChild(label);
         trigger.appendChild(arrow);
         wrapper.appendChild(trigger);
 
         const menu = document.createElement('div');
+        menu.id = listboxId;
+        menu.setAttribute('role', 'listbox');
         menu.className = 'custom-select-options hidden absolute left-0 right-0 z-50 mt-1.5 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-xl shadow-[0_12px_32px_-8px_rgba(0,0,0,0.08)] max-h-60 overflow-y-auto p-1 font-sans';
-        
+
+        let activeIndex = select.selectedIndex;
+
+        const highlightOption = (idx) => {
+            activeIndex = idx;
+            const items = menu.querySelectorAll('.custom-select-option');
+            items.forEach((el, i) => {
+                el.classList.toggle('is-active', i === idx);
+            });
+            const activeEl = items[idx];
+            trigger.setAttribute('aria-activedescendant', activeEl ? activeEl.id : '');
+            if (activeEl && typeof activeEl.scrollIntoView === 'function') {
+                activeEl.scrollIntoView({ block: 'nearest' });
+            }
+        };
+
+        const commitOption = (idx) => {
+            select.selectedIndex = idx;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            closeCustomSelectMenu(menu, trigger);
+            trigger.focus();
+        };
+
         Array.from(select.options).forEach((opt, idx) => {
             const item = document.createElement('div');
             const isSelected = idx === select.selectedIndex;
-            
-            item.className = isSelected 
+
+            item.className = isSelected
                 ? 'custom-select-option px-3.5 py-2 text-[13px] text-brand-700 bg-brand-50/50 font-semibold cursor-pointer flex items-center justify-between transition-all rounded-md mx-1 my-0.5'
                 : 'custom-select-option px-3.5 py-2 text-[13px] text-slate-600 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between transition-all rounded-md mx-1 my-0.5';
+            item.id = listboxId + '-option-' + idx;
+            item.setAttribute('role', 'option');
+            item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
             item.dataset.value = opt.value;
             item.dataset.index = idx;
-            
+
             const itemText = document.createElement('span');
             itemText.textContent = opt.textContent;
-            
+
             const checkIcon = document.createElement('span');
             checkIcon.className = `text-brand-600 flex items-center flex-shrink-0 ${isSelected ? 'block' : 'hidden'}`;
             checkIcon.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i>';
-            
+
             item.appendChild(itemText);
             item.appendChild(checkIcon);
             menu.appendChild(item);
 
             item.onclick = (e) => {
                 e.stopPropagation();
-                select.selectedIndex = idx;
-                select.dispatchEvent(new Event('change', { bubbles: true }));
-                closeCustomSelectMenu(menu, trigger);
+                commitOption(idx);
             };
         });
-        
+
         wrapper.appendChild(menu);
 
         trigger.onclick = (e) => {
             e.stopPropagation();
-            
+
             document.querySelectorAll('.custom-select-options').forEach(otherMenu => {
                 if (otherMenu !== menu) {
                     closeCustomSelectMenu(otherMenu, otherMenu.previousElementSibling);
@@ -537,22 +590,66 @@ function initCustomSelects() {
                 closeCustomSelectMenu(menu, trigger);
             } else {
                 openCustomSelectMenu(menu, trigger);
+                highlightOption(select.selectedIndex);
             }
         };
+
+        // Arrow keys navigate the options; Enter/Space commit the highlighted
+        // one while open (a real <button> already opens/closes on Enter/Space
+        // via the onclick above — preventDefault here only when open, so
+        // that native toggle is left alone for the closed case).
+        trigger.addEventListener('keydown', (e) => {
+            const isOpen = !menu.classList.contains('hidden');
+            const optionCount = select.options.length;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!isOpen) {
+                    openCustomSelectMenu(menu, trigger);
+                    highlightOption(select.selectedIndex);
+                } else {
+                    highlightOption(Math.min(activeIndex + 1, optionCount - 1));
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (!isOpen) {
+                    openCustomSelectMenu(menu, trigger);
+                    highlightOption(select.selectedIndex);
+                } else {
+                    highlightOption(Math.max(activeIndex - 1, 0));
+                }
+            } else if (e.key === 'Home' && isOpen) {
+                e.preventDefault();
+                highlightOption(0);
+            } else if (e.key === 'End' && isOpen) {
+                e.preventDefault();
+                highlightOption(optionCount - 1);
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                if (isOpen) {
+                    e.preventDefault();
+                    commitOption(activeIndex);
+                }
+            } else if (e.key === 'Escape' && isOpen) {
+                e.preventDefault();
+                closeCustomSelectMenu(menu, trigger);
+                trigger.focus();
+            }
+        });
 
         select.addEventListener('change', () => {
             const activeOpt = select.options[select.selectedIndex];
             if (activeOpt) {
                 label.textContent = activeOpt.textContent;
-                
+
                 menu.querySelectorAll('.custom-select-option').forEach(item => {
                     const idxStr = item.dataset.index;
                     const isSel = idxStr === String(select.selectedIndex);
-                    
+
                     item.className = isSel
                         ? 'custom-select-option px-3.5 py-2 text-[13px] text-brand-700 bg-brand-50/50 font-semibold cursor-pointer flex items-center justify-between transition-all rounded-md mx-1 my-0.5'
                         : 'custom-select-option px-3.5 py-2 text-[13px] text-slate-600 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between transition-all rounded-md mx-1 my-0.5';
-                    
+                    item.setAttribute('aria-selected', isSel ? 'true' : 'false');
+
                     const check = item.querySelector('.text-brand-600');
                     if (check) {
                         check.className = `text-brand-600 flex items-center flex-shrink-0 ${isSel ? 'block' : 'hidden'}`;
@@ -594,22 +691,27 @@ function initModalBindings() {
 
 function openSearchPalette() {
     const modal = document.getElementById("search-modal");
-    if (modal) {
+    if (modal && !modal.open) {
         const input = document.getElementById("search-input");
         if (input) input.value = "";
         runPaletteSearch("");
         modal.showModal();
-        animateModalOpen(modal);
+        // Animate the inner wrapper, NOT the <dialog> itself — see the note
+        // on #exit-intent-inner (theme-scripts.js, initExitIntent) for why:
+        // GSAP's transform tween applied directly to a <dialog> breaks its
+        // native top-layer centering.
+        animateModalOpen(document.getElementById("search-modal-inner"));
     }
 }
 
 function closeSearchPalette() {
     const modal = document.getElementById("search-modal");
+    const inner = document.getElementById("search-modal-inner");
     if (modal && modal.open) {
-        animateModalClose(modal, () => {
+        animateModalClose(inner, () => {
             modal.close();
-            if (typeof gsap !== "undefined") {
-                gsap.set(modal, { clearProps: "all" });
+            if (typeof gsap !== "undefined" && inner) {
+                gsap.set(inner, { clearProps: "all" });
             }
         });
     }
@@ -646,10 +748,20 @@ function runPaletteSearch(val) {
     filtered.forEach(item => {
         const li = document.createElement("li");
         li.className = "flex justify-between items-center p-3 hover:bg-slate-50 cursor-pointer rounded-lg transition-colors";
-        li.innerHTML = `
-            <span class="font-semibold text-slate-800">${item.title}</span>
-            <span class="text-[10px] uppercase font-bold text-slate-400 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded font-mono">${item.type}</span>
-        `;
+
+        // Built via textContent, not innerHTML: SEARCH_INDEX is a static list
+        // today, but is meant to be populated from real WordPress data (see
+        // comment above) — titles could then contain user-authored text.
+        const titleEl = document.createElement("span");
+        titleEl.className = "font-semibold text-slate-800";
+        titleEl.textContent = item.title;
+
+        const typeEl = document.createElement("span");
+        typeEl.className = "text-[10px] uppercase font-bold text-slate-400 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded font-mono";
+        typeEl.textContent = item.type;
+
+        li.appendChild(titleEl);
+        li.appendChild(typeEl);
         li.onclick = () => {
             closeSearchPalette();
             item.action();
@@ -667,44 +779,62 @@ const wizardData = {
 
 function openMatchmaker() {
     const modal = document.getElementById("matchmaker-modal");
-    if (modal) {
+    if (modal && !modal.open) {
         resetWizard();
         modal.showModal();
-        animateModalOpen(modal);
+        // Animate the inner wrapper, NOT the <dialog> itself — see the note
+        // on #exit-intent-inner (theme-scripts.js, initExitIntent) for why:
+        // GSAP's transform tween applied directly to a <dialog> breaks its
+        // native top-layer centering.
+        animateModalOpen(document.getElementById("matchmaker-modal-inner"));
     }
 }
 
 function closeMatchmaker() {
     const modal = document.getElementById("matchmaker-modal");
+    const inner = document.getElementById("matchmaker-modal-inner");
     if (modal && modal.open) {
-        animateModalClose(modal, () => {
+        animateModalClose(inner, () => {
             modal.close();
-            if (typeof gsap !== "undefined") {
-                gsap.set(modal, { clearProps: "all" });
+            if (typeof gsap !== "undefined" && inner) {
+                gsap.set(inner, { clearProps: "all" });
             }
         });
     }
+}
+
+// Reads a matchmaker string translated by v5_t() (functions.php,
+// v5_digital_ui_strings()) via the header.php JS bridge — v5_t() itself is
+// PHP-only, so this is how the strings this file sets at runtime (rather
+// than ones already in the server-rendered markup) get translated too. The
+// French literal fallback keeps this working even if the bridge is ever
+// missing (matches how v5_t() itself falls back when Polylang is inactive).
+function mmStr(key, fallback) {
+    return (window.wpThemeSettings && window.wpThemeSettings.matchmakerStrings && window.wpThemeSettings.matchmakerStrings[key]) || fallback;
 }
 
 function resetWizard() {
     wizardStep = 1;
     wizardData.service = "";
     wizardData.budget = "";
-    
+
     document.querySelectorAll(".matching-wizard__step").forEach(step => {
         step.classList.remove("active");
         if (step.dataset.step == "1") step.classList.add("active");
     });
-    
+
     document.querySelectorAll(".step-option-btn").forEach(btn => btn.classList.remove("active"));
-    
+
     const nextBtn = document.querySelector(".next-step-btn");
     if (nextBtn) nextBtn.disabled = true;
-    
+
     const submitBtn = document.querySelector(".submit-wizard-btn");
     if (submitBtn) submitBtn.disabled = true;
-    
-    updateWizardHeader("Trouvez votre agence idéale", "4 questions · 60 secondes");
+
+    // "2 questions · 30 secondes" — was "4 questions · 60 secondes", a stale
+    // mismatch against the wizard's real step count (2) and the identical
+    // subtitle the modal is server-rendered with initially; fixed to match.
+    updateWizardHeader(mmStr('resetTitle', 'Trouvez votre agence idéale'), mmStr('resetSubtitle', '2 questions · 30 secondes'));
 }
 
 function updateWizardHeader(title, subtitle) {
@@ -752,7 +882,7 @@ document.addEventListener("click", (e) => {
         currentStep.classList.remove("active");
         nextStep.classList.add("active");
         wizardStep = 2;
-        updateWizardHeader("Quel est votre budget ?", "Étape 2 sur 2");
+        updateWizardHeader(mmStr('step2Title', 'Quel est votre budget ?'), mmStr('step2Subtitle', 'Étape 2 sur 2'));
     }
 });
 
@@ -768,7 +898,7 @@ document.addEventListener("click", (e) => {
         currentStep.classList.remove("active");
         successStep.classList.add("active");
         wizardStep = "success";
-        updateWizardHeader("Mise en relation réussie !", "Terminé");
+        updateWizardHeader(mmStr('successTitle', 'Mise en relation réussie !'), mmStr('successSubtitle', 'Terminé'));
         
         // Trigger star burst on the modal center
         const rect = successStep.getBoundingClientRect();
@@ -792,6 +922,19 @@ function triggerStarBurst(x, y) {
     setTimeout(() => {
         container.remove();
     }, 450);
+}
+
+// Activates a card whose click-to-navigate behavior lives in an inline
+// onclick (guides/blog/404 "recent articles" cards) when reached by keyboard.
+// The cards carry tabindex="0" + role="link" + an aria-label; this just
+// forwards Enter/Space to the same click the mouse would have fired, so the
+// navigation logic stays in one place (the inline onclick) rather than
+// being duplicated in JS.
+function handleCardKeydown(event) {
+    if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        event.currentTarget.click();
+    }
 }
 
 /* Exit-intent newsletter popup */
@@ -977,7 +1120,7 @@ function initExitIntent() {
 
 // Redirect shortcut clicks to annuaire page with filters
 function shortcutSearch(type, value) {
-    window.location.href = window.wpThemeSettings.homeUrl + 'annuaire/?' + type + '=' + encodeURIComponent(value);
+    window.location.href = window.wpThemeSettings.homeUrl + 'annuaire/?' + encodeURIComponent(type) + '=' + encodeURIComponent(value);
 }
 
 // Mobile dropdown toggle

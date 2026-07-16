@@ -29,7 +29,12 @@ $rail_count       = v5_digital_get_sub_field('rail_count');
 if (!$grid_title)     $grid_title     = 'Intelligence <span class="quiet">Agences.</span>';
 if (!$grid_subtitle)  $grid_subtitle  = 'Notes techniques sur les agences marocaines, la visibilité organique, Core Web Vitals, et les preuves qui séparent les vrais opérateurs SEO des argumentaires commerciaux polis.';
 if ($show_filters    === null || $show_filters    === '') $show_filters    = true;
-if (!$posts_per_page || $posts_per_page == 0) $posts_per_page = -1;
+// 12 (not -1/unbounded): the grid is now paginated below, so there's no need
+// to load and render every published post on every visit. An editor can
+// still type -1 explicitly to opt back into "show everything on one page,
+// no pagination" for a small blog — that's a deliberate, respected choice,
+// distinct from this empty-field fallback.
+if (!$posts_per_page || $posts_per_page == 0) $posts_per_page = 12;
 if ($show_recent_rail === null || $show_recent_rail === '') $show_recent_rail = true;
 if (!$rail_title)  $rail_title = v5_t('Articles récents');
 if (!$rail_count || (int) $rail_count < 1) $rail_count = 5;
@@ -76,9 +81,15 @@ if (is_array($layouts)) {
 }
 
 // ── Query blog posts ──────────────────────────────────────────────────────────
+// A real page number, not the client-side category pills below: those filter
+// by hiding/showing cards already in the DOM (fine at a small post count, see
+// blgFilterTopic()), but the pagination here is what keeps that DOM — and the
+// query producing it — from growing without bound as posts accumulate.
+$paged = max(1, (int) get_query_var('paged') ?: (int) get_query_var('page'));
 $blog_query_args = array(
     'post_type'      => 'post',
     'posts_per_page' => (int) $posts_per_page,
+    'paged'          => $paged,
     'post_status'    => 'publish',
     'orderby'        => 'date',
     'order'          => 'DESC',
@@ -87,7 +98,12 @@ if (!empty($display_category_ids)) {
     $blog_query_args['category__in'] = $display_category_ids;
 }
 $blog_query = new WP_Query($blog_query_args);
-$post_count = $blog_query->found_posts;
+// The count of cards actually on THIS page, not $blog_query->found_posts
+// (the site-wide total across every page) — blgFilterTopic() below already
+// overwrites this same element with a page-local count once a topic pill is
+// clicked, so the initial render matches what filtering produces instead of
+// silently changing meaning the moment a visitor interacts with it.
+$post_count = count($blog_query->posts);
 
 $is_default_blog_category = function ($category) {
     if (!$category || is_wp_error($category)) {
@@ -311,7 +327,45 @@ uasort($blog_categories, function ($a, $b) {
     }
     .blg-article-card:hover .blg-read-more { gap: 7px; }
 
-
+    /* Pagination — scoped to .blg-pagination so it doesn't leak the generic
+       .page-numbers class WordPress core (and other plugins) also use. */
+    .blg-pagination {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 32px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+    }
+    .blg-pagination .page-numbers {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        padding: 0 10px;
+        border-radius: 999px;
+        border: 1.5px solid #e2e8f0;
+        color: #475569;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+    .blg-pagination a.page-numbers:hover {
+        border-color: #2463eb;
+        color: #2463eb;
+        background: #eff6ff;
+    }
+    .blg-pagination .page-numbers.current {
+        background: #101418;
+        color: #fff;
+        border-color: #101418;
+    }
+    .blg-pagination .page-numbers.dots {
+        border: none;
+        color: #94a3b8;
+    }
 
     @media (max-width: 640px) {
         .blog-grid-wrap { width: min(100% - 28px, 1180px); }
@@ -412,7 +466,8 @@ uasort($blog_categories, function ($a, $b) {
                         <article class="blg-article-card blg-post-item"
                                  data-badge="<?php echo esc_attr($badge); ?>"
                                  data-categories="<?php echo esc_attr(implode(' ', $category_slugs)); ?>"
-                                 onclick="window.location.href='<?php the_permalink(); ?>'">
+                                 onclick="window.location.href='<?php the_permalink(); ?>'"
+                                 onkeydown="handleCardKeydown(event)" tabindex="0" role="link" aria-label="<?php the_title_attribute(); ?>">
                             <?php if ($cover_image) : ?>
                                 <div class="blg-card-img" style="height:210px;">
                                     <img src="<?php echo esc_url($cover_image); ?>"
@@ -464,6 +519,24 @@ uasort($blog_categories, function ($a, $b) {
                 <i data-lucide="search-x" style="width:40px;height:40px;color:#cbd5e1;margin:0 auto 12px;display:block;"></i>
                 <p style="font-size:13px;color:#94a3b8;font-family:monospace;">Aucun article dans cette catégorie.</p>
             </div>
+
+            <?php if ($blog_query->max_num_pages > 1) :
+                $page_links = paginate_links(array(
+                    'total'     => $blog_query->max_num_pages,
+                    'current'   => $paged,
+                    'mid_size'  => 1,
+                    'prev_text' => '&larr; Précédent',
+                    'next_text' => 'Suivant &rarr;',
+                    'type'      => 'array',
+                ));
+                if ($page_links) : ?>
+                <nav class="blg-pagination" aria-label="<?php echo esc_attr(v5_t('Pagination des articles')); ?>">
+                    <?php foreach ($page_links as $link) : ?>
+                        <?php echo $link; // phpcs:ignore WordPress.Security.EscapeOutput — paginate_links() escapes its own output ?>
+                    <?php endforeach; ?>
+                </nav>
+                <?php endif;
+            endif; ?>
             </div>
 
             <?php if ($show_recent_rail) : ?>

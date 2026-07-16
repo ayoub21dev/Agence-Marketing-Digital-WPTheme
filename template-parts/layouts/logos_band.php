@@ -134,7 +134,7 @@ if (empty($items)) {
           <?php foreach ($half as $item) : ?>
             <div class="v5-logos-item"<?php echo $copy === 1 ? ' aria-hidden="true"' : ''; ?>>
               <?php if (!empty($item['src'])) : ?>
-                <img src="<?php echo esc_url($item['src']); ?>" alt="<?php echo esc_attr($item['name']); ?>">
+                <img src="<?php echo esc_url($item['src']); ?>" alt="<?php echo esc_attr($item['name']); ?>" loading="lazy">
               <?php else : ?>
                 <span class="text-[15px] font-bold text-slate-500 uppercase font-display select-none whitespace-nowrap"><?php echo esc_html($item['name']); ?></span>
               <?php endif; ?>

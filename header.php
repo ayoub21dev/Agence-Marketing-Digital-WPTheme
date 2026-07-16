@@ -22,7 +22,18 @@
     <script type="text/javascript">
         window.wpThemeSettings = {
             homeUrl: "<?php echo esc_url(home_url('/')); ?>",
-            exitIntentEnabled: <?php echo v5_digital_exit_intent_enabled() ? 'true' : 'false'; ?>
+            exitIntentEnabled: <?php echo v5_digital_exit_intent_enabled() ? 'true' : 'false'; ?>,
+            // v5_t() is PHP-only — this is the bridge for the handful of
+            // matchmaker wizard strings theme-scripts.js sets at runtime
+            // (updateWizardHeader()), which can't otherwise be translated.
+            matchmakerStrings: <?php echo wp_json_encode(array(
+                'resetTitle'      => v5_t('Trouvez votre agence idéale'),
+                'resetSubtitle'   => v5_t('2 questions · 30 secondes'),
+                'step2Title'      => v5_t('Quel est votre budget ?'),
+                'step2Subtitle'   => v5_t('Étape 2 sur 2'),
+                'successTitle'    => v5_t('Mise en relation réussie !'),
+                'successSubtitle' => v5_t('Terminé'),
+            ), JSON_UNESCAPED_UNICODE); ?>
         };
     </script>
 
@@ -61,13 +72,13 @@ if (function_exists('wp_body_open')) {
             <div class="flex justify-between items-center h-14">
                 
                 <!-- Logo Wordmark -->
-                <div class="flex items-center gap-2 cursor-pointer font-display" onclick="window.location.href='<?php echo esc_url(home_url('/')); ?>'">
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center gap-2 font-display">
                     <div class="flex items-center gap-1">
                         <span class="font-extrabold text-[16px] text-slate-900 tracking-tight">Agence</span>
                         <span class="font-extrabold text-[16px] text-brand-600 tracking-tight">Marketing</span>
                         <span class="font-light text-[16px] text-slate-500 tracking-tight">Digital</span>
                     </div>
-                </div>
+                </a>
                                
                 <!-- Desktop Nav Links (Dynamic) -->
                 <nav class="hidden md:flex items-center gap-7">

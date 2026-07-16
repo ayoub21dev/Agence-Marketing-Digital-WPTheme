@@ -45,7 +45,7 @@ if (!$hubs_query->have_posts()) {
                         <div class="w-10 h-10 rounded-lg bg-slate-50 text-slate-600 flex items-center justify-center border border-slate-100 flex-shrink-0">
                             <?php 
                             if (!empty($icon)) {
-                                echo $icon; // Raw SVG icon
+                                echo v5_digital_sanitize_svg_icon($icon);
                             } else {
                                 echo '<i data-lucide="sparkles" class="w-4 h-4"></i>';
                             }

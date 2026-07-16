@@ -58,8 +58,18 @@ $social_proof_2  = v5_get_field_default('social_proof_2', 'Référencement 100% 
                             $classes = $secondary_classes;
                         } elseif ($style === 'custom') {
                             $classes = 'font-bold transition-all';
-                            if (!empty($bg_color)) $styles .= 'background-color:' . esc_attr($bg_color) . ';';
-                            if (!empty($text_color)) $styles .= 'color:' . esc_attr($text_color) . ';';
+                            // esc_attr() only stops attribute breakout; it isn't CSS-context
+                            // sanitization. Only accept values that are actually a color
+                            // (hex or rgb/rgba) — anything else (e.g. a url()/expression()
+                            // payload from an ACF color-picker field) is dropped rather than
+                            // echoed into the style attribute.
+                            $color_pattern = '/^(#[0-9a-fA-F]{3,8}|rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*(,\s*[\d.]+\s*)?\))$/';
+                            if (!empty($bg_color) && preg_match($color_pattern, trim($bg_color))) {
+                                $styles .= 'background-color:' . esc_attr($bg_color) . ';';
+                            }
+                            if (!empty($text_color) && preg_match($color_pattern, trim($text_color))) {
+                                $styles .= 'color:' . esc_attr($text_color) . ';';
+                            }
                         }
 
                         // Determine if it is external

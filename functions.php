@@ -41,6 +41,53 @@ function v5_digital_update_field($selector, $value, $post_id = false) {
     return v5_digital_acf_is_active() ? update_field($selector, $value, $post_id) : false;
 }
 
+/**
+ * Sanitize a hand-authored SVG icon (the `icon_svg` ACF textarea fields on
+ * `specialty_hub` and the challenge section's card repeater) before it's
+ * echoed as trusted HTML. Editors paste icon markup copied from an icon set
+ * (Lucide/Feather/Heroicons-style: a handful of simple shape elements), so
+ * this allows exactly that vocabulary and nothing else — no `<script>`,
+ * `<foreignObject>`, `<use>`/`<image>` (both can load external content via
+ * their href), `<a>` (could carry a `javascript:` href), or SMIL `<animate*>`
+ * elements (a known SVG-specific XSS vector in some browsers). Event-handler
+ * attributes (`onload`, `onerror`, ...) are blocked implicitly: wp_kses()
+ * only keeps attributes explicitly present in the allowlist below, so
+ * anything not listed — including every `on*` attribute — is stripped
+ * regardless of which tag it's on.
+ */
+function v5_digital_sanitize_svg_icon($svg) {
+    if (!is_string($svg) || $svg === '') {
+        return '';
+    }
+
+    $common_presentation_attrs = array(
+        'fill' => true, 'stroke' => true, 'stroke-width' => true,
+        'stroke-linecap' => true, 'stroke-linejoin' => true,
+        'stroke-dasharray' => true, 'opacity' => true, 'class' => true,
+        'transform' => true,
+    );
+
+    $allowed_svg_tags = array(
+        'svg' => array_merge($common_presentation_attrs, array(
+            'xmlns' => true, 'viewbox' => true, 'width' => true, 'height' => true,
+            'aria-hidden' => true, 'focusable' => true, 'role' => true,
+        )),
+        'path'     => array_merge($common_presentation_attrs, array('d' => true, 'fill-rule' => true, 'clip-rule' => true)),
+        'circle'   => array_merge($common_presentation_attrs, array('cx' => true, 'cy' => true, 'r' => true)),
+        'ellipse'  => array_merge($common_presentation_attrs, array('cx' => true, 'cy' => true, 'rx' => true, 'ry' => true)),
+        'rect'     => array_merge($common_presentation_attrs, array('x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true)),
+        'line'     => array_merge($common_presentation_attrs, array('x1' => true, 'y1' => true, 'x2' => true, 'y2' => true)),
+        'polyline' => array_merge($common_presentation_attrs, array('points' => true)),
+        'polygon'  => array_merge($common_presentation_attrs, array('points' => true)),
+        'g'        => $common_presentation_attrs,
+        'defs'     => array(),
+        'title'    => array(),
+        'desc'     => array(),
+    );
+
+    return wp_kses($svg, $allowed_svg_tags);
+}
+
 function v5_digital_acf_missing_admin_notice() {
     if (v5_digital_acf_is_active() || !current_user_can('activate_plugins')) {
         return;
@@ -3001,6 +3048,44 @@ function v5_digital_changelog_section_label($section) {
 }
 
 /**
+ * Visual treatment (CSS data-slug + dashicon) for a changelog section badge.
+ * An unrecognised section — e.g. a future `<!-- changelog: X -->` marker —
+ * falls back to a neutral slug/icon instead of leaving the badge unstyled.
+ */
+function v5_digital_changelog_section_meta($section) {
+    $meta = array(
+        'Added'         => array('slug' => 'added', 'icon' => 'plus-alt2'),
+        'Changed'       => array('slug' => 'changed', 'icon' => 'randomize'),
+        'Fixed'         => array('slug' => 'fixed', 'icon' => 'admin-tools'),
+        'Performance'   => array('slug' => 'performance', 'icon' => 'performance'),
+        'Removed'       => array('slug' => 'removed', 'icon' => 'trash'),
+        'Documentation' => array('slug' => 'documentation', 'icon' => 'media-document'),
+        'Security'      => array('slug' => 'security', 'icon' => 'shield'),
+    );
+    return isset($meta[$section]) ? $meta[$section] : array('slug' => 'default', 'icon' => 'marker');
+}
+
+/** URL/DOM-safe id fragment for a release, e.g. "1.0.1" -> "1-0-1". */
+function v5_digital_changelog_release_slug($version) {
+    $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $version));
+    $slug = trim($slug, '-');
+    return $slug !== '' ? $slug : 'release';
+}
+
+/** Keep a Changelog sections that actually appear, in canonical order — so the
+ *  filter bar never shows a chip for a category nothing has ever used. */
+function v5_digital_changelog_sections_present($releases) {
+    $present = array();
+    foreach ($releases as $release) {
+        foreach (array_keys($release['sections']) as $section) {
+            $present[$section] = true;
+        }
+    }
+    $order = array('Added', 'Changed', 'Fixed', 'Performance', 'Removed', 'Documentation', 'Security');
+    return array_values(array_intersect($order, array_keys($present)));
+}
+
+/**
  * Render one changelog entry's inline markdown: `code`, **bold**, [label](url).
  *
  * Relative links are flattened to their label on purpose: the `changes/*.md`
@@ -3018,6 +3103,41 @@ function v5_digital_changelog_inline($text) {
         return $m[1];
     }, $html);
 }
+
+/**
+ * Load the changelog styling on its own admin page and the dashboard widget.
+ * The search/filter/scrollspy script only makes sense on the full page — the
+ * widget shows one release with no filtering, so it does not need it.
+ */
+function v5_digital_admin_changelog_assets($hook) {
+    if ($hook !== 'appearance_page_v5-digital-changelog' && $hook !== 'index.php') {
+        return;
+    }
+
+    $css_path = get_template_directory() . '/assets/admin/changelog.css';
+
+    wp_enqueue_style(
+        'v5-digital-changelog',
+        get_template_directory_uri() . '/assets/admin/changelog.css',
+        array('dashicons'),
+        file_exists($css_path) ? filemtime($css_path) : false
+    );
+
+    if ($hook !== 'appearance_page_v5-digital-changelog') {
+        return;
+    }
+
+    $js_path = get_template_directory() . '/assets/admin/changelog.js';
+
+    wp_enqueue_script(
+        'v5-digital-changelog',
+        get_template_directory_uri() . '/assets/admin/changelog.js',
+        array(),
+        file_exists($js_path) ? filemtime($js_path) : false,
+        true
+    );
+}
+add_action('admin_enqueue_scripts', 'v5_digital_admin_changelog_assets');
 
 /** Appearance → Nouveautés du thème. */
 function v5_digital_register_changelog_page() {
@@ -3038,45 +3158,125 @@ function v5_digital_render_changelog_page() {
     $releases = v5_digital_get_changelog();
     ?>
     <div class="wrap v5-changelog">
-        <h1><?php echo esc_html(v5_digital_translate_admin_string('Nouveautés du thème')); ?></h1>
-        <p class="description">
-            <?php echo esc_html(v5_digital_translate_admin_string('Version installée')); ?> :
-            <?php echo wp_kses_post(v5_digital_version_html()); ?>
-        </p>
+        <h1 class="v5-cl-title">
+            <span class="dashicons dashicons-megaphone" aria-hidden="true"></span>
+            <?php echo esc_html(v5_digital_translate_admin_string('Nouveautés du thème')); ?>
+        </h1>
+
+        <div class="v5-cl-header">
+            <span class="v5-cl-header-label"><?php echo esc_html(v5_digital_translate_admin_string('Version installée')); ?></span>
+            <span class="v5-cl-header-version"><?php echo wp_kses_post(v5_digital_version_html()); ?></span>
+        </div>
 
         <?php if (empty($releases)) : ?>
             <div class="notice notice-warning inline"><p>
                 <?php echo esc_html(v5_digital_translate_admin_string('Le fichier CHANGELOG.md est introuvable ou vide.')); ?>
             </p></div>
         <?php else : ?>
-            <?php foreach ($releases as $release) : ?>
-                <?php $installed = v5_digital_is_installed_release($release['version']); ?>
-                <div class="card" style="max-width:820px;margin-top:16px;padding:16px 20px;<?php echo $installed ? 'border-left:4px solid #2271b1;' : ''; ?>">
-                    <h2 style="margin-top:0;">
-                        <?php
-                        echo strtolower($release['version']) === 'unreleased'
-                            ? esc_html(v5_digital_translate_admin_string('À venir'))
-                            : esc_html($release['version']);
-                        ?>
-                        <?php if ($release['date']) : ?>
-                            <span style="font-weight:400;color:#646970;font-size:13px;">— <?php echo esc_html($release['date']); ?></span>
-                        <?php endif; ?>
-                        <?php if ($installed) : ?>
-                            <span style="font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;background:#2271b1;color:#fff;padding:2px 8px;border-radius:9px;vertical-align:middle;margin-left:6px;">
-                                <?php echo esc_html(v5_digital_translate_admin_string('installée')); ?>
-                            </span>
-                        <?php endif; ?>
-                    </h2>
-                    <?php foreach ($release['sections'] as $section => $entries) : ?>
-                        <h3 style="margin-bottom:4px;"><?php echo esc_html(v5_digital_changelog_section_label($section)); ?></h3>
-                        <ul style="list-style:disc;margin:0 0 12px 20px;">
-                            <?php foreach ($entries as $entry) : ?>
-                                <li><?php echo wp_kses_post(v5_digital_changelog_inline($entry)); ?></li>
-                            <?php endforeach; ?>
-                        </ul>
+            <div class="v5-cl-toolbar">
+                <div class="v5-cl-search">
+                    <span class="dashicons dashicons-search" aria-hidden="true"></span>
+                    <label class="screen-reader-text" for="v5-cl-search-input">
+                        <?php echo esc_html(v5_digital_translate_admin_string('Rechercher dans le journal')); ?>
+                    </label>
+                    <input
+                        type="search"
+                        id="v5-cl-search-input"
+                        autocomplete="off"
+                        placeholder="<?php echo esc_attr(v5_digital_translate_admin_string('Rechercher une version, un mot…')); ?>"
+                    >
+                </div>
+                <div class="v5-cl-filter-chips" role="group" aria-label="<?php echo esc_attr(v5_digital_translate_admin_string('Filtrer par catégorie')); ?>">
+                    <?php foreach (v5_digital_changelog_sections_present($releases) as $section) : ?>
+                        <?php $meta = v5_digital_changelog_section_meta($section); ?>
+                        <button
+                            type="button"
+                            class="v5-cl-filter-chip"
+                            data-section="<?php echo esc_attr($meta['slug']); ?>"
+                            aria-pressed="true"
+                        >
+                            <span class="dashicons dashicons-<?php echo esc_attr($meta['icon']); ?>" aria-hidden="true"></span>
+                            <?php echo esc_html(v5_digital_changelog_section_label($section)); ?>
+                        </button>
                     <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+            </div>
+
+            <div class="v5-cl-layout">
+                <nav class="v5-cl-toc" aria-label="<?php echo esc_attr(v5_digital_translate_admin_string('Versions')); ?>">
+                    <ul>
+                        <?php foreach ($releases as $release) : ?>
+                            <?php
+                            $installed = v5_digital_is_installed_release($release['version']);
+                            $target    = 'v5-cl-r-' . v5_digital_changelog_release_slug($release['version']);
+                            ?>
+                            <li>
+                                <a href="#<?php echo esc_attr($target); ?>" data-target="<?php echo esc_attr($target); ?>">
+                                    <span>
+                                        <?php
+                                        echo strtolower($release['version']) === 'unreleased'
+                                            ? esc_html(v5_digital_translate_admin_string('À venir'))
+                                            : esc_html($release['version']);
+                                        ?>
+                                    </span>
+                                    <?php if ($installed) : ?>
+                                        <span class="dashicons dashicons-yes" aria-hidden="true"></span>
+                                    <?php endif; ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </nav>
+
+                <div class="v5-cl-timeline">
+                    <?php foreach ($releases as $release) : ?>
+                        <?php
+                        $installed = v5_digital_is_installed_release($release['version']);
+                        $target    = 'v5-cl-r-' . v5_digital_changelog_release_slug($release['version']);
+                        ?>
+                        <div class="v5-cl-release<?php echo $installed ? ' is-installed' : ''; ?>" id="<?php echo esc_attr($target); ?>">
+                            <div class="v5-cl-release-head">
+                                <h2 class="v5-cl-release-version">
+                                    <?php
+                                    echo strtolower($release['version']) === 'unreleased'
+                                        ? esc_html(v5_digital_translate_admin_string('À venir'))
+                                        : esc_html($release['version']);
+                                    ?>
+                                </h2>
+                                <?php if ($release['date']) : ?>
+                                    <span class="v5-cl-release-date"><?php echo esc_html($release['date']); ?></span>
+                                <?php endif; ?>
+                                <?php if ($installed) : ?>
+                                    <span class="v5-cl-pill">
+                                        <span class="dashicons dashicons-yes" aria-hidden="true"></span>
+                                        <?php echo esc_html(v5_digital_translate_admin_string('installée')); ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <?php foreach ($release['sections'] as $section => $entries) : ?>
+                                <?php $meta = v5_digital_changelog_section_meta($section); ?>
+                                <div class="v5-cl-section" data-section="<?php echo esc_attr($meta['slug']); ?>">
+                                    <h3 class="v5-cl-badge" data-section="<?php echo esc_attr($meta['slug']); ?>">
+                                        <span class="dashicons dashicons-<?php echo esc_attr($meta['icon']); ?>" aria-hidden="true"></span>
+                                        <?php echo esc_html(v5_digital_changelog_section_label($section)); ?>
+                                    </h3>
+                                    <ul class="v5-cl-entries">
+                                        <?php foreach ($entries as $entry) : ?>
+                                            <li data-search="<?php echo esc_attr(strtolower(wp_strip_all_tags($entry))); ?>">
+                                                <?php echo wp_kses_post(v5_digital_changelog_inline($entry)); ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <p class="v5-cl-empty" hidden>
+                <?php echo esc_html(v5_digital_translate_admin_string('Aucune entrée ne correspond à votre recherche.')); ?>
+            </p>
         <?php endif; ?>
     </div>
     <?php
@@ -3104,35 +3304,42 @@ add_action('wp_dashboard_setup', 'v5_digital_register_changelog_widget');
 
 function v5_digital_render_changelog_widget() {
     $releases = v5_digital_get_changelog();
+
+    echo '<div class="v5-cl-widget">';
+
     printf(
-        '<p style="margin-top:0;">%s : %s</p>',
+        '<div class="v5-cl-header v5-cl-header--compact"><span class="v5-cl-header-label">%s</span><span class="v5-cl-header-version">%s</span></div>',
         esc_html(v5_digital_translate_admin_string('Version installée')),
         wp_kses_post(v5_digital_version_html())
     );
 
     if (empty($releases)) {
         printf('<p>%s</p>', esc_html(v5_digital_translate_admin_string('Le fichier CHANGELOG.md est introuvable ou vide.')));
+        echo '</div>';
         return;
     }
 
     $latest = $releases[0];
     printf(
-        '<h4 style="margin:8px 0 4px;">%s%s</h4>',
+        '<div class="v5-cl-release-head"><h4 class="v5-cl-release-version">%s</h4>%s</div>',
         strtolower($latest['version']) === 'unreleased'
             ? esc_html(v5_digital_translate_admin_string('À venir'))
             : esc_html($latest['version']),
-        $latest['date'] ? ' <span style="font-weight:400;color:#646970;">— ' . esc_html($latest['date']) . '</span>' : ''
+        $latest['date'] ? '<span class="v5-cl-release-date">' . esc_html($latest['date']) . '</span>' : ''
     );
 
-    echo '<ul style="list-style:disc;margin:0 0 8px 20px;">';
+    echo '<ul class="v5-cl-entries v5-cl-entries--compact">';
     $shown = 0;
     foreach ($latest['sections'] as $section => $entries) {
+        $meta = v5_digital_changelog_section_meta($section);
         foreach ($entries as $entry) {
             if ($shown++ >= 5) {
                 break 2;
             }
             printf(
-                '<li><strong>%s</strong> — %s</li>',
+                '<li><span class="v5-cl-badge v5-cl-badge--tiny" data-section="%1$s"><span class="dashicons dashicons-%2$s" aria-hidden="true"></span>%3$s</span>%4$s</li>',
+                esc_attr($meta['slug']),
+                esc_attr($meta['icon']),
                 esc_html(v5_digital_changelog_section_label($section)),
                 wp_kses_post(v5_digital_changelog_inline($entry))
             );
@@ -3141,10 +3348,12 @@ function v5_digital_render_changelog_widget() {
     echo '</ul>';
 
     printf(
-        '<a href="%s">%s</a>',
+        '<a class="v5-cl-more" href="%s">%s <span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span></a>',
         esc_url(admin_url('themes.php?page=v5-digital-changelog')),
         esc_html(v5_digital_translate_admin_string('Voir le journal complet'))
     );
+
+    echo '</div>';
 }
 
 // ----------------------------------------------------
@@ -4656,13 +4865,76 @@ function v5_digital_ui_strings() {
         'Analyses indépendantes des agences de marketing digital au Maroc. Évaluations objectives, guides de sélection pratiques et absence d\'influence publicitaire.',
         'Rechercher des agences, des pages, des villes...',
         'Fermer la recherche',
-        // Exit-intent newsletter popup
+        'Appuyez sur ÉCHAP pour fermer',
+        'recherche',
+        // Footer column titles
+        'Découvrir',
+        'Ressources',
+        'Villes',
+        'Légal',
+        // Exit-intent newsletter popup (also shared with the footer newsletter band)
         'Fermer',
+        'Adresse email',
+        'Newsletter',
+        'Avant de partir…',
+        'Recevez nos analyses d\'agences par email',
+        'Chaque quinzaine : un audit d\'agence, un signal SEO à surveiller, une sélection de ressources pour les fondateurs et directeurs marketing au Maroc.',
+        'S\'abonner',
+        'Aucun spam · Désabonnement en 1 clic',
+        'Merci pour votre inscription !',
+        'Vous recevrez notre prochaine analyse par email.',
+        // Matchmaker lead wizard
+        'Matchmaker',
+        'Trouvez votre agence idéale',
+        '2 questions · 30 secondes',
+        '1. Quel service recherchez-vous ?',
+        'Étape suivante',
+        '2. Quel est votre budget mensuel ?',
+        'Trouver mon agence',
+        'Agences recommandées trouvées !',
+        'Nous avons analysé nos profils. Un conseiller va vous envoyer une sélection personnalisée par email sous 24 heures.',
+        // Matchmaker wizard — set from JS at runtime (updateWizardHeader() in
+        // theme-scripts.js), via the window.wpThemeSettings.matchmakerStrings
+        // bridge in header.php, since v5_t() itself is PHP-only.
+        'Quel est votre budget ?',
+        'Étape 2 sur 2',
+        'Mise en relation réussie !',
+        'Terminé',
         // Blog / article meta
         'Par',
+        'retour aux articles',
+        'Logo de %s',
+        'Analyses Éditoriales',
+        'Visiter le Site',
         // Recent-posts rail (article sidebar + blog listing)
         'Articles récents',
         'Tout le blog',
+        // Guides section (homepage) — static fallback card titles, used as
+        // both the visible heading and (since the card itself is a single
+        // keyboard-focusable link) its aria-label
+        'Top Agences de Marketing Digital au Maroc',
+        'Meilleures Agences SEO à Casablanca',
+        'Comparatif des Agences Social Media',
+        // Home search filter (search_filter_section)
+        'Service',
+        'Tous les services',
+        'Ville',
+        'Toutes les villes',
+        'Note minimale',
+        'Toutes les notes',
+        '4.5+ Étoiles',
+        '4.0+ Étoiles',
+        'Rechercher',
+        // Blog listing (blog_posts_grid_section)
+        'Pagination des articles',
+        // 404 page
+        'Cette page s\'est égarée.',
+        'Le lien est peut-être rompu ou la page a été déplacée. Pas d\'inquiétude — voici quelques pistes pour retrouver votre chemin.',
+        'Retour à l\'accueil',
+        'Blog',
+        'Méthodologie',
+        'Contact',
+        'Continuer la lecture',
         // Contact form (layout contact_form_section)
         'Prénom',
         'Votre prénom',
@@ -5153,6 +5425,17 @@ add_action('template_redirect', function() {
     status_header(200);
     header('Content-Type: application/xml; charset=utf-8');
 
+    // Sitemaps are crawled repeatedly by bots with no session/cookie to
+    // trigger page caching, so the two unbounded get_posts() calls below ran
+    // on every single request. Cached for a day, invalidated immediately on
+    // any post/page save/delete (v5_digital_invalidate_sitemap_cache below) —
+    // so a new page shows up right away, but repeat crawler hits are cheap.
+    $cached = get_transient('v5_digital_sitemap_xml');
+    if (is_string($cached) && $cached !== '') {
+        echo $cached;
+        exit;
+    }
+
     // Each entry: [loc, lastmod (ISO 8601 or null), changefreq, priority]
     $entries = array();
 
@@ -5225,22 +5508,42 @@ add_action('template_redirect', function() {
     // out of the sitemap; specialty singles are orphan pages the front-end
     // never links to.)
 
-    echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     foreach ($entries as $entry) {
         list($loc, $lastmod, $changefreq, $priority) = $entry;
-        echo "  <url>\n";
-        echo '    <loc>' . esc_url($loc) . "</loc>\n";
+        $xml .= "  <url>\n";
+        $xml .= '    <loc>' . esc_url($loc) . "</loc>\n";
         if ($lastmod) {
-            echo '    <lastmod>' . esc_html($lastmod) . "</lastmod>\n";
+            $xml .= '    <lastmod>' . esc_html($lastmod) . "</lastmod>\n";
         }
-        echo '    <changefreq>' . $changefreq . "</changefreq>\n";
-        echo '    <priority>' . $priority . "</priority>\n";
-        echo "  </url>\n";
+        $xml .= '    <changefreq>' . $changefreq . "</changefreq>\n";
+        $xml .= '    <priority>' . $priority . "</priority>\n";
+        $xml .= "  </url>\n";
     }
-    echo '</urlset>' . "\n";
+    $xml .= '</urlset>' . "\n";
+
+    set_transient('v5_digital_sitemap_xml', $xml, DAY_IN_SECONDS);
+    echo $xml;
     exit;
 });
+
+/** Invalidate the cached sitemap XML whenever content that could appear in
+ * it changes, so a new/edited/deleted page or post shows up promptly instead
+ * of waiting out the day-long safety-net TTL above. Skips autosaves/revisions
+ * — both fire save_post too, and without this guard every autosave tick
+ * while an author is actively editing a draft would bust the cache, defeating
+ * much of the point of caching it in the first place. */
+function v5_digital_invalidate_sitemap_cache($post_id = 0) {
+    if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) {
+        return;
+    }
+    delete_transient('v5_digital_sitemap_xml');
+}
+add_action('save_post', 'v5_digital_invalidate_sitemap_cache');
+add_action('deleted_post', 'v5_digital_invalidate_sitemap_cache');
+add_action('trashed_post', 'v5_digital_invalidate_sitemap_cache');
+add_action('untrashed_post', 'v5_digital_invalidate_sitemap_cache');
 
 /**
  * Helper to get ACF field/sub-field value with a fallback default value

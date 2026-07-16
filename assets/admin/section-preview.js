@@ -233,7 +233,14 @@
         frame.addEventListener('load', onFrameLoad);
         frame.addEventListener('error', function () { setStatus(i18n.error || 'Erreur', true); });
 
-        window.addEventListener('resize', fitFrame);
+        var resizeTimer = null;
+        window.addEventListener('resize', function () {
+            // fitFrame() reads clip.clientWidth (forces layout); debounce
+            // rather than recalculating on every event while a window edge
+            // is being dragged.
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(fitFrame, 150);
+        });
         return modal;
     }
 

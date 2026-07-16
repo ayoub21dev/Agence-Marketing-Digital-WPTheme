@@ -95,7 +95,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                                 <p class="text-[15px] leading-relaxed text-slate-700">"<?php echo esc_html($c_quote); ?>"</p>
                                 <div class="mt-7 flex items-center gap-3">
                                     <?php if (!empty($c_image)) : ?>
-                                        <img src="<?php echo esc_url($c_image); ?>" alt="<?php echo esc_attr($c_author); ?>" class="h-11 w-11 rounded-full object-cover">
+                                        <img src="<?php echo esc_url($c_image); ?>" alt="<?php echo esc_attr($c_author); ?>" loading="lazy" class="h-11 w-11 rounded-full object-cover">
                                     <?php else : ?>
                                         <div class="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-[12px] font-bold text-slate-500"><?php echo esc_html(substr($c_author, 0, 1)); ?></div>
                                     <?php endif; ?>
@@ -203,7 +203,7 @@ if ($has_eyebrow || $has_title || $has_desc || $metrics === null || $has_metrics
                                 <p class="text-[15px] leading-relaxed text-slate-700">"<?php echo esc_html($quote); ?>"</p>
                                 <div class="mt-7 flex items-center gap-3">
                                     <?php if (!empty($image)) : ?>
-                                        <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($author); ?>" class="h-11 w-11 rounded-full object-cover">
+                                        <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($author); ?>" loading="lazy" class="h-11 w-11 rounded-full object-cover">
                                     <?php endif; ?>
                                     <div>
                                         <div class="text-[14px] font-bold text-slate-950"><?php echo esc_html($author); ?></div>

@@ -17,7 +17,8 @@ if ($has_eyebrow || $has_title || $has_link || $has_posts) :
 
 $query_args = array(
     'post_type'      => 'post',
-    'post_status'    => 'publish'
+    'post_status'    => 'publish',
+    'no_found_rows'  => true, // total count never read below
 );
 
 if (!empty($selected_post_ids)) {
@@ -71,10 +72,12 @@ $guides_query = new WP_Query($query_args);
                     // Retrieve category/tag name or fallback (skips "Uncategorized")
                     $badge = v5_digital_get_post_badge($post_id, 'Analyse');
                     ?>
-                    <div onclick="window.location.href='<?php the_permalink(); ?>'" class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
+                    <div onclick="window.location.href='<?php the_permalink(); ?>'"
+                         onkeydown="handleCardKeydown(event)" tabindex="0" role="link" aria-label="<?php the_title_attribute(); ?>"
+                         class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
                         <?php if ($thumbnail_url) : ?>
                             <div class="h-48 overflow-hidden bg-slate-100 flex-shrink-0">
-                                <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             </div>
                         <?php endif; ?>
                         <div class="p-5 flex flex-col flex-grow">
@@ -105,7 +108,9 @@ $guides_query = new WP_Query($query_args);
                     }
                 }
                 ?>
-                <div onclick="window.location.href='<?php echo esc_url($fallback_links['top-agencies']); ?>'" class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
+                <div onclick="window.location.href='<?php echo esc_url($fallback_links['top-agencies']); ?>'"
+                     onkeydown="handleCardKeydown(event)" tabindex="0" role="link" aria-label="<?php echo esc_attr(v5_t('Top Agences de Marketing Digital au Maroc')); ?>"
+                     class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
 
                     <div class="p-5 flex flex-col flex-grow">
                         <span class="text-[11px] font-semibold text-slate-800 uppercase tracking-wider">Classement</span>
@@ -119,9 +124,11 @@ $guides_query = new WP_Query($query_args);
                     </div>
                 </div>
 
-                <div onclick="window.location.href='<?php echo esc_url($fallback_links['seo-casablanca']); ?>'" class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
+                <div onclick="window.location.href='<?php echo esc_url($fallback_links['seo-casablanca']); ?>'"
+                     onkeydown="handleCardKeydown(event)" tabindex="0" role="link" aria-label="<?php echo esc_attr(v5_t('Meilleures Agences SEO à Casablanca')); ?>"
+                     class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
                     <div class="h-48 overflow-hidden bg-slate-100 flex-shrink-0">
-                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop" alt="Agences SEO Casablanca" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop" alt="Agences SEO Casablanca" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
                         <span class="text-[11px] font-semibold text-slate-800 uppercase tracking-wider">Guide</span>
@@ -135,9 +142,11 @@ $guides_query = new WP_Query($query_args);
                     </div>
                 </div>
 
-                <div onclick="window.location.href='<?php echo esc_url($fallback_links['social-media-compared']); ?>'" class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
+                <div onclick="window.location.href='<?php echo esc_url($fallback_links['social-media-compared']); ?>'"
+                     onkeydown="handleCardKeydown(event)" tabindex="0" role="link" aria-label="<?php echo esc_attr(v5_t('Comparatif des Agences Social Media')); ?>"
+                     class="card-hover bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer group flex flex-col">
                     <div class="h-48 overflow-hidden bg-slate-100 flex-shrink-0">
-                        <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&h=400&fit=crop" alt="Agences Réseaux Sociaux" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&h=400&fit=crop" alt="Agences Réseaux Sociaux" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
                         <span class="text-[11px] font-semibold text-slate-800 uppercase tracking-wider">Comparatif</span>

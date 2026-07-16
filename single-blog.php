@@ -113,7 +113,7 @@ get_header();
                             <span class="text-slate-900 font-semibold truncate max-w-[150px] sm:max-w-xs"><?php the_title(); ?></span>
                         </div>
                         <a id="v5-back-to-articles" href="<?php echo esc_url($blog_url); ?>" class="bg-white hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] text-slate-600 flex items-center gap-1 transition-all no-underline">
-                            <i data-lucide="arrow-left" class="w-3 h-3"></i> <span>retour aux articles</span>
+                            <i data-lucide="arrow-left" class="w-3 h-3"></i> <span><?php echo esc_html(v5_t('retour aux articles')); ?></span>
                         </a>
                     </div>
 
@@ -242,7 +242,7 @@ get_header();
                             }
                                         ?>
                                         <div class="mt-10 pt-8 border-t border-slate-200">
-                                            <h3 class="font-extrabold text-[16px] text-slate-900 uppercase font-display tracking-wide mb-6">Analyses Éditoriales</h3>
+                                            <h3 class="font-extrabold text-[16px] text-slate-900 uppercase font-display tracking-wide mb-6"><?php echo esc_html(v5_t('Analyses Éditoriales')); ?></h3>
                                             <div class="space-y-4">
                                                 <?php foreach ($agency_reviews as $rev) :
                                                     $agency_id = $rev['agency'];
@@ -268,7 +268,7 @@ get_header();
                                                     $rank    = intval($rev['rank']);
                                                     $link_text = isset($rev['link_text']) ? trim((string) $rev['link_text']) : '';
                                                     if ($link_text === '') {
-                                                        $link_text = 'Visiter le Site';
+                                                        $link_text = v5_t('Visiter le Site');
                                                     }
                                                     ?>
                                                     <div class="border border-slate-200 rounded-xl p-5 md:p-6 bg-slate-50/30 hover:bg-slate-50/50 transition-colors shadow-sm relative">
@@ -276,7 +276,7 @@ get_header();
                                                             <div class="flex items-center gap-3">
                                                                 <?php if ($logo_src) : ?>
                                                                     <img src="<?php echo esc_url($logo_src); ?>"
-                                                                         alt="<?php echo esc_attr($agency_post->post_title); ?> Logo"
+                                                                         alt="<?php echo esc_attr(sprintf(v5_t('Logo de %s'), $agency_post->post_title)); ?>"
                                                                          class="w-10 h-10 rounded-lg object-cover border border-slate-200 bg-white">
                                                                 <?php else : ?>
                                                                     <div class="w-10 h-10 rounded-lg border border-slate-200 bg-brand-600 flex items-center justify-center text-white font-extrabold text-[12px] font-mono tracking-wider">
