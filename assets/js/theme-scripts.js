@@ -1053,13 +1053,15 @@ function initExitIntentModal() {
 }
 
 /**
- * Fires the popup once per session on a strong "about to leave" signal:
- * desktop cursor exiting toward the browser chrome, or a rapid scroll-up
- * near the top of the page on touch devices (no mouse to read exit intent
- * from). Skipped entirely if the server-side gate
- * (window.wpThemeSettings.exitIntentEnabled — v5_digital_exit_intent_enabled())
- * is off, if it already fired this session, or if this visitor already
- * subscribed on a previous visit.
+ * Fires the popup once per session, ONLY on an actual "leaving" signal:
+ * desktop cursor exiting toward the browser chrome, or a click on the
+ * "retour aux articles" link (a real navigation away). A rapid-scroll-up
+ * heuristic used to exist as a mobile proxy but fired during normal
+ * reading (flicking back up to re-read) — removed on request: the popup
+ * must never appear while the visitor is still on the article. Skipped
+ * entirely if the server-side gate (window.wpThemeSettings.exitIntentEnabled
+ * — v5_digital_exit_intent_enabled()) is off, if it already fired this
+ * session, or if this visitor already subscribed on a previous visit.
  */
 function initExitIntent() {
     const modal = document.getElementById("exit-intent-modal");
@@ -1087,20 +1089,17 @@ function initExitIntent() {
             // Storage unavailable — the once-per-session cap just won't hold.
         }
         document.removeEventListener("mouseout", onMouseOut);
-        window.removeEventListener("scroll", onScroll);
         if (backLink) backLink.removeEventListener("click", onBackLinkClick);
 
         if (redirectUrl) {
             exitIntentPendingRedirect = redirectUrl;
         }
 
-        // A short delay, not an immediate open. The mobile trigger fires
-        // mid-scroll-gesture, exactly when the browser's address bar may be
-        // showing/hiding and transiently resizing the viewport; opening
-        // before that settles centers the dialog against a viewport size
-        // that's about to change, and it ends up looking shifted up once the
-        // chrome finishes animating. Harmless on desktop too — an unnoticeable
-        // delay before a popup the visitor didn't ask for.
+        // A short delay, not an immediate open: on mobile the back-link tap
+        // can coincide with the browser's address bar showing/hiding and
+        // transiently resizing the viewport; opening before that settles
+        // centers the dialog against a size that's about to change. Harmless
+        // on desktop — an unnoticeable delay before an unrequested popup.
         window.setTimeout(openExitIntent, 220);
     };
 
@@ -1110,24 +1109,6 @@ function initExitIntent() {
         if (e.clientY <= 0 && !e.relatedTarget) trigger();
     };
     document.addEventListener("mouseout", onMouseOut);
-
-    // Touch devices have no cursor to read exit intent from; a fast upward
-    // scroll back near the top of the page is the closest equivalent signal.
-    let lastScrollY = window.scrollY;
-    let lastScrollTime = performance.now();
-    const onScroll = () => {
-        const now = performance.now();
-        const deltaUp = lastScrollY - window.scrollY;
-        const deltaTime = now - lastScrollTime;
-
-        if (deltaUp > 80 && deltaTime < 300 && window.scrollY < window.innerHeight) {
-            trigger();
-        }
-
-        lastScrollY = window.scrollY;
-        lastScrollTime = now;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
 
     // Explicit signal: the visitor clicked away from the article. Stronger
     // than mouseout/scroll (it's an actual navigation, not an inference), so
