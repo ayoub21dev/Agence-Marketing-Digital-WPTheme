@@ -14,6 +14,12 @@ depuis le dernier tag. Détails : `changes/2026-07-10-changelog-versioning.md`.
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-17
+
+### Fixed
+
+- Correctifs issus de la relecture complète du thème — [`changes/2026-07-17-full-read-audit-fixes.md`](changes/2026-07-17-full-read-audit-fixes.md)
+
 ## [1.1.0] - 2026-07-16
 
 ### Added
@@ -64,6 +70,7 @@ existait déjà, mais sans changelog ni tag — ce point de départ les ancre.
 - XML sitemap rewrite — [`changes/2026-07-07-sitemap.md`](changes/2026-07-07-sitemap.md)
 - Deploy: stop shipping dev-only files to production — [`changes/2026-07-09-deploy-excludes.md`](changes/2026-07-09-deploy-excludes.md)
 
-[Unreleased]: https://github.com/ayoub21dev/Agence-Marketing-Digital-WPTheme/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/ayoub21dev/Agence-Marketing-Digital-WPTheme/compare/v1.1.1...HEAD
 [1.0.0]: https://github.com/ayoub21dev/Agence-Marketing-Digital-WPTheme/releases/tag/v1.0.0
 [1.1.0]: https://github.com/ayoub21dev/Agence-Marketing-Digital-WPTheme/compare/v1.0.0...v1.1.0
+[1.1.1]: https://github.com/ayoub21dev/Agence-Marketing-Digital-WPTheme/compare/v1.1.0...v1.1.1

@@ -1,6 +1,6 @@
 {
   "name": "agence-marketing-digital-theme",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "Build tooling for the Agence Marketing Digital WordPress theme (Tailwind CSS).",
   "scripts": {
