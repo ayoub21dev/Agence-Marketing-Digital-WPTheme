@@ -2610,6 +2610,7 @@ function v5_digital_render_section_preview() {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="<?php echo esc_url(get_template_directory_uri() . '/assets/css/tailwind.css?ver=' . $tw_ver); ?>">
     <link rel="stylesheet" href="<?php echo esc_url(get_template_directory_uri() . '/assets/css/theme-styles.css?ver=' . $css_ver); ?>">
+    <script>document.documentElement.classList.add('v5-motion-pending');</script>
     <style>
         /* Mirrors header.php's inline rule (tailwind only emits used utilities). */
         .hidden { display: none; }
@@ -2621,24 +2622,27 @@ function v5_digital_render_section_preview() {
            first rendered element, and give the frame a little breathing room. */
         body > *:first-child { margin-top: 0 !important; }
         body { padding-top: 1px; }
-        /* Mirrors header.php's FOUC-prevention rules exactly, so the real GSAP
-           entrance animation (loaded below) has the same hidden starting point
-           it has on the live site instead of flashing in unstyled. */
-        .hero-title, .section-label, main h1 + p, main .hero-title + p {
+        /* Mirrors header.php's pre-paint anti-flash guard (same class, same
+           release path: theme-scripts.js removes it at motion boot; same 1.2s
+           pure-CSS fail-safe). Selectors are NOT main-scoped here because a
+           previewed section renders as a bare <body> child with no <main>. */
+        html.v5-motion-pending .hero-title,
+        html.v5-motion-pending .section-label,
+        html.v5-motion-pending h1 + p,
+        html.v5-motion-pending .hero-title + p {
             opacity: 0;
+            animation: v5-guard-reveal 0.3s ease 1.2s forwards;
         }
-        .motion-enhanced .hero-title,
-        .motion-enhanced .section-label,
-        .motion-enhanced main h1 + p,
-        .motion-enhanced main .hero-title + p {
-            opacity: 1;
+        @media (prefers-reduced-motion: reduce) {
+            html.v5-motion-pending .hero-title,
+            html.v5-motion-pending .section-label,
+            html.v5-motion-pending h1 + p,
+            html.v5-motion-pending .hero-title + p {
+                opacity: 1;
+                animation: none;
+            }
         }
-        body:not(.motion-enhanced) .hero-title,
-        body:not(.motion-enhanced) .section-label,
-        body:not(.motion-enhanced) main h1 + p,
-        body:not(.motion-enhanced) main .hero-title + p {
-            opacity: 1;
-        }
+        @keyframes v5-guard-reveal { to { opacity: 1; } }
         .v5-preview-empty {
             font-family: Inter, system-ui, sans-serif;
             color: #64748b;

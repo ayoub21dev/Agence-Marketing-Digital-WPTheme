@@ -161,18 +161,31 @@ function initLogoMarquees() {
 function initMotionSystem() {
     motionState.reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (!canUseMotion()) return;
+    if (!canUseMotion()) {
+        // No GSAP (CDN failure) or reduced motion: release the pre-paint
+        // guard immediately so header.php's opacity:0 rules stop applying
+        // and content shows without waiting for the CSS fail-safe delay.
+        document.documentElement.classList.remove("v5-motion-pending");
+        return;
+    }
     if (motionState.initialized) return;
 
     motionState.initialized = true;
     document.body.classList.add("motion-enhanced");
+
+    // Release the pre-paint guard BEFORE building the entrance tweens, in the
+    // same synchronous block: gsap.from() captures its END values from the
+    // element's current computed style, so the guard's opacity:0 must already
+    // be gone here or the tweens would animate 0 -> 0 and strand content
+    // invisible. No paint can happen between this line and the tweens below.
+    document.documentElement.classList.remove("v5-motion-pending");
+
     gsap.defaults({ ease: "power3.out", duration: 0.45 });
 
     if (typeof ScrollTrigger !== "undefined") {
         gsap.registerPlugin(ScrollTrigger);
     }
 
-    // Hero entrance runs immediately (before first paint) to avoid any flash.
     animatePageEntrance();
 
     // The scroll-triggered setups create ScrollTriggers, which read element
@@ -198,8 +211,18 @@ function animatePageEntrance() {
     const heroItems = document.querySelectorAll("main .section-label, main h1 + p, main .hero-title + p");
     const tl = gsap.timeline();
 
-    if (header) {
+    // The sticky header is NOT covered by the pre-paint guard (hiding the nav
+    // until JS runs would feel broken), so a from() here blinks it off/on —
+    // acceptable once as an intro, unbearable on every page switch. Play it
+    // only on the first page of the session; storage failure = skip (no blink).
+    let playHeaderIntro = false;
+    try {
+        playHeaderIntro = !sessionStorage.getItem("v5_header_intro_played");
+    } catch (e) { /* private mode: skip */ }
+
+    if (header && playHeaderIntro) {
         tl.from(header, { y: -12, autoAlpha: 0, duration: 0.28 });
+        try { sessionStorage.setItem("v5_header_intro_played", "1"); } catch (e) { /* ignore */ }
     }
 
     if (heroTitle) {

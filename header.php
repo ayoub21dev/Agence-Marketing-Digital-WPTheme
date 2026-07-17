@@ -37,26 +37,39 @@
         };
     </script>
 
+    <!-- Anti-flash guard. The class is added SYNCHRONOUSLY, before first paint,
+         which is the only way the guard can actually work: keying it on
+         body.motion-enhanced (added at DOMContentLoaded) meant content painted
+         visible, then GSAP's from() snapped it invisible and animated it back —
+         a visible appear→vanish→fade flash on every page navigation. -->
+    <script>document.documentElement.classList.add('v5-motion-pending');</script>
     <style>
         .hidden { display: none; }
-        /* Prevent GSAP flash of unstyled elements */
-        .hero-title, .section-label, main h1 + p, main .hero-title + p {
+        /* Hide entrance targets only when JS is confirmed running (the class
+           above never gets added for no-JS visitors and crawlers, so nothing
+           is ever hidden from them). initMotionSystem() removes the class
+           synchronously right before it builds the GSAP entrance, so the
+           from() tweens capture opacity:1 as their end state. The delayed
+           pure-CSS animation is the fail-safe: if the motion boot never runs
+           (CDN outage, script error), content still reveals on its own. */
+        html.v5-motion-pending main .hero-title,
+        html.v5-motion-pending main .section-label,
+        html.v5-motion-pending main h1 + p,
+        html.v5-motion-pending main .hero-title + p {
             opacity: 0;
+            animation: v5-guard-reveal 0.3s ease 1.2s forwards;
         }
-        /* When motion system loads, it adds .motion-enhanced to body */
-        .motion-enhanced .hero-title, 
-        .motion-enhanced .section-label, 
-        .motion-enhanced main h1 + p, 
-        .motion-enhanced main .hero-title + p {
-            opacity: 1;
+        /* Reduced-motion users get no entrance animations — never hide. */
+        @media (prefers-reduced-motion: reduce) {
+            html.v5-motion-pending main .hero-title,
+            html.v5-motion-pending main .section-label,
+            html.v5-motion-pending main h1 + p,
+            html.v5-motion-pending main .hero-title + p {
+                opacity: 1;
+                animation: none;
+            }
         }
-        /* Fallback for no JS or reduced motion */
-        body:not(.motion-enhanced) .hero-title,
-        body:not(.motion-enhanced) .section-label,
-        body:not(.motion-enhanced) main h1 + p,
-        body:not(.motion-enhanced) main .hero-title + p {
-            opacity: 1;
-        }
+        @keyframes v5-guard-reveal { to { opacity: 1; } }
     </style>
     <?php wp_head(); ?>
 </head>
