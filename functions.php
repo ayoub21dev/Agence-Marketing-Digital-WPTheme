@@ -161,6 +161,20 @@ function v5_digital_register_cpts() {
         return;
     }
 
+    // This fallback only runs when ACF is deactivated. Its rewrite/visibility
+    // args MUST mirror the four load-bearing flags in acf-json/post_type_*.json
+    // (publicly_queryable:false, rewrite:false, query_var:false, with_front:false,
+    // exclude_from_search:true except agency) — otherwise deactivating ACF
+    // silently re-exposes the CPTs at public URLs and undoes the soft-404
+    // hardening documented in CLAUDE.md.
+    $v5_cpt_hardening = array(
+        'publicly_queryable'  => false,
+        'exclude_from_search' => true,
+        'rewrite'             => false,
+        'query_var'           => false,
+        'has_archive'         => false,
+    );
+
     // Partner Logos
     register_post_type('partner_logo', array(
         'labels' => array(
@@ -177,11 +191,10 @@ function v5_digital_register_cpts() {
             'not_found_in_trash' => __('Aucun logo partenaire trouvé dans la corbeille', 'agence-marketing-digital'),
         ),
         'public' => true,
-        'has_archive' => false,
         'supports' => array('title'),
         'menu_icon' => 'dashicons-format-image',
         'show_in_rest' => true,
-    ));
+    ) + $v5_cpt_hardening);
 
     // Stat Metrics
     register_post_type('stat_metric', array(
@@ -199,11 +212,10 @@ function v5_digital_register_cpts() {
             'not_found_in_trash' => __('Aucune statistique trouvée dans la corbeille', 'agence-marketing-digital'),
         ),
         'public' => true,
-        'has_archive' => false,
         'supports' => array('title', 'page-attributes'),
         'menu_icon' => 'dashicons-chart-bar',
         'show_in_rest' => true,
-    ));
+    ) + $v5_cpt_hardening);
 
     // Specialty Hubs
     register_post_type('specialty_hub', array(
@@ -221,11 +233,10 @@ function v5_digital_register_cpts() {
             'not_found_in_trash' => __('Aucune spécialité trouvée dans la corbeille', 'agence-marketing-digital'),
         ),
         'public' => true,
-        'has_archive' => false,
         'supports' => array('title'),
         'menu_icon' => 'dashicons-category',
         'show_in_rest' => true,
-    ));
+    ) + $v5_cpt_hardening);
 
     // Agencies
     register_post_type('agency', array(
@@ -242,11 +253,15 @@ function v5_digital_register_cpts() {
             'not_found' => __('Aucune agence trouvée', 'agence-marketing-digital'),
         ),
         'public' => true,
-        'has_archive' => true,
         'supports' => array('title', 'editor', 'excerpt'),
         'menu_icon' => 'dashicons-businessman',
         'taxonomies' => array('agency_service', 'agency_city'),
-    ));
+        // agency alone keeps exclude_from_search:false — taxonomy archives run a
+        // WP_Query resolved through get_post_types(['exclude_from_search'=>false]);
+        // true here would silently empty /service/… and /city/…. Site search is
+        // handled by v5_digital_exclude_cpts_from_search() (§5c-ter) instead.
+        'exclude_from_search' => false,
+    ) + $v5_cpt_hardening);
 
     // Register Services Taxonomy
     register_taxonomy('agency_service', 'agency', array(
@@ -266,7 +281,9 @@ function v5_digital_register_cpts() {
         'show_ui' => true,
         'show_admin_column' => true,
         'show_in_rest' => true,
-        'rewrite' => array('slug' => 'service'),
+        // with_front:false matches acf-json — the blog permalink base is
+        // /blog/%postname%/, so with_front:true would nest /blog/service/….
+        'rewrite' => array('slug' => 'service', 'with_front' => false),
     ));
 
     // Register Cities Taxonomy
@@ -287,7 +304,7 @@ function v5_digital_register_cpts() {
         'show_ui' => true,
         'show_admin_column' => true,
         'show_in_rest' => true,
-        'rewrite' => array('slug' => 'city'),
+        'rewrite' => array('slug' => 'city', 'with_front' => false),
     ));
 
     // Testimonials CPT
@@ -306,11 +323,10 @@ function v5_digital_register_cpts() {
             'not_found_in_trash' => __('Aucun témoignage trouvé dans la corbeille', 'agence-marketing-digital'),
         ),
         'public' => true,
-        'has_archive' => false,
         'supports' => array('title', 'editor'),
         'menu_icon' => 'dashicons-testimonial',
         'show_in_rest' => true,
-    ));
+    ) + $v5_cpt_hardening);
 
 }
 
@@ -4886,6 +4902,18 @@ function v5_digital_ui_strings() {
         // Matchmaker lead wizard
         'Matchmaker',
         'Trouvez votre agence idéale',
+        // Matchmaker step-1 fallback service labels (shown only when the
+        // agency_service taxonomy has no terms — values stay untranslated on
+        // purpose, /annuaire/ filters match on them)
+        'SEO (Référencement naturel)',
+        'Publicité Payante (Ads)',
+        'Réseaux Sociaux / Influence',
+        'Création & Design Web',
+        // Matchmaker step-2 budget ranges
+        '5 000 MAD – 15 000 MAD',
+        '15 000 MAD – 50 000 MAD',
+        '50 000 MAD – 100 000 MAD',
+        'Plus de 100 000 MAD',
         '2 questions · 30 secondes',
         '1. Quel service recherchez-vous ?',
         'Étape suivante',
@@ -4903,6 +4931,8 @@ function v5_digital_ui_strings() {
         // Blog / article meta
         'Par',
         'retour aux articles',
+        'Accueil',
+        '5 min de lecture',
         'Logo de %s',
         'Analyses Éditoriales',
         'Visiter le Site',
@@ -4928,6 +4958,8 @@ function v5_digital_ui_strings() {
         // Blog listing (blog_posts_grid_section)
         'Pagination des articles',
         // 404 page
+        '404 · Page introuvable',
+        'Lire',
         'Cette page s\'est égarée.',
         'Le lien est peut-être rompu ou la page a été déplacée. Pas d\'inquiétude — voici quelques pistes pour retrouver votre chemin.',
         'Retour à l\'accueil',
@@ -4957,6 +4989,9 @@ function v5_digital_ui_strings() {
         // Fallback shown when the AMD Contact Forms plugin is inactive
         'Le formulaire est momentanément indisponible. Écrivez-nous directement par email :',
         'Envoyer un email',
+        // Front page fallback (shown only when the page has no layout rows)
+        'Bienvenue sur Agence Marketing Digital',
+        'Veuillez modifier cette page dans le tableau de bord d\'administration pour ajouter des mises en page flexibles ou activer le thème pour déclencher l\'initialisation automatique.',
     );
 }
 
@@ -5202,7 +5237,10 @@ function v5_digital_menu_item_is_active($item) {
     if ($item_url === $current_url || ($item_url === rtrim(home_url(), '/') && is_front_page())) {
         return true;
     }
-    if (strpos($item_url, '/blog') !== false && (is_post_type_archive('blog') || is_singular('blog') || is_page('blog'))) {
+    // Articles live at /blog/%postname%/ as core posts — the old 'blog' CPT was
+    // migrated to posts (see v5_digital_migrate_blog_cpt_to_posts), so a menu
+    // "Blog" item must light up on is_singular('post'), not the unregistered CPT.
+    if (strpos($item_url, '/blog') !== false && (is_singular('post') || is_home() || is_page('blog'))) {
         return true;
     }
     return false;
@@ -5214,7 +5252,7 @@ function v5_digital_nav_fallback_is_active($check) {
         case 'front':
             return is_front_page();
         case 'blog':
-            return is_page('blog') || is_home() || is_singular('blog') || is_post_type_archive('blog') || is_singular('post');
+            return is_page('blog') || is_home() || is_singular('post');
         default:
             return is_page($check);
     }
@@ -5236,7 +5274,7 @@ function v5_digital_nav_fallback_is_active($check) {
 // Priority 99 so it runs after ACF has registered the CPTs/taxonomies on `init`.
 // Soft flush ($hard = false): CPT/taxonomy rules live in the DB option, never in
 // .htaccess — and Studio/nginx have no .htaccess to write anyway.
-define('V5_DIGITAL_REWRITE_VERSION', '2026-07-10-cpt-urls');
+define('V5_DIGITAL_REWRITE_VERSION', '2026-07-17-fallback-hardening');
 
 add_action('init', 'v5_digital_flush_rewrites_once', 99);
 function v5_digital_flush_rewrites_once() {

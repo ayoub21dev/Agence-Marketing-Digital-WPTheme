@@ -55,7 +55,7 @@ $suggested = new WP_Query(array(
     <section class="err-hero relative z-10">
         <div class="relative z-10 max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-20 md:py-24 text-center">
 
-            <span class="section-label text-slate-500 mb-4 block">404 · Page introuvable</span>
+            <span class="section-label text-slate-500 mb-4 block"><?php echo esc_html(v5_t('404 · Page introuvable')); ?></span>
 
             <!-- Wired into the home hero's real animation hook:
                  .hero-focus-word gives the 0 the same blue scale-in + colour
@@ -117,7 +117,7 @@ $suggested = new WP_Query(array(
                 <?php
                 while ($suggested->have_posts()) : $suggested->the_post();
                     $badge      = v5_digital_get_post_badge(get_the_ID(), 'Guide');
-                    $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
+                    $read_time  = v5_digital_get_field('read_time') ?: v5_t('5 min de lecture');
 
                     $cover_image = has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'large') : '';
                     if (!$cover_image) $cover_image = v5_digital_get_field('cover_image_media');
@@ -145,7 +145,7 @@ $suggested = new WP_Query(array(
                                     <?php echo esc_html(v5_digital_get_field('author_name') ?: get_the_author()); ?>
                                 </span>
                                 <span class="text-[12.5px] font-bold text-brand-600 hover:text-brand-700 transition-colors font-mono flex items-center gap-1">
-                                    <span>Lire</span>
+                                    <span><?php echo esc_html(v5_t('Lire')); ?></span>
                                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-brand-500"></i>
                                 </span>
                             </div>

@@ -11,6 +11,14 @@ $primary_text   = v5_get_field_default('primary_text', 'Lire la méthodologie');
 $primary_link   = v5_get_field_default('primary_link', '/methodologie/');
 $secondary_text = v5_get_field_default('secondary_text', 'Nous contacter');
 $secondary_link = v5_get_field_default('secondary_link', '/contact/');
+
+// Anything that already carries a scheme (https:, mailto:, tel:, …) or is
+// protocol-relative (//host) must pass through untouched — home_url() would
+// prefix the site URL and produce a broken link. Only site-relative paths get
+// resolved against home_url(). esc_url() at the call sites still sanitizes.
+$v5_about_cta_url = function ($link) {
+    return preg_match('#^([a-z][a-z0-9+.\-]*:|//)#i', (string) $link) ? $link : home_url($link);
+};
 ?>
 
 <style>
@@ -86,13 +94,13 @@ if ($has_eyebrow || $has_title || $has_desc || $has_primary || $has_secondary) :
         </div>
         <div class="flex flex-col sm:flex-row gap-3 shrink-0">
             <?php if ($has_primary) : ?>
-                <a href="<?php echo esc_url(home_url($primary_link)); ?>" class="method-button primary">
+                <a href="<?php echo esc_url($v5_about_cta_url($primary_link)); ?>" class="method-button primary">
                     <span><?php echo esc_html($primary_text); ?></span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
             <?php endif; ?>
             <?php if ($has_secondary) : ?>
-                <a href="<?php echo esc_url(home_url($secondary_link)); ?>" class="method-button secondary">
+                <a href="<?php echo esc_url($v5_about_cta_url($secondary_link)); ?>" class="method-button secondary">
                     <span><?php echo esc_html($secondary_text); ?></span>
                     <i data-lucide="mail" class="w-4 h-4"></i>
                 </a>

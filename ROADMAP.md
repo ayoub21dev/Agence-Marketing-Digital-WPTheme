@@ -10,6 +10,11 @@ Not committed work — a place to capture ideas before they become tasks.
 
 ### 1. Live preview when selecting a section
 
+> **✅ Shipped** (2026-07-08/09) — eye button on every picker card and row toolbar,
+> live iframe preview modal, per-page section grouping, "utilisée" badge.
+> See `changes/2026-07-08-section-preview.md` and
+> `changes/2026-07-09-page-builder-section-groups.md`.
+
 Give editors a visual preview of each section as they pick it in the page
 builder, so they see the result *before* saving.
 
@@ -21,6 +26,11 @@ builder, so they see the result *before* saving.
   admin script + a preview image per `template-parts/layouts/*` file.
 
 ### 2. Conditional fields in the section selector
+
+> **◑ Partially shipped** (2026-07-09) — the duplicate-section warning and the
+> single-category/show_filters notice both exist as admin JS (see §2 of
+> `functions.php`). Still open: the on-page filter listing only the *selected*
+> categories instead of all of them.
 
 Show/hide fields based on context so only relevant settings appear.
 
@@ -54,6 +64,11 @@ reusable block.
 
 ### 4. Global options page
 
+> **✅ Shipped** — the ACF "Site Settings" options page exists
+> (`acf-json/group_site_settings.json`, registered in `functions.php`):
+> contact email, office address, social URLs, footer description. Consumed by
+> `footer.php` and the contact_form layout.
+
 Add a central admin screen for site-wide info that isn't tied to any single
 page.
 
@@ -70,6 +85,11 @@ page.
   are intentionally local.
 
 ### 5. Back-office language: French by default, switchable to English per user
+
+> **✅ Shipped** (2026-07-09) — including dynamic translation of the whole ACF
+> admin (field labels, layout names) per admin profile language. See
+> `changes/2026-07-09-admin-language.md` and
+> `changes/2026-07-09-acf-admin-translation.md`.
 
 Ship the wp-admin back-office in French by default, while letting each
 individual editor switch their own admin interface to English — independent
@@ -108,9 +128,9 @@ CSS/JS variable names in the theme, rather than leaving them bare.
 - **Notes:** `functions.php`-side code already sets a namespace precedent —
   `v5_digital_get_field()`, `v5_digital_get_primary_menu_items()` — worth
   reusing that same `v5-digital` root for CSS/JS instead of inventing a
-  second convention. Decide and document this before Phase 2 of
-  `REBUILD-PLAN.md` starts producing layout markup that would need
-  retrofitting later.
+  second convention. Decide and document this before the Rhillane multisite
+  rebuild (separate project, its own repo/plan) starts producing layout
+  markup that would need retrofitting later.
 
 ---
 
@@ -127,6 +147,12 @@ Replace the flat header nav with a mega menu.
   behaviour. Touches `header.php` + `theme-scripts.js`.
 
 ### 8. Exit-intent pop-up modal
+
+> **✅ Shipped** (2026-07-08) — newsletter capture on article pages only,
+> desktop mouseout + mobile scroll-up + "retour aux articles" triggers, once
+> per session, suppressed after subscribing. See
+> `changes/2026-07-08-exit-intent-popup.md`. Note: the form is still
+> front-end only — no server-side storage yet (see parking lot).
 
 Show a modal when a visitor is about to leave the page.
 
@@ -204,3 +230,12 @@ accessibility, then recommend which to implement and how.
 ## Ideas parking lot
 
 _Add loose ideas here before they're fleshed out._
+
+- **Form backends** — the newsletter band, exit-intent popup, and matchmaker
+  wizard all collect input but store nothing server-side (submits are
+  cosmetic). Needs storage, an admin view, spam protection, and GDPR
+  handling — one shared solution for all three.
+- **Matchmaker entry point** — the wizard is fully built (modal, steps,
+  i18n) but nothing on the site calls `openMatchmaker()`; it is currently
+  unreachable by visitors. Same for the Ctrl/Cmd+K search palette: no
+  visible button opens it, and its results are hardcoded placeholder data.

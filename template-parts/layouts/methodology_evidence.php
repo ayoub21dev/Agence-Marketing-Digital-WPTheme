@@ -21,9 +21,38 @@ if ($has_label || $has_title || $evidence_rows === null || $has_rows) :
         --ink: #101418;
         --muted: #66717f;
         --blue: #2463eb;
-        
+
         padding: clamp(32px, 4vw, 52px) 0;
         background: #ffffff;
+    }
+    /* Scoped copies of the shared method-page rules (methodology_process.php
+       declares the unscoped originals — every value here must stay identical
+       to that file's, including the 640px override: these scoped rules out-
+       rank the unscoped ones, so a drift would misalign the sections when
+       both are on the same page). Without these, this section loses its
+       width constraint and title/label styling when placed on a page WITHOUT
+       the process section — same standalone-rendering pattern as
+       newsletter_cta's .blog-grid-wrap copy. */
+    .blg-evidence-section .method-wrap {
+        width: min(1200px, calc(100% - 40px));
+        margin: 0 auto;
+    }
+    .blg-evidence-section .section-label {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+    .blg-evidence-section .section-title {
+        font-size: clamp(24px, 3vw, 38px);
+        line-height: 1.15;
+        font-weight: 800;
+        color: var(--ink);
+    }
+    @media (max-width: 640px) {
+        .blg-evidence-section .method-wrap { width: min(100% - 28px, 1180px); }
     }
     .evidence-layout {
         display: grid;

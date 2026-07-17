@@ -86,7 +86,7 @@ get_header();
             $badge = v5_digital_get_post_badge(get_the_ID(), 'Guide');
             
             $read_time = v5_digital_get_field('read_time');
-            if (!$read_time) $read_time = '5 min de lecture';
+            if (!$read_time) $read_time = v5_t('5 min de lecture');
             
             $author = get_the_author() ?: (v5_digital_get_field('author_name') ?: 'Rédaction');
 
@@ -106,9 +106,9 @@ get_header();
                     <!-- Breadcrumbs & Back -->
                     <div class="flex items-center justify-between mb-5">
                         <div class="flex items-center gap-1.5 text-[12px] text-slate-500 font-mono">
-                            <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url(home_url('/')); ?>">Accueil</a>
+                            <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url(home_url('/')); ?>"><?php echo esc_html(v5_t('Accueil')); ?></a>
                             <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                            <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url($blog_url); ?>">Blog</a>
+                            <a class="cursor-pointer hover:text-slate-900" href="<?php echo esc_url($blog_url); ?>"><?php echo esc_html(v5_t('Blog')); ?></a>
                             <i data-lucide="chevron-right" class="w-3 h-3"></i>
                             <span class="text-slate-900 font-semibold truncate max-w-[150px] sm:max-w-xs"><?php the_title(); ?></span>
                         </div>

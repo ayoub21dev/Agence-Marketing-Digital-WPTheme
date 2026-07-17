@@ -53,8 +53,8 @@ if ($picks_count === 1) {
     $grid_cols_class = 'md:grid-cols-2 lg:grid-cols-4';
 }
 
-if (!function_exists('theme_render_stars_html')) {
-    function theme_render_stars_html($rating) {
+if (!function_exists('v5_digital_render_stars_html')) {
+    function v5_digital_render_stars_html($rating) {
         $html = '';
         $floor = floor($rating);
         for ($i = 1; $i <= 5; $i++) {
@@ -133,7 +133,7 @@ if (!function_exists('theme_render_stars_html')) {
                                 <div class="min-w-0">
                                     <h3 class="font-bold text-[15px] text-slate-900 font-display truncate"><?php the_title(); ?></h3>
                                     <div class="flex items-center gap-1">
-                                        <?php echo theme_render_stars_html($rating ? $rating : 4.5); ?>
+                                        <?php echo v5_digital_render_stars_html($rating ? $rating : 4.5); ?>
                                         <span class="text-[13px] font-semibold text-slate-700 font-mono"><?php echo esc_html($rating ? $rating : '4.5'); ?></span>
                                         <span class="text-[11px] text-slate-500 font-mono">(<?php echo esc_html($reviews ? $reviews : '10'); ?>)</span>
                                     </div>

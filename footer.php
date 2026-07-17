@@ -69,11 +69,13 @@ if (taxonomy_exists('agency_service')) {
     }
 }
 if (empty($matchmaker_services)) {
+    // Labels are translatable; the values are NOT — /annuaire/'s filtering
+    // matches on these exact value strings.
     $matchmaker_services = array(
-        array('value' => 'SEO', 'label' => 'SEO (Référencement naturel)'),
-        array('value' => 'Paid Ads', 'label' => 'Publicité Payante (Ads)'),
-        array('value' => 'Social Media', 'label' => 'Réseaux Sociaux / Influence'),
-        array('value' => 'Web Design', 'label' => 'Création & Design Web'),
+        array('value' => 'SEO', 'label' => v5_t('SEO (Référencement naturel)')),
+        array('value' => 'Paid Ads', 'label' => v5_t('Publicité Payante (Ads)')),
+        array('value' => 'Social Media', 'label' => v5_t('Réseaux Sociaux / Influence')),
+        array('value' => 'Web Design', 'label' => v5_t('Création & Design Web')),
     );
 }
 ?>
@@ -234,19 +236,19 @@ if (empty($matchmaker_services)) {
                 <p class="text-[13px] font-semibold text-slate-500 mb-3 uppercase tracking-wider"><?php echo esc_html(v5_t('2. Quel est votre budget mensuel ?')); ?></p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 step-options">
                     <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="small">
-                        <span>5 000 MAD – 15 000 MAD</span>
+                        <span><?php echo esc_html(v5_t('5 000 MAD – 15 000 MAD')); ?></span>
                         <i data-lucide="check" class="w-4 h-4 text-brand-600 hidden select-check-icon"></i>
                     </button>
                     <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="medium">
-                        <span>15 000 MAD – 50 000 MAD</span>
+                        <span><?php echo esc_html(v5_t('15 000 MAD – 50 000 MAD')); ?></span>
                         <i data-lucide="check" class="w-4 h-4 text-brand-600 hidden select-check-icon"></i>
                     </button>
                     <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="large">
-                        <span>50 000 MAD – 100 000 MAD</span>
+                        <span><?php echo esc_html(v5_t('50 000 MAD – 100 000 MAD')); ?></span>
                         <i data-lucide="check" class="w-4 h-4 text-brand-600 hidden select-check-icon"></i>
                     </button>
                     <button class="step-option-btn text-left p-3 border border-slate-200 rounded-xl text-[13px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-semibold cursor-pointer transition-all flex items-center justify-between" data-value="enterprise">
-                        <span>Plus de 100 000 MAD</span>
+                        <span><?php echo esc_html(v5_t('Plus de 100 000 MAD')); ?></span>
                         <i data-lucide="check" class="w-4 h-4 text-brand-600 hidden select-check-icon"></i>
                     </button>
                 </div>

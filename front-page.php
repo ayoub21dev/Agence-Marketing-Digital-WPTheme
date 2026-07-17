@@ -21,8 +21,8 @@ if (have_posts()) :
                 // Fallback message if no layout rows are populated
                 ?>
                 <div class="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-20 text-center" style="margin-block: 100px;">
-                    <h2 class="font-display text-[1.75rem] font-bold text-slate-900 leading-tight mb-3">Bienvenue sur Agence Marketing Digital</h2>
-                    <p class="text-slate-500 max-w-md mx-auto mt-2">Veuillez modifier cette page dans le tableau de bord d'administration pour ajouter des mises en page flexibles ou activer le thème pour déclencher l'initialisation automatique.</p>
+                    <h2 class="font-display text-[1.75rem] font-bold text-slate-900 leading-tight mb-3"><?php echo esc_html(v5_t('Bienvenue sur Agence Marketing Digital')); ?></h2>
+                    <p class="text-slate-500 max-w-md mx-auto mt-2"><?php echo esc_html(v5_t('Veuillez modifier cette page dans le tableau de bord d\'administration pour ajouter des mises en page flexibles ou activer le thème pour déclencher l\'initialisation automatique.')); ?></p>
                 </div>
                 <?php
             endif;

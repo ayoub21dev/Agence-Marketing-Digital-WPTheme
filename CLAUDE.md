@@ -116,6 +116,7 @@ both public. Their archives render through the `index.php` fallback.
 - `group_blog_meta` (post) — badge, read_time, author_name, cover_image_url/media
 - `group_blog_content` (post) — `blog_layouts` flexible content → `agency_reviews_block` (repeater of agency reviews)
 - `group_homepage_fields` (pages) — **`page_layouts` flexible content**, the page builder (see below)
+- `group_site_settings` (options page) — the ACF Pro **"Site Settings"** admin screen (`acf_add_options_page`, slug `site-settings`, §2 of functions.php): contact_email, office_title/address/city, social URLs, footer_description. Read via `v5_digital_get_field('…', 'option')`; `v5_digital_get_dynamic_email()` resolves contact_email → contact@&lt;domain&gt; fallback. Its labels are English on purpose (unlike every other group).
 
 ---
 
@@ -143,7 +144,7 @@ endwhile;
 ```
 So **ACF layout `foo_section` ⇒ file `template-parts/layouts/foo.php`.** To add a section: add the layout to the `page_layouts` flexible-content group (in ACF UI / JSON) AND create the matching `template-parts/layouts/<name>.php`.
 
-**Layout files** (`template-parts/layouts/`): hero, common_hero, stats_band, search_filter, logos_band, challenge, approach, outcomes, picks, specialties, guides, blog_posts_grid, footer_cta, contact_form, newsletter_cta, methodology_process, methodology_evidence, methodology_monitor, about_grid, about_cta. Many query CPTs directly (picks→agency, specialties→specialty_hub, stats_band→stat_metric, logos_band→partner_logo, outcomes→testimonial) and have static fallbacks when empty.
+**Layout files** (`template-parts/layouts/`, 21 files): hero, common_hero, stats_band, search_filter, logos_band, challenge, approach, outcomes, picks, specialties, guides, blog_posts_grid, footer_cta, contact_form, newsletter_cta, methodology_process, methodology_evidence, methodology_monitor, about_grid, about_cta, form (generic AMD Contact Forms embed — renders nothing when the plugin is inactive). Many query CPTs directly (picks→agency, specialties→specialty_hub, stats_band→stat_metric, logos_band→partner_logo, outcomes→testimonial) and have static fallbacks when empty.
 
 ### Navigation
 - **Header menu:** `v5_digital_get_primary_menu_items()` reads the WP menu on the `primary` location (Polylang-aware), with `v5_digital_nav_fallback_links()` as a hardcoded fallback (accueil, blog, à propos, méthodologie, contact). Menus are **DB content**, so local ≠ production unless each site's menu matches.

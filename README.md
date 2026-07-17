@@ -91,7 +91,7 @@ Le thème utilise un système de dispatch automatique. Tout bloc ajouté dans l'
 ### 2. Installation
 Cloner le dépôt dans votre dossier de thèmes WordPress (`wp-content/themes/`) :
 ```bash
-git clone https://github.com/BENYEKHLEF-Anouar/Agence-Marketing-Digital-WPTheme.git agence-marketing-digital
+git clone https://github.com/ayoub21dev/Agence-Marketing-Digital-WPTheme.git agence-marketing-digital
 cd agence-marketing-digital
 ```
 

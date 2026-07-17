@@ -433,7 +433,7 @@ uasort($blog_categories, function ($a, $b) {
                     while ($blog_query->have_posts()) : $blog_query->the_post();
 
                         $badge      = v5_digital_get_post_badge(get_the_ID(), 'Guide');
-                        $read_time  = v5_digital_get_field('read_time') ?: '5 min de lecture';
+                        $read_time  = v5_digital_get_field('read_time') ?: v5_t('5 min de lecture');
                         $author     = get_the_author() ?: v5_digital_get_field('author_name');
 
                         // Cover image priority: featured image -> legacy ACF media/URL fields. Empty means no image.
@@ -461,7 +461,9 @@ uasort($blog_categories, function ($a, $b) {
                         }
 
                         $excerpt = get_the_excerpt();
-                        if (strlen($excerpt) > 115) $excerpt = substr($excerpt, 0, 115) . '…';
+                        // mb_*: a byte-based substr can cut an accented French
+                        // character in half and emit a broken � glyph.
+                        if (mb_strlen($excerpt) > 115) $excerpt = mb_substr($excerpt, 0, 115) . '…';
                         ?>
                         <article class="blg-article-card blg-post-item"
                                  data-badge="<?php echo esc_attr($badge); ?>"
